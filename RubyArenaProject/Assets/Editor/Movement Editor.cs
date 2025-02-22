@@ -1,0 +1,24 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEditor;
+
+[CustomEditor(typeof(Movement))]
+public class MovementEditor : Editor
+{
+    public override void OnInspectorGUI()
+    {
+        // Draw the default inspector
+        DrawDefaultInspector();
+
+        // Get a reference to the script
+        Movement myScript = (Movement)target;
+
+        // Add a button to the Inspector
+        if (GUILayout.Button("Switch Camera Style "))
+        {
+            // Call the function
+            myScript.SwitchCameraStyle();
+        }
+    }
+}
