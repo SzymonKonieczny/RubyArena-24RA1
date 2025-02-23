@@ -13,14 +13,18 @@ public class PlayerAnimationScript : NetworkBehaviour
     {
         Rb = GetComponent<Rigidbody>();
         PlayerMove = GetComponent<Movement>();
-    }
 
+    }
+    public void setAnimatorField(Animator ani)
+    {
+        animator = ani;
+    }
     // Update is called once per frame
     void Update()
     {
         velo = PlayerMove.RbVelocityNetworkVar.Value.magnitude;
 
-        animator.SetFloat("Velocity", velo);
+       animator.SetFloat("Velocity", velo);
     }
     public void PlayState(string stateName)
     {

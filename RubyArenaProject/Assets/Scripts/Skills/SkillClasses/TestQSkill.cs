@@ -32,9 +32,6 @@ public class TestQSkill : BaseSkillEntityBehaviorSkillShot //make it into a base
 
     }
 
-   
-  
-
     [ClientRpc]
     void DamageThePlayerClientRpc(ulong NetworkObjID)
     {
@@ -43,7 +40,12 @@ public class TestQSkill : BaseSkillEntityBehaviorSkillShot //make it into a base
         {
             if (networkObject.IsOwner)
             {
-                networkObject.transform.position = new Vector3(0, 5, 0);
+               Vector3 force =  (networkObject.transform.position - transform.position).TimesVector(new Vector3(1, 0,1).normalized)
+                    * 5 + new Vector3(0,80,0);
+                Debug.LogWarning($"hit + {networkObject.name}");
+                networkObject.GetComponent<Movement>().AddNetworkRbForceClientRPC(force);
+                // networkObject.transform.position = new Vector3(0, 5, 0);
+
             }
         }
     }

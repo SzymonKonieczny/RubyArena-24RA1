@@ -21,13 +21,14 @@ public class Movement : NetworkBehaviour
 
      Transform cameraPos;
     [SerializeField] Transform Model;
-    [SerializeField] Transform CombatLookAt;
     [SerializeField] Transform Orientation;
     [SerializeField] Transform UpwardTorsoBone;
     [SerializeField] PlayerOrientationModes OrientationMode = PlayerOrientationModes.Walking;
     public NetworkVariable<Vector3> RbVelocityNetworkVar = new NetworkVariable<Vector3>(writePerm: NetworkVariableWritePermission.Owner);
     PlayerResources playerResources;
     private Vector3 RequestedVelocityToAdd = new Vector3(); //Vector of velocity requested by the server to add to this Rb
+    private Vector3 RequestedForceToAdd = new Vector3(); //Vector of velocity requested by the server to add to this Rb
+
     private InputCollectorScript InputCollector;
     private Rigidbody Rb;
     private PlayerScript playerScript;
@@ -76,7 +77,11 @@ public class Movement : NetworkBehaviour
     {
         RequestedVelocityToAdd += vel;
     }
-
+    [ClientRpc]
+    public void AddNetworkRbForceClientRPC(Vector3 force)
+    {
+        RequestedForceToAdd += force;
+    }
     void FixedUpdate()
     {
         if (playerScript.isStunnedNetworkVar.Value) return;
@@ -151,6 +156,13 @@ public class Movement : NetworkBehaviour
         velocity.y = Rb.velocity.y;
         Rb.velocity = velocity;
         RbVelocityNetworkVar.Value = velocity;
+
+        if(RequestedForceToAdd != Vector3.zero)
+        {
+            Rb.AddForce(RequestedForceToAdd);
+
+            RequestedForceToAdd = Vector3.zero;
+        }
     }
 
     void OnCollisionEnter(Collision collision)

@@ -19,7 +19,6 @@ public class PlayerCombatManager : NetworkBehaviour
     [SerializeField] float SkillCooldown = 0;
     InputCollectorScript InputCollector;
     PlayerScript playerScript;
-    [SerializeField] Transform CombatLookAt;
     [SerializeField] Transform SkillshotSpawnPoint;
 
     [SerializeField] PlayerAnimationScript animationScript;
@@ -58,7 +57,7 @@ public class PlayerCombatManager : NetworkBehaviour
 
     }
 
-    private void OnDrawGizmos()
+   /* private void OnDrawGizmos()
     {
         var ray = Camera.main.ScreenPointToRay(new Vector3((float)Screen.width / 2f, (float)Screen.height / 2f));
         Physics.Raycast(ray, out RaycastHit raycastHit);
@@ -72,7 +71,7 @@ public class PlayerCombatManager : NetworkBehaviour
 
         Gizmos.color = Color.blue;
         Gizmos.DrawRay(ray.origin, SkillDir);
-    }
+    }*/
     // Update is called once per frame
     void Update()
     {
