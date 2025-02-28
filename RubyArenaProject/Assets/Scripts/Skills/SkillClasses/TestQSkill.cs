@@ -33,10 +33,9 @@ public class TestQSkill : BaseSkillEntityBehaviorSkillShot //make it into a base
     }
 
     [ClientRpc]
-    void DamageThePlayerClientRpc(ulong NetworkObjID)
+    void MovePlayerAroundClientRPC(ulong networkObjectID)
     {
-
-        if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(NetworkObjID, out NetworkObject networkObject))
+        if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(networkObjectID, out NetworkObject networkObject))
         {
             if (networkObject.IsOwner)
             {
@@ -80,7 +79,13 @@ public class TestQSkill : BaseSkillEntityBehaviorSkillShot //make it into a base
         if(Object!= null)
         {
             Debug.Log("PlayerHit");
-            DamageThePlayerClientRpc(Object.NetworkObjectId);
+            if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(Object.NetworkObjectId, out NetworkObject networkObject))
+            {
+                MovePlayerAroundClientRPC(networkObject.NetworkObjectId);
+                var playerRes =  networkObject.GetComponent<PlayerResources>();
+                playerRes.damage(SkillDataSO.damage);
+            }
+
         }
         StartCoroutine(DestroyCoroutine(2f));
     }

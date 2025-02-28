@@ -35,14 +35,14 @@ public class PlayerCombatManager : NetworkBehaviour
         animationScript = GetComponent<PlayerAnimationScript>();
         playerMove = GetComponent<Movement>();
         NetworkObject = GetComponent<NetworkObject>();
-        Skill1 = Skill1SO.Type switch
-        {
-            SkillType.EntitySpawner => new EntitySpawningSkill(),
-            SkillType.Dash => null,
-            SkillType.Seroid => null,
-            _ => null
-        };
-        Skill1.SkillDataSO = Skill1SO;
+       //Skill1 = Skill1SO.Type switch
+       //{
+       //    SkillType.EntitySpawner => new EntitySpawningSkill(),
+       //    SkillType.Dash => null,
+       //    SkillType.Seroid => null,
+       //    _ => null
+       //};
+       //Skill1.SkillDataSO = Skill1SO;
         Skill1.animator = animationScript;
 
         Skill2 = Skill2SO.Type switch
