@@ -53,7 +53,8 @@ public class MenuScript : MonoBehaviour
     {
         if (useRelay.isOn)
         {
-            InitServices();
+            await InitServices();
+
             var joinAllocation = await RelayService.Instance.JoinAllocationAsync(InputJoinCode.text);
             var relayServerData = new RelayServerData(joinAllocation, "dtls");
             NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
