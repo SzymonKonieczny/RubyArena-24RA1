@@ -41,13 +41,22 @@ public class SkillTestGravityPull : BaseSkillEntityBehaviorSkillShot
 
         foreach (var Collider in Colliders)
         {
-            var Rb = Collider.transform.GetComponent<Rigidbody>();
-            if (Rb != null)
+            //var Rb = Collider.transform.GetComponent<Rigidbody>();
+           //if (Rb != null)
+           //{
+           //    Rb.AddForce(((transform.position - Collider.transform.position + new Vector3(0, 3, 0)).normalized*500 )
+           //        , ForceMode.Acceleration);
+           //
+           //
+           //    Debug.Log($"Found RB in range {Collider.name}");
+           //}
+            var playerMove = Collider.transform.GetComponent<Movement>();
+            if (playerMove != null)
             {
-                Rb.AddForce(((transform.position - Collider.transform.position + new Vector3(0, 3, 0)).normalized*500 )
-                    , ForceMode.Acceleration);
-                Debug.Log($"Found RB in range {Collider.name}");
+                playerMove.AddNetworkRbForceClientRPC(((transform.position - Collider.transform.position + new Vector3(0, 3, 0)).normalized * 500));
             }
+
+
         }
 
         yield return null;
