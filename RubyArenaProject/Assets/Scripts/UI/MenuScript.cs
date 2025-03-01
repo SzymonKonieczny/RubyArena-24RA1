@@ -10,6 +10,7 @@ using Unity.Services.Relay;
 using Unity.Networking.Transport.Relay;
 using Unity.Netcode.Transports.UTP;
 using UnityEngine.UI;
+using System.Threading.Tasks;
 
 public class MenuScript : MonoBehaviour
 {
@@ -19,7 +20,7 @@ public class MenuScript : MonoBehaviour
     [SerializeField] private TMPro.TMP_InputField InputJoinCode;
     [SerializeField] private TMPro.TMP_Text DisplayJoinCode;
     [SerializeField] public string SceneName = "Starting Scene";
-    async void InitServices()
+    async Task InitServices()
     {
         await UnityServices.InitializeAsync();
 
@@ -31,7 +32,7 @@ public class MenuScript : MonoBehaviour
 
         if (useRelay.isOn)
         {
-            InitServices();
+            await InitServices();
             Allocation allocation = await RelayService.Instance.CreateAllocationAsync(3);
             string code = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
             DisplayJoinCode.text = code;
