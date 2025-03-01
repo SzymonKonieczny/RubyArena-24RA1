@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,10 +8,9 @@ public class PlayerResources : UnitResource
 {
     [SerializeField] Slider HP_Slider;
     [SerializeField] Slider Mana_Slider;
-
+    
     [SerializeField] float MaxHP = 100;
     [SerializeField] float MaxMana = 100;
-
     public void SetMaxHP(float amount)
     {
         MaxHP = amount;
@@ -22,6 +22,8 @@ public class PlayerResources : UnitResource
 
     public override void damage(float amount)
     {
+        if (!IsServer) return;
+
         Hp.Value -= amount;
     }
 
@@ -37,17 +39,24 @@ public class PlayerResources : UnitResource
 
     public override void takeMana(float amount)
     {
+        if (!IsServer) return;
+
         Mana.Value -= amount;
 
     }
     private void Start()
     {
+        if(IsServer)
+        {
+            Hp.Value = MaxHP;
+            Mana.Value = MaxMana;
+        }
+
         if (!IsOwner) return;
 
 
         HP_Slider = GameObject.FindGameObjectWithTag("HealthBar")?.GetComponent<Slider>();
-        Hp.Value = MaxHP;
-        Mana.Value = MaxMana;
+      
 
         Mana.OnValueChanged += (float preV, float newV) =>
         {

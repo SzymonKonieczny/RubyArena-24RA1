@@ -26,11 +26,11 @@ public class TestQSkill : BaseSkillEntityBehaviorSkillShot //make it into a base
     // Update is called once per frame
     void FixedUpdate()
     {
-        if (!IsServer) return;
-
-
         if (isActive)
             transform.Translate(transform.forward * speed * Time.deltaTime,Space.World);
+
+        if (!IsServer) return;
+
 
         TimeAlive += Time.fixedDeltaTime;
         if (TimeAlive > 6f)
@@ -71,11 +71,12 @@ public class TestQSkill : BaseSkillEntityBehaviorSkillShot //make it into a base
 
     protected override NetworkObject GetAffectedObjectS()
     {
-      var Colliders = Physics.OverlapSphere(this.transform.position, 0.4f);
-      var playerScript = Colliders[0]?.transform?.GetComponent<PlayerScript>();
+     // var Colliders = Physics.OverlapSphere(this.transform.position, 0.4f);
+
+      var playerScript = collisioninfo.transform.GetComponent<PlayerScript>(); //Colliders[0]?.transform?.GetComponent<PlayerScript>();
       if (playerScript != null)
       {
-        var NetworkObjHit = Colliders[0].transform.GetComponent<NetworkObject>();
+        var NetworkObjHit = playerScript.transform.GetComponent<NetworkObject>();
             return NetworkObjHit;
       }
       return null;

@@ -6,8 +6,8 @@ using Unity.Netcode;
 public abstract class UnitResource : NetworkBehaviour
 {
 
-   [SerializeField] public NetworkVariable<float> Hp = new NetworkVariable<float>();
-    [SerializeField] public NetworkVariable<float> Mana = new NetworkVariable<float>();
+    [SerializeField] public NetworkVariable<float> Hp = new NetworkVariable<float>(100);
+    [SerializeField] public NetworkVariable<float> Mana = new NetworkVariable<float>(100);
 
 
 

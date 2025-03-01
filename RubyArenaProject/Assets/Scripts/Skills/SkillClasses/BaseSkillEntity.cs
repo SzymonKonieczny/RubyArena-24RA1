@@ -18,7 +18,7 @@ public abstract class BaseSkillEntityBehavior : NetworkBehaviour
     [SerializeField] protected Collider collider;
     [SerializeField] protected NetworkObject NetworkObj;
     [SerializeField] public SkillDataSO SkillDataSO;
-
+    protected Collision collisioninfo;
     public virtual void Start()
     {
     }
@@ -33,9 +33,10 @@ public abstract class BaseSkillEntityBehavior : NetworkBehaviour
     protected void OnCollisionEnter(Collision collision)
     {
         if (!IsServer) return;
-        {
-            Hit.Value = true;
-        }
+        
+        collisioninfo = collision;
+        Hit.Value = true;
+        
 
     }
  
