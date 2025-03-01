@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
+using UnityEditor.Rendering;
+using UnityEngine.Experimental.Rendering;
 public class TestQSkill : BaseSkillEntityBehaviorSkillShot //make it into a baseSkill
 {
     // Start is called before the first frame update
@@ -9,6 +11,7 @@ public class TestQSkill : BaseSkillEntityBehaviorSkillShot //make it into a base
     MeshRenderer Renderer;
     Rigidbody rb;
     NetworkObject HitPlayer;
+    [SerializeField] int speed = 60;
 
     void Start()
     {
@@ -17,14 +20,18 @@ public class TestQSkill : BaseSkillEntityBehaviorSkillShot //make it into a base
         Renderer = GetComponent<MeshRenderer>();
         rb = GetComponent<Rigidbody>();
         NetworkObj = GetComponent<NetworkObject>();
-        collider = GetComponent<SphereCollider>();
+        collider = GetComponent<Collider>();
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
         if (!IsServer) return;
-          rb.velocity = transform.forward * 20;
+
+
+        if (isActive)
+            transform.Translate(transform.forward * speed * Time.deltaTime,Space.World);
+
         TimeAlive += Time.fixedDeltaTime;
         if (TimeAlive > 6f)
                 NetworkObj.Despawn(true);
@@ -40,7 +47,7 @@ public class TestQSkill : BaseSkillEntityBehaviorSkillShot //make it into a base
             if (networkObject.IsOwner)
             {
                Vector3 force =  (networkObject.transform.position - transform.position).TimesVector(new Vector3(1, 0,1).normalized)
-                    * 5 + new Vector3(0,80,0);
+                    * 5;
                 Debug.LogWarning($"hit + {networkObject.name}");
                 networkObject.GetComponent<Movement>().AddNetworkRbForceClientRPC(force);
                 // networkObject.transform.position = new Vector3(0, 5, 0);
@@ -93,5 +100,6 @@ public class TestQSkill : BaseSkillEntityBehaviorSkillShot //make it into a base
     protected override void DisableColldiersSC()
     {
         collider.enabled = false;
+        isActive = false;
     }
 }
