@@ -41,8 +41,11 @@ public class GameModeManager
     {
         if (!NetworkManager.Singleton.IsServer) return;
 
-        dyingPlayer.playerMove.PlayerDeathClientRPC();
-        dyingPlayer.playerResources.Hp.Value = dyingPlayer.playerResources.getMaxHP();
+        if(CurrentGameMode == GameModeType.OneVOne)
+        {
+            dyingPlayer.playerMove.PlayerDeathClientRPC();
+            dyingPlayer.playerResources.Hp.Value = dyingPlayer.playerResources.getMaxHP();
+        }
     }
 
 }
