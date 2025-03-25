@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
+using Unity.Netcode;
 
 public class PlayerResources : UnitResource
 {
@@ -11,6 +12,8 @@ public class PlayerResources : UnitResource
     
     [SerializeField] float MaxHP = 100;
     [SerializeField] float MaxMana = 100;
+
+    private PlayerScript Player; //optimization to call getComponent less
     public void SetMaxHP(float amount)
     {
         MaxHP = amount;
@@ -19,12 +22,30 @@ public class PlayerResources : UnitResource
     {
         MaxMana = amount;
     }
+    public float getMaxHP()
+    {
+        return MaxHP;
+    }
 
-    public override void damage(float amount)
+    public override void damage(SkillDataSO skillData)
     {
         if (!IsServer) return;
 
-        Hp.Value -= amount;
+        Hp.Value -= skillData.damage;
+
+        if(Player == null)
+        {
+         if(!TryGetComponent<PlayerScript>(out Player))
+            {
+                Debug.LogError("Unable to get this player");
+            }
+        }
+        PlayerScript? DamageDealer = null;
+        if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(skillData.ownerId, out NetworkObject networkObject))
+        {
+           DamageDealer = networkObject.GetComponent<PlayerScript>();
+        }
+        GameModeManager.Instance().OnPlayerTakeDmg.Invoke(Player, skillData.damage, DamageDealer);
     }
 
     public override float getHP()

@@ -10,8 +10,11 @@ public abstract class UnitResource : NetworkBehaviour
     [SerializeField] public NetworkVariable<float> Mana = new NetworkVariable<float>(100);
 
 
-
-    public abstract void damage(float amount);
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="skillData">Takes SkillDataSO, to track the damage dealer</param>
+    public abstract void damage(SkillDataSO skillData);
     public abstract void takeMana(float amount);
     public abstract float getHP();
     public abstract float getMana();

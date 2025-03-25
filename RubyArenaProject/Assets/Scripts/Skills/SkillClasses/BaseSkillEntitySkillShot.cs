@@ -23,10 +23,11 @@ public abstract class BaseSkillEntityBehaviorSkillShot : BaseSkillEntityBehavior
             DisableColldiersSC();
             AffectObjectS(affectedObj);
         }
+PlayEffectsC();
         if (IsClient) // host is both client and server!
         {
             DisableColldiersSC();
-            PlayEffectsC();
+            
         }
 
     }

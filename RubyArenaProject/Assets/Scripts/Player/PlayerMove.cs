@@ -25,7 +25,7 @@ public class Movement : NetworkBehaviour
     [SerializeField] Transform UpwardTorsoBone;
     [SerializeField] PlayerOrientationModes OrientationMode = PlayerOrientationModes.Walking;
     public NetworkVariable<Vector3> RbVelocityNetworkVar = new NetworkVariable<Vector3>(writePerm: NetworkVariableWritePermission.Owner);
-    PlayerResources playerResources;
+    public PlayerResources playerResources {  get;  private set; }
     private Vector3 RequestedVelocityToAdd = new Vector3(); //Vector of velocity requested by the server to add to this Rb
     private Vector3 RequestedForceToAdd = new Vector3(); //Vector of velocity requested by the server to add to this Rb
 
@@ -47,7 +47,6 @@ public class Movement : NetworkBehaviour
         {
             if (OrientationMode == PlayerOrientationModes.Walking)
             {
-
                 AimingCameraPos.gameObject.SetActive(false);
                 cameraPos = NormalCameraPos;
             }
@@ -57,21 +56,28 @@ public class Movement : NetworkBehaviour
                 cameraPos = AimingCameraPos;
             }
         }
-
        
-       if(IsOwner) 
+       if(IsServer)
+        {
             playerResources.Hp.OnValueChanged += (float prev, float newV) =>
-             {
-                 if (newV <= 0)
-                 {
-                     playerResources.Hp.Value = 100;
-                     
-                        NetworkObject.transform.position = new Vector3(0, 2, 0);
-                 }
-             };
-        
-
+            {
+                if (newV <= 0)
+                {
+                    GameModeManager.Instance().OnPlayerDeath.Invoke(playerScript);
+                }
+            };
+        }
     }
+
+    [ClientRpc]
+    public void PlayerDeathClientRPC()
+    {
+        if (GameModeManager.Instance().CurrentGameMode == GameModeType.OneVOne)
+        {
+            transform.position = new Vector3(0, 2, 0);
+        }
+    }
+
     [ClientRpc]
     public void AddNetworkRbVelocityClientRPC(Vector3 vel)
     {
@@ -82,6 +88,7 @@ public class Movement : NetworkBehaviour
     {
         RequestedForceToAdd += force;
     }
+
     void FixedUpdate()
     {
         if (playerScript.isStunnedNetworkVar.Value) return;

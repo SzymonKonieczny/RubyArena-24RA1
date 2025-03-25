@@ -45,7 +45,7 @@ public class AutoAttackSkill : BaseSkillEntityBehaviorSkillShot
         if(PlayerResources!=null)
         {
            if(SkillDataSO.ownerId != networkObj.OwnerClientId)
-               PlayerResources.damage(60);
+               PlayerResources.damage(SkillDataSO);
         }
 
     }

@@ -13,6 +13,8 @@ public class PlayerScript : NetworkBehaviour
     public NetworkVariable <int> CharacterID;
     [SerializeField] PlayerAnimationScript PlayerAnimationScript;
     public Transform ActiveModel;
+    public PlayerResources playerResources;
+    public Movement playerMove;
 
     protected override void OnNetworkPostSpawn()
     {
@@ -25,18 +27,18 @@ public class PlayerScript : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-
-            CharacterID.OnValueChanged += (int pre, int post) =>
-            {
-                InstantiateModel(post);
-            };
+        playerMove = GetComponent<Movement>();
+        CharacterID.OnValueChanged += (int pre, int post) =>
+        {
+            InstantiateModel(post);
+        };
          if (IsServer)
          {
              CharacterID.Value = NetworkManager.ConnectedClients.Count;
          }
 
         InstantiateModel(CharacterID.Value);
-      
+        playerResources = GetComponent<PlayerResources>();
 
 
         if (!IsLocalPlayer)
