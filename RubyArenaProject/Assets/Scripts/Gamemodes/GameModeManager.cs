@@ -3,19 +3,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
-public class GameModeManager 
+public class GameModeManager
 {
-    public static  GameModeManager instance;
+    public static GameModeManager instance;
     public GameModeType CurrentGameMode;
-    private GameModeManager() {
+    private GameModeManager()
+    {
 
         OnPlayerTakeDmg = new Action<PlayerScript, float, PlayerScript?>(HandlePlayerTakeDmg);
         OnPlayerDeath = new Action<PlayerScript>(HandlePlayerDeath);
     }
 
     public static GameModeManager Instance()
-     {
-        if(instance == null)
+    {
+        if (instance == null)
         {
             instance = new GameModeManager();
         }
@@ -26,14 +27,14 @@ public class GameModeManager
     /// <summary>
     /// On player take damage. PlayerTakingDmg, amount, PlayerDealingDmg (nullable)
     /// </summary>
-    public Action<PlayerScript,float, PlayerScript?> OnPlayerTakeDmg;
+    public Action<PlayerScript, float, PlayerScript?> OnPlayerTakeDmg;
 
     /// <summary>
     /// On player take damage. PlayerDying, Player Killing (nullable)
     /// </summary>
     public Action<PlayerScript> OnPlayerDeath;
 
-    private void HandlePlayerTakeDmg(PlayerScript PlayerTakingDmg, float famage  , PlayerScript? PlayerDealingDmg)
+    private void HandlePlayerTakeDmg(PlayerScript PlayerTakingDmg, float famage, PlayerScript? PlayerDealingDmg)
     {
 
     }
@@ -41,7 +42,7 @@ public class GameModeManager
     {
         if (!NetworkManager.Singleton.IsServer) return;
 
-        if(CurrentGameMode == GameModeType.OneVOne)
+        if (CurrentGameMode == GameModeType.OneVOne)
         {
             dyingPlayer.playerMove.PlayerDeathClientRPC();
             dyingPlayer.playerResources.Hp.Value = dyingPlayer.playerResources.getMaxHP();

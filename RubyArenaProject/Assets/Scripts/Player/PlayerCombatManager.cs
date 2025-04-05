@@ -15,6 +15,7 @@ public class PlayerCombatManager : NetworkBehaviour
     public SkillDataSO Skill1SO;
     public SkillDataSO Skill2SO;
 
+    public NetworkVariable<bool> canCombat = new(false);
 
     [SerializeField] float SkillCooldown = 0;
     InputCollectorScript InputCollector;
@@ -24,25 +25,27 @@ public class PlayerCombatManager : NetworkBehaviour
     [SerializeField] PlayerAnimationScript animationScript;
     [SerializeField] Movement playerMove;
     [SerializeField] NetworkObject NetworkObject;
-
+    private bool isInitialized = false;
 
 
     // Start is called before the first frame update
-    void Start()
+    public void Initialize()
     {
+        isInitialized = true;
+
         InputCollector = GetComponent<InputCollectorScript>();
         playerScript = GetComponent<PlayerScript>();
         animationScript = GetComponent<PlayerAnimationScript>();
         playerMove = GetComponent<Movement>();
         NetworkObject = GetComponent<NetworkObject>();
-       //Skill1 = Skill1SO.Type switch
-       //{
-       //    SkillType.EntitySpawner => new EntitySpawningSkill(),
-       //    SkillType.Dash => null,
-       //    SkillType.Seroid => null,
-       //    _ => null
-       //};
-       //Skill1.SkillDataSO = Skill1SO;
+        Skill1 = Skill1SO.Type switch
+        {
+            SkillType.EntitySpawner => new EntitySpawningSkill(),
+            SkillType.Dash => null,
+            SkillType.Seroid => null,
+            _ => null
+        };
+        Skill1.SkillDataSO = Skill1SO;
         Skill1.animator = animationScript;
 
         Skill2 = Skill2SO.Type switch
@@ -75,7 +78,7 @@ public class PlayerCombatManager : NetworkBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (!IsOwner) return;
+        if (!IsOwner || !isInitialized) return;
        
         SkillCooldown -= Time.deltaTime;
 
@@ -109,16 +112,21 @@ public class PlayerCombatManager : NetworkBehaviour
     }
 
     [ClientRpc]
-    void RequestedSpellAnswerClientRPC(bool wasAccepted, int iskillIdd)
+    void RequestedSpellAnswerClientRPC(bool wasAccepted, int skillID)
     {
         if (!IsOwner) return; //Only the requestee
-
-        var RequestedSpell = iskillIdd switch
+        var RequestedSpell = skillID switch
         {
             1 => Skill1,
             2 => Skill2,
             _ => null
         };
+        if (!wasAccepted)
+        {
+            RequestedSpell.ChangeSkilRequestState(SkillRequestState.NotRequested);
+
+            return;
+        }
 
         RequestedSpell.ChangeSkilRequestState(SkillRequestState.Accepted);
 
@@ -145,6 +153,15 @@ public class PlayerCombatManager : NetworkBehaviour
     {
         if (!IsServer) return;
 
+        if (!canCombat.Value)
+        {
+            RequestedSpellAnswerClientRPC(false, id);
+        }
+        else
+        {
+            RequestedSpellAnswerClientRPC(true, id);
+        }
+
         var RequestedSpell = id switch 
         {
            1 => Skill1,
@@ -158,23 +175,17 @@ public class PlayerCombatManager : NetworkBehaviour
         switch (RequestedSpell.SkillDataSO.Type)
         {
             case SkillType.EntitySpawner:
-
-
                 StartCoroutine(SpawnEntityAfterDelay(RequestedSpell,
                     Position, Direction));
 
                 break;
             case SkillType.Seroid:
-
-
                 break;
             case SkillType.Dash:
                 break;
         }
 
-        RequestedSpellAnswerClientRPC(true,id);
         TellClientsToAnimateSkillClientRPC(id);
-
 
         //EditorApplication.isPaused = true;
 
@@ -196,6 +207,21 @@ public class PlayerCombatManager : NetworkBehaviour
 
         // EditorApplication.isPaused = true;
     }
-   
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (!IsServer) return;
+
+        if (other.CompareTag("NonFightArea"))
+            canCombat.Value = false;
+
+    }
+    private void OnTriggerExit(Collider other)
+    {
+        if (!IsServer) return;
+
+        if (other.CompareTag("NonFightArea"))
+            canCombat.Value = true;
+    }
 
 }

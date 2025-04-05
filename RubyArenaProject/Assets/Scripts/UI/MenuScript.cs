@@ -41,6 +41,11 @@ public class MenuScript : MonoBehaviour
             NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
 
         }
+
+        NetworkManager.Singleton.OnClientConnectedCallback += (ulong id) =>
+        {
+            //NetworkManager.Singleton.SceneManager.OnSceneEvent
+        };
         StartMap();
     }
 
@@ -64,8 +69,11 @@ public class MenuScript : MonoBehaviour
     }
     private async void Start()
     {
-        
+
     }
 
-
+    private void Singleton_OnClientConnectedCallback(ulong obj)
+    {
+        throw new System.NotImplementedException();
+    }
 }

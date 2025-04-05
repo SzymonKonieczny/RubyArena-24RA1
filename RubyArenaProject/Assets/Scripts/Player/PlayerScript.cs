@@ -10,55 +10,65 @@ public class PlayerScript : NetworkBehaviour
     [SerializeField] Transform[] CameraTransforms;
     public NetworkVariable<bool> isStunnedNetworkVar = new NetworkVariable<bool>();
     public Transform ModelAnchor;
-    public NetworkVariable <int> CharacterID;
+    public NetworkVariable<int> CharacterID= new NetworkVariable<int>(-1); 
+    public NetworkVariable<bool> hasCharacter = new(false);
+
     [SerializeField] PlayerAnimationScript PlayerAnimationScript;
+    [SerializeField] PlayerCombatManager playerCombatManager;
     public Transform ActiveModel;
     public PlayerResources playerResources;
     public Movement playerMove;
 
-    protected override void OnNetworkPostSpawn()
-    {
-        if (IsServer)
-        {
-            CharacterID.Value = NetworkManager.ConnectedClients.Count;
-        }
-
-    }
 
     public override void OnNetworkSpawn()
     {
         playerMove = GetComponent<Movement>();
+        playerCombatManager = GetComponent<PlayerCombatManager>();
         CharacterID.OnValueChanged += (int pre, int post) =>
         {
-            InstantiateModel(post);
+            InitializeCharacter();
         };
-         if (IsServer)
-         {
-             CharacterID.Value = NetworkManager.ConnectedClients.Count;
-         }
+        if (IsServer)
+        {
+        CharacterID.Value = -1;
+        
+        }
 
-        InstantiateModel(CharacterID.Value);
         playerResources = GetComponent<PlayerResources>();
 
 
         if (!IsLocalPlayer)
         {
-            
+            InitializeCharacter(); //for every character already in the game, try to initialize their characters 
             foreach (Transform t in CameraTransforms)
             {
                 Destroy(t.GetComponent<CinemachineFreeLook>());
             }
-
+        }
+        else // if we are the local player
+        {
+            CanvasManger.Instance.CharacterSelect.gameObject.SetActive(true);
+            CanvasManger.Instance.playerScript = this;
+            playerResources.Initialize();
+            playerCombatManager.Initialize();
         }
 
     }
-    void InstantiateModel(int id)
+    void InitializeCharacter()
     {
+        if (CharacterID.Value == -1) //means character wasnt yet selected
+            return;
+
+        CanvasManger.Instance.CharacterSelect.gameObject.SetActive(false);
+
+
         if (ActiveModel != null)
         {
             Destroy(ActiveModel.gameObject);
         }
         GameObject ModelGO = Instantiate(CharacterList.Instance.Chracters[CharacterID.Value % 2].Model,ModelAnchor);
+        hasCharacter.Value = true;
+
         ModelGO.transform.SetLocalPositionAndRotation(new Vector3(0, -1, 0), Quaternion.Euler(0, 0, 0));
         ActiveModel = ModelGO.transform;
         PlayerAnimationScript = GetComponent<PlayerAnimationScript>();
@@ -81,6 +91,14 @@ public class PlayerScript : NetworkBehaviour
             combatManager.Skill1.SkillDataSO = assignedSkill;
             combatManager.Skill1.animator = PlayerAnimationScript;
         }
+
+    }
+    [ServerRpc]
+   public void AskToSelectCharacterServerRpc(int selectedCharacterID)
+    {
+        if (!IsServer || hasCharacter.Value) return;
+
+        CharacterID.Value = selectedCharacterID;
 
     }
 

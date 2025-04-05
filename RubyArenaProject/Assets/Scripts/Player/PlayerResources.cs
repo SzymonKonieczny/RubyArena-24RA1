@@ -65,7 +65,7 @@ public class PlayerResources : UnitResource
         Mana.Value -= amount;
 
     }
-    private void Start()
+    public void Initialize()
     {
         if(IsServer)
         {

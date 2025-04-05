@@ -25,6 +25,6 @@ public class SkillManagerScript : NetworkBehaviour
 
     void testSkill(int input)
     {
-        Debug.Log($"TEST SKILL USED WITH {input}");  
+        Debug.Log($"TEST SKILL USED WITH {input}. SCRAP THIS SYSTEM");  
     }
 }
