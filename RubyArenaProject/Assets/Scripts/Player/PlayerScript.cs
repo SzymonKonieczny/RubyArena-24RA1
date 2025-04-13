@@ -24,6 +24,7 @@ public class PlayerScript : NetworkBehaviour
     {
         playerMove = GetComponent<Movement>();
         playerCombatManager = GetComponent<PlayerCombatManager>();
+        transform.position = new Vector3(25,20,12);
         CharacterID.OnValueChanged += (int pre, int post) =>
         {
             InitializeCharacter();
@@ -52,6 +53,8 @@ public class PlayerScript : NetworkBehaviour
             playerResources.Initialize();
             playerCombatManager.Initialize();
         }
+        isStunnedNetworkVar.Value = true; //We start stunned for as long as we are choosing our champ
+
 
     }
     void InitializeCharacter()
@@ -59,7 +62,8 @@ public class PlayerScript : NetworkBehaviour
         if (CharacterID.Value == -1) //means character wasnt yet selected
             return;
 
-        CanvasManger.Instance.CharacterSelect.gameObject.SetActive(false);
+        if(IsLocalPlayer) //Only when I have selected a champ, my local UI changes!
+            CanvasManger.Instance.CharacterSelect.gameObject.SetActive(false);
 
 
         if (ActiveModel != null)
@@ -99,6 +103,7 @@ public class PlayerScript : NetworkBehaviour
         if (!IsServer || hasCharacter.Value) return;
 
         CharacterID.Value = selectedCharacterID;
+        isStunnedNetworkVar.Value = false; //After character selection we un-stun the player
 
     }
 

@@ -29,6 +29,7 @@ public class MenuScript : MonoBehaviour
 
     public async void StartHost()
     {
+        LogNetworkConfig();
 
         if (useRelay.isOn)
         {
@@ -47,8 +48,8 @@ public class MenuScript : MonoBehaviour
             //NetworkManager.Singleton.SceneManager.OnSceneEvent
         };
         StartMap();
-    }
 
+    }
     public async void StartMap()
     {
         NetworkManager.Singleton.StartHost();
@@ -56,6 +57,8 @@ public class MenuScript : MonoBehaviour
     }
     public async void StartClient()
     {
+        LogNetworkConfig();
+
         if (useRelay.isOn)
         {
             await InitServices();
@@ -75,5 +78,10 @@ public class MenuScript : MonoBehaviour
     private void Singleton_OnClientConnectedCallback(ulong obj)
     {
         throw new System.NotImplementedException();
+    }
+    void LogNetworkConfig()
+    {
+        var config = NetworkManager.Singleton.NetworkConfig;
+        Debug.Log($"TickRate: {config.TickRate}, Transport: {config.NetworkTransport.GetType().Name}, Prefabs: {config.Prefabs.NetworkPrefabsLists.Count}");
     }
 }

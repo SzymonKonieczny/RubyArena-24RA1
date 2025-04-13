@@ -1,5 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -28,7 +27,6 @@ public class CanvasManger : MonoBehaviour
     {
         if (Instance != this)
             Instance = this;
-
 
     }
 
