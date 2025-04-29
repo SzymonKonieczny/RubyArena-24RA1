@@ -1,6 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using Unity.Netcode;
 
 public abstract class BaseSkillEntityBehaviorSkillShot : BaseSkillEntityBehavior
@@ -15,20 +12,25 @@ public abstract class BaseSkillEntityBehaviorSkillShot : BaseSkillEntityBehavior
 
     protected override void CollisionRegisteredOnServer(bool prev, bool newV)
     {
-        
+
         if (newV == false || prev == true) return;
-        if(IsServer)
+
+        if (IsServer)
         {
-            var affectedObj = GetAffectedObjectS();
-            DisableColldiersSC();
-            AffectObjectS(affectedObj);
+            if (!wasCancelled)
+            {
+                var affectedObj = GetAffectedObjectS();
+                AffectObjectS(affectedObj);
+            }
+          //  DisableColldiersSC();
         }
-PlayEffectsC();
-        if (IsClient) // host is both client and server!
-        {
+
+        PlayEffectsC();
             DisableColldiersSC();
-            
-        }
+     //   if (IsClient) // host is both client and server!
+     //   {
+     //
+     //   }
 
     }
 }

@@ -17,23 +17,34 @@ public class EntitySpawningSkill : BaseSkill
 
     public override void OnRequestStateChange(SkillRequestState state)
     {
-        if(state == SkillRequestState.Accepted)
-        {
-            animator.PlayState(SkillDataSO.animationCastName);
+        switch (state){
+            case SkillRequestState.Requested:
+                LastUsed = Time.time;
+                animator.PlayState(SkillDataSO.animationWindUpName, SkillDataSO.windUpTime);
+                //animator.PlayState(new SkillAnimationOptions {Speed = 1f/ SkillDataSO.windUpTime, StateName = SkillDataSO.animationWindUpName });
+
+                break;
+            case SkillRequestState.Accepted:
+                //       animator.PlayState(SkillDataSO.animationCastName, SkillDataSO.castTime);
+              //  animator.PlayState(new SkillAnimationOptions { Speed = 1f / SkillDataSO.castTime, StateName = SkillDataSO.animationCastName });
+                animator.Trigger("SpellCastAccepted");
+                SkillRequestState = SkillRequestState.NotRequested; //soft change to default
+
+                break;
+            case SkillRequestState.Rejected:
+                animator.PlayState("Idle");
+                SkillRequestState = SkillRequestState.NotRequested;//soft change to default
+
+                break;
+
+            default:
+                animator.PlayState("Idle");
+                Debug.Log($"State of: {nameof(state)} does not have defined behavior.");
+                break;
         }
-        else
-        {
-            animator.PlayState("Idle");
-        }
-        SkillRequestState = SkillRequestState.NotRequested;
+       
     }
 
-    public override void SkillRequested()
-    {
-        LastUsed = Time.time;
-        animator.PlayState(SkillDataSO.animationWindUpName);
-
-    }
-
+  
     
 }

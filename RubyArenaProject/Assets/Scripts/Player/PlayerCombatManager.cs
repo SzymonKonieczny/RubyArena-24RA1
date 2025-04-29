@@ -15,7 +15,7 @@ public class PlayerCombatManager : NetworkBehaviour
     public SkillDataSO Skill1SO;
     public SkillDataSO Skill2SO;
 
-    public NetworkVariable<bool> canCombat = new(false);
+    public NetworkVariable<bool> canCombat = new(true);
 
     [SerializeField] float SkillCooldown = 0;
     InputCollectorScript InputCollector;
@@ -82,10 +82,8 @@ public class PlayerCombatManager : NetworkBehaviour
        
         SkillCooldown -= Time.deltaTime;
 
-        if (playerScript.isStunnedNetworkVar.Value) return;
-
-
-
+        if (playerScript.isStunnedNetworkVar.Value || !canCombat.Value) return;
+                                                 // canCombat is also checked when accepting/rejecting a spell
         var ray = Camera.main.ScreenPointToRay(new Vector3((float)Screen.width / 2f, (float)Screen.height / 2f));
         Vector3 SkillDir = new();
         if (Physics.Raycast(ray, out RaycastHit raycastHit))
@@ -96,18 +94,17 @@ public class PlayerCombatManager : NetworkBehaviour
         {
             SkillDir = ray.direction;
         }
-            if (InputCollector.QClick && Skill1.CanCast())
-            {
-                Skill1.SkillRequested();
-                SpawnSkillEntityServerRPC(1, SkillshotSpawnPoint.position, SkillDir);
 
-            }
-            if (InputCollector.EClick && Skill2.CanCast())
-            {
-                Skill2.SkillRequested();
-                SpawnSkillEntityServerRPC(2, SkillshotSpawnPoint.position, SkillDir);
-
-             }
+        if (InputCollector.QClick && Skill1.CanCast())
+        {
+            Skill1.ChangeSkilRequestState(SkillRequestState.Requested);
+            SpawnSkillEntityServerRPC(1, SkillshotSpawnPoint.position, SkillDir);
+        }
+        if (InputCollector.EClick && Skill2.CanCast())
+        {
+            Skill2.ChangeSkilRequestState(SkillRequestState.Requested);
+            SpawnSkillEntityServerRPC(2, SkillshotSpawnPoint.position, SkillDir);
+        }
 
     }
 
@@ -124,7 +121,6 @@ public class PlayerCombatManager : NetworkBehaviour
         if (!wasAccepted)
         {
             RequestedSpell.ChangeSkilRequestState(SkillRequestState.NotRequested);
-
             return;
         }
 

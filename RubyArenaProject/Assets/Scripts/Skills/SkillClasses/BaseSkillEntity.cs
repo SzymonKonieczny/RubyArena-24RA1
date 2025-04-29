@@ -13,6 +13,7 @@ public abstract class BaseSkillEntityBehavior : NetworkBehaviour
 {
    [SerializeField] protected NetworkVariable<bool> Hit = new NetworkVariable<bool>(false);
     [SerializeField] protected bool isActive = true;
+    [SerializeField] protected bool wasCancelled = false;
     [SerializeField] protected float TimeAlive = 0;
     [SerializeField] protected GameObject entityToSpawn; //Entity to to spawn (for instance after collition for AOE overtime effects)
     [SerializeField] protected Collider collider;
@@ -39,7 +40,18 @@ public abstract class BaseSkillEntityBehavior : NetworkBehaviour
         
 
     }
- 
+    protected void OnTriggerEnter(Collider other)
+    {
+        if (!IsServer) return;
+
+
+        if (other.CompareTag("NonFightArea"))
+        {
+            wasCancelled = true;
+            Hit.Value = true;
+        }
+    }
+
 
 
 }

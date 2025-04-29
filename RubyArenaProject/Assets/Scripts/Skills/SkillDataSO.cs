@@ -17,6 +17,8 @@ public class SkillDataSO : ScriptableObject
     public float castTime;
 
     public float coolDown;
+    public float windUpTime = 0.1f;
+
 
     /// <summary>
     /// a prefab with a derived class of SkillBehavior

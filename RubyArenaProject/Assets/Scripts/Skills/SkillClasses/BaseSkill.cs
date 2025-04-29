@@ -20,7 +20,6 @@ public abstract class BaseSkill
 
     [SerializeField] public PlayerAnimationScript animator;
 
-    public abstract void SkillRequested();
     public abstract void ChangeSkilRequestState(SkillRequestState newState);
 
     public abstract void OnRequestStateChange(SkillRequestState state);
@@ -33,5 +32,6 @@ public enum SkillRequestState
 {
     NotRequested,
     Requested,
-    Accepted
+    Accepted,
+    Rejected
 }

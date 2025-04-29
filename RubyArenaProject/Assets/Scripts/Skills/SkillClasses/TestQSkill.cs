@@ -46,7 +46,7 @@ public class TestQSkill : BaseSkillEntityBehaviorSkillShot //make it into a base
         {
             if (networkObject.IsOwner)
             {
-               Vector3 force =  (networkObject.transform.position - transform.position).TimesVector(new Vector3(1, 0,1).normalized)
+               Vector3 force =  (networkObject.transform.position - transform.position).ScaleVec(new Vector3(1, 0,1).normalized)
                     * 5;
                 Debug.LogWarning($"hit + {networkObject.name}");
                 networkObject.GetComponent<Movement>().AddNetworkRbForceClientRPC(force);
