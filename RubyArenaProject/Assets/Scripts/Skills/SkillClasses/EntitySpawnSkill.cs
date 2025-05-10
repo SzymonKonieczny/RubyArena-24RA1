@@ -21,12 +21,12 @@ public class EntitySpawningSkill : BaseSkill
             case SkillRequestState.Requested:
                 LastUsed = Time.time;
                 animator.PlayState(SkillDataSO.animationWindUpName, SkillDataSO.windUpTime);
-                //animator.PlayState(new SkillAnimationOptions {Speed = 1f/ SkillDataSO.windUpTime, StateName = SkillDataSO.animationWindUpName });
+                animator.PlayState(new SkillAnimationOptions {Speed = 1f/ SkillDataSO.windUpTime, StateName = SkillDataSO.animationWindUpName });
 
                 break;
             case SkillRequestState.Accepted:
                 //       animator.PlayState(SkillDataSO.animationCastName, SkillDataSO.castTime);
-              //  animator.PlayState(new SkillAnimationOptions { Speed = 1f / SkillDataSO.castTime, StateName = SkillDataSO.animationCastName });
+                animator.PlayState(new SkillAnimationOptions { Speed = 1f / SkillDataSO.castTime, StateName = SkillDataSO.animationCastName });
                 animator.Trigger("SpellCastAccepted");
                 SkillRequestState = SkillRequestState.NotRequested; //soft change to default
 
