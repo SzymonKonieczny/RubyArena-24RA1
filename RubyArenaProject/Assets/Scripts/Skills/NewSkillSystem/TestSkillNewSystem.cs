@@ -9,8 +9,8 @@ public class TestSkillNewSystem : SkillBase
     {
         animationScript = combatManagerRef.animationScript;
 
-        animationScript.PlayState("WindUp");
         float windupTime = 0.2f;
+        animationScript.PlayState("WindUp", windupTime);
         InputCollector.StunTime = windupTime;
         Vector3 LookDir = getLookDirection();
 
@@ -43,17 +43,15 @@ public class TestSkillNewSystem : SkillBase
     // Start is called before the first frame update
     public void Init()
     {
-        this.combatManagerRef= gameObject.GetComponent<PlayerSkillHolder>().playerCombatManager;
+        this.combatManagerRef= gameObject.GetComponentInParent<PlayerCombatManager>();
         testPrefab = Resources.Load<GameObject>("Prefabs/SkillEntities/BlakeShot");
-        animationScript = combatManagerRef.animationScript;
-        InputCollector = gameObject.GetComponent<PlayerSkillHolder>().inputCollectorScript;
+        animationScript = combatManagerRef?.animationScript;
+        InputCollector = gameObject.GetComponentInParent<InputCollectorScript>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (combatManagerRef == null)
-            combatManagerRef = gameObject.GetComponent<PlayerCombatManager>();
         if (Input.GetKeyDown(KeyCode.Space) && combatManagerRef.IsLocalPlayer) 
         {
             Use();

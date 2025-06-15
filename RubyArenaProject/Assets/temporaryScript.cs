@@ -11,9 +11,7 @@ public class temporaryScript : NetworkBehaviour
     {
         if(collision.collider.CompareTag("Player"))
         {
-            Type scriptType = Type.GetType("TestSkillNewSystem, Assembly-CSharp");
             ulong id = collision.collider.gameObject.GetComponent<NetworkBehaviour>().NetworkObjectId;
-            collision.collider.gameObject.AddComponent(scriptType);
             GiveScriptServerRPC(id);
         }
     }
@@ -40,8 +38,14 @@ public class temporaryScript : NetworkBehaviour
         if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(id, out var networkObject))
         {
             GameObject go = networkObject.gameObject;
-            Type scriptType = Type.GetType("TestSkillNewSystem, Assembly-CSharp");
-            go.AddComponent(scriptType);
+            var skillHolder = go.GetComponentInChildren<PlayerSkillHolder>().transform;
+
+            GameObject skillpref = Instantiate(skillPrefab);
+            skillpref.GetComponent<NetworkObject>().Spawn();
+            skillpref.transform.SetParent(skillHolder);
+
+            var das = skillpref.GetComponent<TestSkillNewSystem>();
+            das.Init();
         }
     }
 }
