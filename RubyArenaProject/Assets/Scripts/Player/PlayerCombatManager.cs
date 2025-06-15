@@ -20,9 +20,10 @@ public class PlayerCombatManager : NetworkBehaviour
     [SerializeField] float SkillCooldown = 0;
     InputCollectorScript InputCollector;
     PlayerScript playerScript;
-    [SerializeField] Transform SkillshotSpawnPoint;
+    public Transform SkillshotSpawnPoint;
 
-    [SerializeField] PlayerAnimationScript animationScript;
+    public PlayerAnimationScript animationScript;
+
     [SerializeField] Movement playerMove;
     [SerializeField] NetworkObject NetworkObject;
     private bool isInitialized = false;

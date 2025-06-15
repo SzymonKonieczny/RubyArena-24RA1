@@ -9,7 +9,6 @@ using UnityEngine;
 /// Base class for skills sitting in the players "inventory" (skill slots in CombatManager)
 /// Object-ifing the management of individual skills such as their usage, what animations they should trigger etc.
 /// </summary>
-[Serializable]
 public abstract class BaseSkill 
 {
     [SerializeField] public SkillDataSO SkillDataSO;
