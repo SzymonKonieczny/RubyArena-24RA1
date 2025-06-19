@@ -31,8 +31,7 @@ public class PlayerScript : NetworkBehaviour
         };
         if (IsServer)
         {
-        CharacterID.Value = -1;
-        
+            CharacterID.Value = -1;
         }
 
         playerResources = GetComponent<PlayerResources>();
@@ -84,16 +83,31 @@ public class PlayerScript : NetworkBehaviour
         var combatManager = GetComponent<PlayerCombatManager>();
         if (combatManager != null)
         {
-            var assignedSkill = CharacterList.Instance.Chracters[CharacterID.Value % 2].Skill1;
-            combatManager.Skill1 = assignedSkill.Type switch
+            //var assignedSkill = CharacterList.Instance.Chracters[CharacterID.Value % 2].Skill1;
+
+            //combatManager.Skill1 = assignedSkill.Type switch
+            //{
+            //    SkillType.EntitySpawner => new EntitySpawningSkill(),
+            //    SkillType.Dash => null,
+            //    SkillType.Seroid => null,
+            //    _ => null
+            //};
+           // combatManager.Skill1.SkillDataSO = assignedSkill;
+            //combatManager.Skill1.animator = PlayerAnimationScript;
+
+            if(IsServer)
             {
-                SkillType.EntitySpawner => new EntitySpawningSkill(),
-                SkillType.Dash => null,
-                SkillType.Seroid => null,
-                _ => null
-            };
-            combatManager.Skill1.SkillDataSO = assignedSkill;
-            combatManager.Skill1.animator = PlayerAnimationScript;
+                var skillPrefab = CharacterList.Instance.Chracters[CharacterID.Value % 2].SkillPrefab;
+                var skillHolder = GetComponent<PlayerSkillHolder>().transform;
+
+                GameObject skillpref = Instantiate(skillPrefab);
+                var skillprefNetworkObj = skillpref.GetComponent<NetworkObject>();
+                skillprefNetworkObj.SpawnWithOwnership(NetworkObject.OwnerClientId);
+                skillprefNetworkObj.TrySetParent(skillHolder);
+
+                var das = skillpref.GetComponent<TestSkillNewSystem>();
+                das.Init();
+            }
         }
 
     }

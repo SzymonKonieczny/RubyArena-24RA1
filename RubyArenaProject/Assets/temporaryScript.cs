@@ -7,9 +7,17 @@ using System;
 public class temporaryScript : NetworkBehaviour
 {
     public GameObject skillPrefab;
-    private void OnCollisionEnter(Collision collision)
+    private void OnTriggerEnter(Collider other)
     {
-        if(collision.collider.CompareTag("Player"))
+        if (other.CompareTag("Player") && IsServer)
+        {
+            ulong id = other.gameObject.GetComponent<NetworkBehaviour>().NetworkObjectId;
+            GiveScriptServerRPC(id);
+        }
+    }
+    private void Ontrigger(Collision collision)
+    {
+        if(collision.collider.CompareTag("Player") && IsServer)
         {
             ulong id = collision.collider.gameObject.GetComponent<NetworkBehaviour>().NetworkObjectId;
             GiveScriptServerRPC(id);
@@ -18,7 +26,7 @@ public class temporaryScript : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     void GiveScriptServerRPC(ulong id)
     {
-        GiveScriptClientRPC(id);
+        //GiveScriptClientRPC(id);
         if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(id, out var networkObject))
         {
             GameObject go = networkObject.gameObject;

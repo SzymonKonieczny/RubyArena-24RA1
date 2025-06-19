@@ -5,6 +5,11 @@ using Unity.Netcode;
 public class TestSkillNewSystem : SkillBase
 {
     GameObject testPrefab;
+    public override void OnNetworkSpawn()
+    {
+        base.OnNetworkSpawn();
+        Init();
+    }
     public override bool Use()
     {
         animationScript = combatManagerRef.animationScript;
@@ -24,10 +29,14 @@ public class TestSkillNewSystem : SkillBase
     {
         if (!IsServer) return;
 
-        GameObject SkillEntity = Instantiate(testPrefab);
+        GameObject skillEntityGO = Instantiate(testPrefab);
 
-        SkillEntity.GetComponent<NetworkObject>().Spawn();
-        SkillEntity.transform.SetPositionAndRotation(combatManagerRef.SkillshotSpawnPoint.transform.position + lookDir * 2, Quaternion.LookRotation(lookDir, Vector3.up));
+        skillEntityGO.GetComponent<NetworkObject>().Spawn();
+        skillEntityGO.transform.SetPositionAndRotation(combatManagerRef.SkillshotSpawnPoint.transform.position + lookDir * 2, Quaternion.LookRotation(lookDir, Vector3.up));
+        var skillEntity = skillEntityGO.GetComponent<BaseSkillEntityBehavior>();
+        skillEntity.SkillDataSO = ScriptableObject.CreateInstance<SkillDataSO>();
+        skillEntity.SkillDataSO.damage = 5;
+
 
     }
 
@@ -43,16 +52,18 @@ public class TestSkillNewSystem : SkillBase
     // Start is called before the first frame update
     public void Init()
     {
-        this.combatManagerRef= gameObject.GetComponentInParent<PlayerCombatManager>();
+        var skillholder = gameObject.GetComponentInParent<PlayerSkillHolder>();
+        this.combatManagerRef = skillholder.playerCombatManager;
         testPrefab = Resources.Load<GameObject>("Prefabs/SkillEntities/BlakeShot");
         animationScript = combatManagerRef?.animationScript;
-        InputCollector = gameObject.GetComponentInParent<InputCollectorScript>();
+        InputCollector = skillholder.inputCollectorScript;
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space) && combatManagerRef.IsLocalPlayer) 
+        if (Input.GetKeyDown(KeyCode.Q) && combatManagerRef.IsLocalPlayer) 
         {
             Use();
         }

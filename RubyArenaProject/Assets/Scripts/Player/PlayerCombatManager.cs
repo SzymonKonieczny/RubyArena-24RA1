@@ -84,7 +84,9 @@ public class PlayerCombatManager : NetworkBehaviour
         SkillCooldown -= Time.deltaTime;
 
         if (playerScript.isStunnedNetworkVar.Value || !canCombat.Value) return;
-                                                 // canCombat is also checked when accepting/rejecting a spell
+        // canCombat is also checked when accepting/rejecting a spell
+
+        return;
         var ray = Camera.main.ScreenPointToRay(new Vector3((float)Screen.width / 2f, (float)Screen.height / 2f));
         Vector3 SkillDir = new();
         if (Physics.Raycast(ray, out RaycastHit raycastHit))
