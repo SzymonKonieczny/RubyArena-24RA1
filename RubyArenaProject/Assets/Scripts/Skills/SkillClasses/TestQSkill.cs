@@ -12,6 +12,7 @@ public class TestQSkill : BaseSkillEntityBehaviorSkillShot //make it into a base
     Rigidbody rb;
     NetworkObject HitPlayer;
     [SerializeField] int speed = 60;
+    NetworkVariable<Vector3> networkedPosition = new NetworkVariable<Vector3>();
 
     void Start()
     {
@@ -22,15 +23,27 @@ public class TestQSkill : BaseSkillEntityBehaviorSkillShot //make it into a base
         NetworkObj = GetComponent<NetworkObject>();
         collider = GetComponent<Collider>();
     }
-
+    private void Awake() // ensured called only once
+    {
+        networkedPosition.OnValueChanged += onNetworkPosChange;
+    }
+    void onNetworkPosChange (Vector3 Old, Vector3 New)
+    {
+        transform.position = New;
+    }
     // Update is called once per frame
     void FixedUpdate()
     {
         if (isActive)
+        {
             transform.Translate(transform.forward * speed * Time.deltaTime,Space.World);
+        }
 
-        if (!IsServer) return;
+        if (!IsServer)
+            return;
 
+
+        networkedPosition.Value = transform.position;
 
         TimeAlive += Time.fixedDeltaTime;
         if (TimeAlive > 6f)
@@ -38,6 +51,7 @@ public class TestQSkill : BaseSkillEntityBehaviorSkillShot //make it into a base
 
 
     }
+
 
     [ClientRpc]
     void MovePlayerAroundClientRPC(ulong networkObjectID)

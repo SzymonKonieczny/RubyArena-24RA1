@@ -40,10 +40,12 @@ public class TestSkillNewSystem : SkillBase
         var skillEntity = skillEntityGO.GetComponent<BaseSkillEntityBehavior>();
         skillEntity.SkillDataSO = ScriptableObject.CreateInstance<SkillDataSO>();
         skillEntity.SkillDataSO.damage = 5;
-
+        ServerAnnounceSpellCastClientRPC(0);
+    }
+    async void SpawnEntityDelayed()
+    {
 
     }
-
     [ClientRpc]
     void ServerAnnounceSpellCastClientRPC(ulong networkObjId)
     {
@@ -68,25 +70,14 @@ public class TestSkillNewSystem : SkillBase
     // Update is called once per frame
     void Update()
     {
+        if (InputCollector == null || combatManagerRef == null)
+            return;
 
-        if (Input.GetKeyDown(KeyCode.Q) && combatManagerRef.IsLocalPlayer) 
+        if (InputCollector.QClick && combatManagerRef.IsLocalPlayer) 
         {
             Use();
         }
     }
 
-    Vector3 getLookDirection()
-    {
-        var ray = Camera.main.ScreenPointToRay(new Vector3((float)Screen.width / 2f, (float)Screen.height / 2f));
-        Vector3 SkillDir = new();
-        if (Physics.Raycast(ray, out RaycastHit raycastHit))
-        {
-            SkillDir = (raycastHit.point - this.combatManagerRef.SkillshotSpawnPoint.position).normalized;
-        }
-        else
-        {
-            SkillDir = ray.direction;
-        }
-        return SkillDir;
-    }
+   
 }
