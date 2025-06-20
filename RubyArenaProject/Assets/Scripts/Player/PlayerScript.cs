@@ -106,7 +106,6 @@ public class PlayerScript : NetworkBehaviour
                 skillprefNetworkObj.TrySetParent(skillHolder);
 
                 var das = skillpref.GetComponent<TestSkillNewSystem>();
-                das.Init();
             }
         }
 

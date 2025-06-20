@@ -53,7 +53,6 @@ public class temporaryScript : NetworkBehaviour
             skillpref.transform.SetParent(skillHolder);
 
             var das = skillpref.GetComponent<TestSkillNewSystem>();
-            das.Init();
         }
     }
 }

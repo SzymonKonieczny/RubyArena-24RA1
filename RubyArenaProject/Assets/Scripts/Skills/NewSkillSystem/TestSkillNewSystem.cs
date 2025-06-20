@@ -8,8 +8,12 @@ public class TestSkillNewSystem : SkillBase
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
+    }
+    private void OnTransformParentChanged()
+    {
         Init();
     }
+
     public override bool Use()
     {
         animationScript = combatManagerRef.animationScript;
@@ -52,7 +56,8 @@ public class TestSkillNewSystem : SkillBase
     // Start is called before the first frame update
     public void Init()
     {
-        var skillholder = gameObject.GetComponentInParent<PlayerSkillHolder>();
+        Debug.Log("Parent name :" + gameObject.transform.parent.name);
+        PlayerSkillHolder skillholder = gameObject.GetComponentInParent<PlayerSkillHolder>();
         this.combatManagerRef = skillholder.playerCombatManager;
         testPrefab = Resources.Load<GameObject>("Prefabs/SkillEntities/BlakeShot");
         animationScript = combatManagerRef?.animationScript;
@@ -63,6 +68,7 @@ public class TestSkillNewSystem : SkillBase
     // Update is called once per frame
     void Update()
     {
+
         if (Input.GetKeyDown(KeyCode.Q) && combatManagerRef.IsLocalPlayer) 
         {
             Use();
