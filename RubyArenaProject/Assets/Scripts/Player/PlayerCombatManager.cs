@@ -87,6 +87,8 @@ public class PlayerCombatManager : NetworkBehaviour
         // canCombat is also checked when accepting/rejecting a spell
 
         return;
+
+        // Old system
         var ray = Camera.main.ScreenPointToRay(new Vector3((float)Screen.width / 2f, (float)Screen.height / 2f));
         Vector3 SkillDir = new();
         if (Physics.Raycast(ray, out RaycastHit raycastHit))
