@@ -58,8 +58,6 @@ public class TestSkillNewSystem : SkillBase
 
     }
 
-  
-
     // Update is called once per frame
     void Update()
     {
