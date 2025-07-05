@@ -47,7 +47,7 @@ public class TestSkillNewSystem : SkillBase
     }
     async void SpawnEntityDelayed()
     {
-
+         
     }
     [ClientRpc]
     void ServerAnnounceSpellCastClientRPC(ulong networkObjId)
@@ -58,17 +58,7 @@ public class TestSkillNewSystem : SkillBase
 
     }
 
-    // Start is called before the first frame update
-    public void Init()
-    {
-        Debug.Log("Parent name :" + gameObject.transform.parent.name);
-        PlayerSkillHolder skillholder = gameObject.GetComponentInParent<PlayerSkillHolder>();
-        this.combatManagerRef = skillholder.playerCombatManager;
-        testPrefab = Resources.Load<GameObject>("Prefabs/SkillEntities/BlakeShot");
-        animationScript = combatManagerRef?.animationScript;
-        InputCollector = skillholder.inputCollectorScript;
-
-    }
+  
 
     // Update is called once per frame
     void Update()

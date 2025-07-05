@@ -7,6 +7,7 @@ public class BlinkSkill : SkillBase
 {
     Vector3 posOffset;
     float cooldown = 0;
+    [SerializeField] ParticleSystem effect;
     public override bool Use()
     {
         RaycastHit rayHit = getRayHit();
@@ -45,11 +46,14 @@ public class BlinkSkill : SkillBase
         }
         //if (IsServer) return;
         animationScript.PlayState("jumping");
+        effect.Play();
         if (IsOwner)
         {
             StartCoroutine(Jump(posOffset));
+            
+
         }
-        
+
 
         // animationScript.Trigger("SpellCastAccepted");
 

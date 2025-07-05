@@ -127,7 +127,7 @@ public class PlayerScript : NetworkBehaviour
         GameObject skillpref = Instantiate(skillPrefab);
         var skillprefNetworkObj = skillpref.GetComponent<NetworkObject>();
         skillprefNetworkObj.SpawnWithOwnership(clientID);
-        skillprefNetworkObj.TrySetParent(skillHolder);
+        skillprefNetworkObj.TrySetParent(skillHolder,false);
     }
     [ServerRpc]
    public void AskToSelectCharacterServerRpc(int selectedCharacterID)
