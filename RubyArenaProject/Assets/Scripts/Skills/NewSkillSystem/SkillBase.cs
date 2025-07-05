@@ -13,8 +13,14 @@ public abstract class SkillBase : NetworkBehaviour
     public InputCollectorScript InputCollector;
 
     [SerializeField] public SkillDataSO SkillDataSO;
-
+  
     public abstract bool Use();
+    protected RaycastHit getRayHit()
+    {
+        var ray = Camera.main.ScreenPointToRay(new Vector3((float)Screen.width / 2f, (float)Screen.height / 2f));
+        Physics.Raycast(ray, out RaycastHit raycastHit);
+        return raycastHit;
+    }
     protected Vector3 getLookDirection()
     {
         var ray = Camera.main.ScreenPointToRay(new Vector3((float)Screen.width / 2f, (float)Screen.height / 2f));
@@ -29,30 +35,38 @@ public abstract class SkillBase : NetworkBehaviour
         }
         return SkillDir;
     }
-/*      General Usage Recommendations :
-     bool Use()
+    public void Init()
     {
-        Play Animation For Windup
-
-        Get Direction etc
-
-        Send an RPC to teh server to ask for exetution.
+        PlayerSkillHolder skillholder = gameObject.GetComponentInParent<PlayerSkillHolder>();
+        this.combatManagerRef = skillholder.playerCombatManager;
+        animationScript = skillholder.animationScript;
+        InputCollector = skillholder.inputCollectorScript;
     }
 
-    [ServerRpc]
-    void ServerSideUseServerRPC(Vector3 lookDir, ServerRpcParams rpcParams = default)
-    {
-       
-        Execute, or scheldue (with an async for delay) execution
+    /*      General Usage Recommendations :
+         bool Use()
+        {
+            Play Animation For Windup
 
-        Announce it was used so the clients can play the animations
+            Get Direction etc
 
-    }
+            Send an RPC to teh server to ask for exetution.
+        }
 
-    [ClientRpc]
-    void ServerAnnounceSpellCastClientRPC(ulong networkObjId)
-    {
-        animationScript.PlayState("SpellCast1");
+        [ServerRpc]
+        void ServerSideUseServerRPC(Vector3 lookDir, ServerRpcParams rpcParams = default)
+        {
 
-    }*/
+            Execute, or scheldue (with an async for delay) execution
+
+            Announce it was used so the clients can play the animations
+
+        }
+
+        [ClientRpc]
+        void ServerAnnounceSpellCastClientRPC(ulong networkObjId)
+        {
+            animationScript.PlayState("SpellCast1");
+
+        }*/
 }

@@ -33,6 +33,9 @@ public class TestSkillNewSystem : SkillBase
     {
         if (!IsServer) return;
 
+
+
+
         GameObject skillEntityGO = Instantiate(testPrefab);
 
         skillEntityGO.GetComponent<NetworkObject>().Spawn();
@@ -49,9 +52,9 @@ public class TestSkillNewSystem : SkillBase
     [ClientRpc]
     void ServerAnnounceSpellCastClientRPC(ulong networkObjId)
     {
-        if (IsServer) return;
-
-        animationScript.PlayState("SpellCast1");
+        //if (IsServer) return;
+        animationScript.PlayState("Spellcast1");
+        //animationScript.Trigger("SpellCastAccepted");
 
     }
 

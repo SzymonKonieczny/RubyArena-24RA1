@@ -7,7 +7,9 @@ using UnityEngine;
 public class CharacterModelSO : ScriptableObject
 {
     [SerializeField] public GameObject Model;
-    [SerializeField] public GameObject SkillPrefab;
+    [SerializeField] public GameObject SkillPrefab1;
+    [SerializeField] public GameObject SkillPrefab2;
+
 
     //[SerializeField] public SkillDataSO Skill1;
 

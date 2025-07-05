@@ -97,18 +97,37 @@ public class PlayerScript : NetworkBehaviour
 
             if(IsServer)
             {
-                var skillPrefab = CharacterList.Instance.Chracters[CharacterID.Value % 2].SkillPrefab;
-                var skillHolder = GetComponent<PlayerSkillHolder>().transform;
 
-                GameObject skillpref = Instantiate(skillPrefab);
-                var skillprefNetworkObj = skillpref.GetComponent<NetworkObject>();
-                skillprefNetworkObj.SpawnWithOwnership(NetworkObject.OwnerClientId);
-                skillprefNetworkObj.TrySetParent(skillHolder);
+                addSkillPrefab(CharacterList.Instance.Chracters[CharacterID.Value % 2].SkillPrefab1, NetworkObject.OwnerClientId);
+                addSkillPrefab(CharacterList.Instance.Chracters[CharacterID.Value % 2].SkillPrefab2, NetworkObject.OwnerClientId);
 
-                var das = skillpref.GetComponent<TestSkillNewSystem>();
+                // var skillPrefab = CharacterList.Instance.Chracters[CharacterID.Value % 2].SkillPrefab1;
+                //
+                // var skillHolder = GetComponent<PlayerSkillHolder>().transform;
+                //
+                // GameObject skillpref = Instantiate(skillPrefab);
+                // var skillprefNetworkObj = skillpref.GetComponent<NetworkObject>();
+                // skillprefNetworkObj.SpawnWithOwnership(NetworkObject.OwnerClientId);
+                // skillprefNetworkObj.TrySetParent(skillHolder);
+
+
+                // var das = skillpref.GetComponent<TestSkillNewSystem>();
             }
         }
 
+    }
+
+    void addSkillPrefab(GameObject prefab, ulong clientID)
+    {
+        if (prefab == null) return;
+        var skillPrefab = prefab;
+
+        var skillHolder = GetComponent<PlayerSkillHolder>().transform;
+
+        GameObject skillpref = Instantiate(skillPrefab);
+        var skillprefNetworkObj = skillpref.GetComponent<NetworkObject>();
+        skillprefNetworkObj.SpawnWithOwnership(clientID);
+        skillprefNetworkObj.TrySetParent(skillHolder);
     }
     [ServerRpc]
    public void AskToSelectCharacterServerRpc(int selectedCharacterID)
