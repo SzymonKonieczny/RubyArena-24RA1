@@ -6,7 +6,7 @@ using Unity.Netcode;
 public class BlinkSkill : SkillBase
 {
     Vector3 posOffset;
-    float cooldown = 0;
+    float cooldown = 0; 
     [SerializeField] ParticleSystem effect;
     public override bool Use()
     {
@@ -22,10 +22,13 @@ public class BlinkSkill : SkillBase
         }
         animationScript.PlayState("jumping");
         InputCollector.StunTime = 0.3f;
-        ServerSideUseServerRPC();
+        ServerSideUseServerRPC(); 
         return true;
     }
-
+    private void OnTransformParentChanged()
+    {
+        Init();
+    }
     IEnumerator Jump(Vector3 position)
     {
         yield return new WaitForSeconds(0.2f);
@@ -50,13 +53,7 @@ public class BlinkSkill : SkillBase
         if (IsOwner)
         {
             StartCoroutine(Jump(posOffset));
-            
-
         }
-
-
-        // animationScript.Trigger("SpellCastAccepted");
-
     }
     private void Start()
     {

@@ -28,6 +28,14 @@ public class PlayerCombatManager : NetworkBehaviour
     [SerializeField] NetworkObject NetworkObject;
     private bool isInitialized = false;
 
+    [ClientRpc]
+    public void SetStunTimerClientRPC(float time)
+    {
+        if (InputCollector.StunTime < 0) 
+            InputCollector.StunTime = 0;
+
+        InputCollector.StunTime += time;
+    }
 
     // Start is called before the first frame update
     public void Initialize()

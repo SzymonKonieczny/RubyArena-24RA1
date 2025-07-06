@@ -19,7 +19,7 @@ public class InputCollectorScript : MonoBehaviour
     /// <summary>
     /// CHEAT PRONE PROBALBLY TEMP SOLUTION xd ("temp")
     /// </summary>
-
+    
 
     // Update is called once per frame
     void Update()
@@ -35,12 +35,9 @@ public class InputCollectorScript : MonoBehaviour
             return;
         }
 
-
         VerticalAxis = Input.GetAxis("Vertical");
         HorizontalAxis = Input.GetAxis("Horizontal");
         QClick = Input.GetKeyDown(KeyCode.Q);
         EClick = Input.GetKeyDown(KeyCode.E);
-
-
     }
 }
