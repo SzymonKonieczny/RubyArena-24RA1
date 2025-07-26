@@ -13,7 +13,7 @@ public abstract class SkillBase : NetworkBehaviour
     public InputCollectorScript InputCollector;
 
     [SerializeField] public SkillDataSO SkillDataSO;
-  
+    protected float cooldown;
     public abstract bool Use();
     protected RaycastHit getRayHit()
     {

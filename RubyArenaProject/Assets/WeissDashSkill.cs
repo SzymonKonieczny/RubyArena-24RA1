@@ -3,36 +3,23 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 
-public class BlinkSkill : SkillBase
+public class WeissDashSkill : SkillBase
 {
-    Vector3 posOffset;
-    [SerializeField] ParticleSystem effect;
+    public int ForceAdded = 50;
     public override bool Use()
     {
-        RaycastHit rayHit = getRayHit();
-        if (rayHit.distance > 10 || rayHit.distance == 0 )
-        {
-            var ray = Camera.main.ScreenPointToRay(new Vector3((float)Screen.width / 2f, (float)Screen.height / 2f));
-            posOffset =  ray.direction.normalized * 10 + new Vector3(0, 3, 0);
-        }
-        else
-        {
-            posOffset = rayHit.point + new Vector3(0, 3, 0);
-        }
-        animationScript.PlayState("jumping");
+    
+     
+        //animationScript.PlayState("jumping");
         InputCollector.StunTime = 0.3f;
-        ServerSideUseServerRPC(); 
+        ServerSideUseServerRPC();
         return true;
     }
     private void OnTransformParentChanged()
     {
         Init();
     }
-    IEnumerator Jump(Vector3 position)
-    {
-        yield return new WaitForSeconds(0.2f);
-        combatManagerRef.transform.position += position;
-    }
+
     [ServerRpc]
     void ServerSideUseServerRPC(ServerRpcParams rpcParams = default)
     {
@@ -42,16 +29,17 @@ public class BlinkSkill : SkillBase
     [ClientRpc]
     void ServerAnnounceSpellCastClientRPC()
     {
-        if(animationScript == null)
+        if (animationScript == null)
         {
             Init();
         }
         //if (IsServer) return;
-        animationScript.PlayState("jumping");
-        effect.Play();
+        //animationScript.PlayState("jumping");
+       // effect.Play();
         if (IsOwner)
         {
-            StartCoroutine(Jump(posOffset));
+            //combatManagerRef.playerMove.AddNetworkRbForceClientRPC((combatManagerRef.playerMove.Orientation.forward * ForceAdded ) + new Vector3(0, 1f, 0));
+            combatManagerRef.playerMove.startDash();
         }
     }
     private void Start()
@@ -67,7 +55,7 @@ public class BlinkSkill : SkillBase
         if (InputCollector.EClick && combatManagerRef.IsLocalPlayer)
         {
             Use();
-            cooldown = 5f;
+            cooldown = 1f;
         }
     }
 }

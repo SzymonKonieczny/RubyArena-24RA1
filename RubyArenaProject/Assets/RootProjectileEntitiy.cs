@@ -12,10 +12,40 @@ public class RootProjectileEntitiy : NetworkBehaviour
     [SerializeField] GameObject playerHitParticles;
     [SerializeField] Rigidbody rb;
     [SerializeField] Collider collider;
-
-
-    private void Update()
+    [SerializeField] GameObject ParticleHolderGhostObject;
+    ParticleSystemGhostObject particleSystemGhostObject;
+    public override void OnNetworkSpawn()
     {
+        base.OnNetworkSpawn();
+        if(IsClient)
+        {
+            GameObject particleHolder =Instantiate(ParticleHolderGhostObject);
+            particleSystemGhostObject = particleHolder.GetComponent<ParticleSystemGhostObject>();
+            if(particleSystemGhostObject!=null)
+            {
+                particleSystemGhostObject.Init(this.transform);
+                particleSystemGhostObject.transform.position = this.transform.position;
+                var particleSystems = particleSystemGhostObject.GetComponentsInChildren<ParticleSystem>(true);
+                foreach(var PS in particleSystems)
+                {
+                    if (PS.transform.name == "FlyingPaticles")
+                    {
+                        flyingParticles = PS.gameObject;
+                    }
+                    else if (PS.transform.name == "PrisonParticles")
+                    {
+                        playerHitParticles = PS.gameObject;
+                    }
+                }
+
+                flyingParticles.SetActive(true);
+            }
+        }
+    }
+    private void FixedUpdate()
+    {
+
+        if (!IsServer) return;
         if(lifeTime <=0)
         {
             this.NetworkObject.Despawn();
@@ -25,6 +55,12 @@ public class RootProjectileEntitiy : NetworkBehaviour
         {
             transform.position = transform.position + transform.forward.normalized * 10 * Time.deltaTime;
         }
+    }
+    public override void OnNetworkDespawn()
+    {
+        Destroy(particleSystemGhostObject.gameObject);
+
+        base.OnNetworkDespawn();
     }
     [ClientRpc]
     public void SwapParticleSystemsClientRPC()

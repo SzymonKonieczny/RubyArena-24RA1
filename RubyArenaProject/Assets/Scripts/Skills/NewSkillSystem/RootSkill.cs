@@ -6,6 +6,7 @@ using Unity.Netcode;
 public class RootSkill : SkillBase
 {
     [SerializeField] GameObject projectile;
+    Rigidbody rbTest;
     // Start is called before the first frame update
     void Start()
     {
@@ -14,6 +15,7 @@ public class RootSkill : SkillBase
     private void OnTransformParentChanged()
     {
         Init();
+        rbTest = InputCollector.transform.GetComponent<Rigidbody>();
     }
     // Update is called once per frame
     void Update()
@@ -38,6 +40,8 @@ public class RootSkill : SkillBase
 
         ServerSideUseServerRPC(LookDir);
 
+
+        rbTest.AddForce(new Vector3(0, 100, 0),ForceMode.VelocityChange);
         return true;
     }
 

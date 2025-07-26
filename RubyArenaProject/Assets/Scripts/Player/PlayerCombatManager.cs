@@ -24,7 +24,7 @@ public class PlayerCombatManager : NetworkBehaviour
 
     public PlayerAnimationScript animationScript;
 
-    [SerializeField] Movement playerMove;
+    public Movement playerMove;
     [SerializeField] NetworkObject NetworkObject;
     private bool isInitialized = false;
 

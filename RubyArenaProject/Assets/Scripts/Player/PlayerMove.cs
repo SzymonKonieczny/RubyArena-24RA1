@@ -21,7 +21,7 @@ public class Movement : NetworkBehaviour
 
      Transform cameraPos;
     [SerializeField] Transform Model;
-    [SerializeField] Transform Orientation;
+    public Transform Orientation;
     [SerializeField] Transform UpwardTorsoBone;
     [SerializeField] PlayerOrientationModes OrientationMode = PlayerOrientationModes.Walking;
     public NetworkVariable<Vector3> RbVelocityNetworkVar = new NetworkVariable<Vector3>(writePerm: NetworkVariableWritePermission.Owner);
@@ -30,9 +30,11 @@ public class Movement : NetworkBehaviour
     private Vector3 RequestedForceToAdd = new Vector3(); //Vector of velocity requested by the server to add to this Rb
 
     private InputCollectorScript InputCollector;
-    private Rigidbody Rb;
+    public Rigidbody Rb;
     private PlayerScript playerScript;
     public float speed = 30;
+    public bool canFly = false;
+    public float dashModifier = 25;
 
     public float jumpForce;
 
@@ -88,6 +90,24 @@ public class Movement : NetworkBehaviour
     {
         RequestedForceToAdd += force;
     }
+    IEnumerator Dash(Vector3 dashDirection, float dashSpeed, float dashDuration)
+    {
+        float time = 0f;
+        int it = 0;
+        while (time < dashDuration)
+        {
+            Vector3 offset = dashDirection.normalized * dashModifier * Time.fixedDeltaTime;
+            transform.position += offset;
+            time += Time.fixedDeltaTime;
+            yield return new WaitForFixedUpdate();
+            it += 1;
+        }
+
+    }
+    public void startDash()
+    {
+        StartCoroutine(Dash(Rb.velocity.normalized, speed , 0.2f));
+    }
 
     void FixedUpdate()
     {
@@ -135,13 +155,7 @@ public class Movement : NetworkBehaviour
     }
     void HandleMove()
     {
-        if (Input.GetAxis("Jump") > 0)
-        {
-            if (isGrounded)
-            {
-                Rb.AddForce(transform.up * jumpForce);
-            }
-        }
+      
         Vector3 velocity = new();
         switch (OrientationMode)
         {
@@ -156,17 +170,34 @@ public class Movement : NetworkBehaviour
                 break;
         }
 
-
+        if (canFly)
+        {
+            if (Input.GetKey(KeyCode.Space))
+            {
+                velocity.y = jumpForce;
+            }
+            if (Input.GetKey(KeyCode.LeftShift))
+            {
+                velocity.y = -jumpForce;
+            }
+        }
+        else
+        {
+            if(isGrounded && Input.GetKeyDown(KeyCode.Space))
+            {
+                velocity.y = jumpForce;
+            }
+        }
         velocity += RequestedVelocityToAdd;
         RequestedVelocityToAdd = Vector3.zero;
 
-        velocity.y = Rb.velocity.y;
+        velocity.y += Rb.velocity.y;
         Rb.velocity = velocity;
         RbVelocityNetworkVar.Value = velocity;
 
         if(RequestedForceToAdd != Vector3.zero)
         {
-            Rb.AddForce(RequestedForceToAdd);
+            Rb.AddForce(RequestedForceToAdd, ForceMode.Impulse);
 
             RequestedForceToAdd = Vector3.zero;
         }
