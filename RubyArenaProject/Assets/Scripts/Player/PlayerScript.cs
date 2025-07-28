@@ -29,12 +29,14 @@ public class PlayerScript : NetworkBehaviour
         {
             InitializeCharacter();
         };
+        playerResources = GetComponent<PlayerResources>();
+        
+        
         if (IsServer)
         {
             CharacterID.Value = -1;
         }
 
-        playerResources = GetComponent<PlayerResources>();
 
 
         if (!IsLocalPlayer)
@@ -49,9 +51,11 @@ public class PlayerScript : NetworkBehaviour
         {
             CanvasManger.Instance.CharacterSelect.gameObject.SetActive(true);
             CanvasManger.Instance.playerScript = this;
-            playerResources.Initialize();
-            playerCombatManager.Initialize();
+    //        playerCombatManager.Initialize();
         }
+        playerCombatManager.Initialize();
+        playerResources.Initialize();
+
         isStunnedNetworkVar.Value = true; //We start stunned for as long as we are choosing our champ
 
 

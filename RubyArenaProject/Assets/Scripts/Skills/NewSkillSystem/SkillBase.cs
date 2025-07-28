@@ -35,8 +35,9 @@ public abstract class SkillBase : NetworkBehaviour
         }
         return SkillDir;
     }
-    public void Init()
+    virtual public void Init()
     {
+       
         PlayerSkillHolder skillholder = gameObject.GetComponentInParent<PlayerSkillHolder>();
         this.combatManagerRef = skillholder.playerCombatManager;
         animationScript = skillholder.animationScript;

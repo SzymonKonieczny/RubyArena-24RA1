@@ -15,18 +15,22 @@ public class RubyFormSkill : SkillBase
 
 
         //animationScript.PlayState("jumping");
-        InputCollector.StunTime = 0.3f;
+        //InputCollector.StunTime = 0.3f;
         ServerSideUseServerRPC();
         return true;
     }
     private void OnTransformParentChanged()
     {
         Init();
+    }
+
+    override public void Init()
+    {
+        base.Init();
         renderers = combatManagerRef.GetComponentsInChildren<SkinnedMeshRenderer>(true);
         ParticleSystem.MainModule main = roseParticles.main;
         main.duration = duration;
     }
-
     [ServerRpc]
     void ServerSideUseServerRPC(ServerRpcParams rpcParams = default)
     {
@@ -36,18 +40,15 @@ public class RubyFormSkill : SkillBase
     [ClientRpc]
     void ServerAnnounceSpellCastClientRPC()
     {
-        if (animationScript == null)
+        if (animationScript == null || renderers.Length == 0)
         {
-            Init();
-        }
+          Init(); 
+        } 
         //if (IsServer) return;
         //animationScript.PlayState("jumping");
         // effect.Play();
-        if (IsOwner)
-        {
             //combatManagerRef.playerMove.AddNetworkRbForceClientRPC((combatManagerRef.playerMove.Orientation.forward * ForceAdded ) + new Vector3(0, 1f, 0));
-            StartCoroutine(FormSwap(duration));
-        }
+         StartCoroutine(this.FormSwap(duration));
     }
     IEnumerator FormSwap (float duration)
     {

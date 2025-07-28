@@ -37,6 +37,10 @@ public class PlayerCombatManager : NetworkBehaviour
         InputCollector.StunTime += time;
     }
 
+    private void OnTransformParentChanged()
+    {
+        Initialize();
+    }
     // Start is called before the first frame update
     public void Initialize()
     {
@@ -47,7 +51,7 @@ public class PlayerCombatManager : NetworkBehaviour
         animationScript = GetComponent<PlayerAnimationScript>();
         playerMove = GetComponent<Movement>();
         NetworkObject = GetComponent<NetworkObject>();
-        Skill1 = Skill1SO.Type switch
+       /*Skill1 = Skill1SO.Type switch
         {
             SkillType.EntitySpawner => new EntitySpawningSkill(),
             SkillType.Dash => null,
@@ -65,7 +69,7 @@ public class PlayerCombatManager : NetworkBehaviour
             _ => null
         };
         Skill2.SkillDataSO = Skill2SO;
-        Skill2.animator = animationScript;
+        Skill2.animator = animationScript;*/
 
     }
 
@@ -95,7 +99,7 @@ public class PlayerCombatManager : NetworkBehaviour
         // canCombat is also checked when accepting/rejecting a spell
 
         return;
-
+/*
         // Old system
         var ray = Camera.main.ScreenPointToRay(new Vector3((float)Screen.width / 2f, (float)Screen.height / 2f));
         Vector3 SkillDir = new();
@@ -117,7 +121,7 @@ public class PlayerCombatManager : NetworkBehaviour
         {
             Skill2.ChangeSkilRequestState(SkillRequestState.Requested);
             SpawnSkillEntityServerRPC(2, SkillshotSpawnPoint.position, SkillDir);
-        }
+        }*/
 
     }
 
