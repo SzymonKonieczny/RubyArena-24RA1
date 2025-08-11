@@ -1,0 +1,108 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using Unity.Netcode;
+
+public class YangBlastSkill : SkillBase
+{
+    Rigidbody rbTest;
+    // Start is called before the first frame update
+    void Start()
+    {
+
+    }
+    private void OnTransformParentChanged()
+    {
+        Init();
+        rbTest = InputCollector.transform.GetComponent<Rigidbody>();
+    }
+    // Update is called once per frame
+    void Update()
+    {
+        if (InputCollector == null || combatManagerRef == null)
+            return;
+
+        if (InputCollector.EClick && combatManagerRef.IsLocalPlayer)
+        {
+            Use();
+        }
+    }
+
+    public override bool Use()
+{
+    animationScript = combatManagerRef.animationScript;
+
+    float windupTime = 0.2f;
+    animationScript.PlayState("WindUp", windupTime);
+    InputCollector.StunTime = windupTime;
+    Vector3 LookDir = getLookDirection();
+    combatManagerRef.playerMove.AddNetworkRbVelocityClientRPC(-LookDir * 5);
+    ServerSideUseServerRPC(LookDir, combatManagerRef.SkillshotSpawnPoint.position, this.NetworkObjectId);
+
+    return true;
+}
+
+    [ServerRpc]
+    void ServerSideUseServerRPC(Vector3 lookDir, Vector3 skillOrigin,ulong senderId, ServerRpcParams rpcParams = default)
+    {
+        if (!IsServer) return;
+
+        Collider[] overlaps = Physics.OverlapSphere(skillOrigin, 5);
+        List<PlayerCombatManager> playerCombatManagers = new();
+        foreach(var o in overlaps)
+        {
+            if(o.CompareTag("Player"))
+            {
+                var combatManager = o.transform.GetComponent<PlayerCombatManager>();
+                if (combatManager) playerCombatManagers.Add(combatManager);
+            }
+        }
+        List<PlayerCombatManager> playersInRange = new();
+
+        Debug.DrawLine(skillOrigin, skillOrigin + (lookDir.normalized * 5), Color.blue, 2f);
+        foreach (var player in playerCombatManagers)
+        {
+            Vector3 toTarget = ( player.transform.position - skillOrigin);
+            float angle = Mathf.Acos(Vector3.Dot(lookDir.normalized, toTarget.normalized));
+
+            Debug.DrawLine(skillOrigin, skillOrigin + toTarget, Color.gray, 2f);
+
+            Debug.Log($"angle : {angle}");
+            if(Mathf.Abs(angle) < Mathf.Deg2Rad * 40)
+            {
+                playersInRange.Add(player);
+                Debug.DrawLine(skillOrigin, skillOrigin + toTarget, Color.red,2f);
+            }
+
+        }
+
+        NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(senderId, out NetworkObject networkObject);
+
+        foreach (var player in playersInRange)
+        {
+            var playerResources = player.GetComponent<PlayerResources>();
+            if (!playerResources) continue;
+
+            Vector3 toTarget = (player.transform.position - skillOrigin);
+            player.playerMove.AddNetworkRbVelocityClientRPC(toTarget.normalized * 10);
+
+            var SkillDataSO = ScriptableObject.CreateInstance<SkillDataSO>();
+
+
+            SkillDataSO.damage = 40;
+            SkillDataSO.ownerId = senderId;
+            playerResources.damage(SkillDataSO);
+        }
+
+        ServerAnnounceSpellCastClientRPC(0);
+    }
+
+    [ClientRpc]
+    void ServerAnnounceSpellCastClientRPC(ulong networkObjId)
+    {
+        //if (IsServer) return;
+        animationScript.PlayState("Spellcast1");
+        //animationScript.Trigger("SpellCastAccepted");
+
+    }
+}

@@ -27,6 +27,7 @@ public class PlayerResources : UnitResource
         return MaxHP;
     }
 
+
     public override void damage(SkillDataSO skillData)
     {
         if (!IsServer) return;
@@ -93,5 +94,5 @@ public class PlayerResources : UnitResource
 
     }
 
-
+   
 }

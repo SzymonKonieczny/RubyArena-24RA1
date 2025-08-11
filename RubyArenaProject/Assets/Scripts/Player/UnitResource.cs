@@ -15,6 +15,7 @@ public abstract class UnitResource : NetworkBehaviour
     /// </summary>
     /// <param name="skillData">Takes SkillDataSO, to track the damage dealer</param>
     public abstract void damage(SkillDataSO skillData);
+
     public abstract void takeMana(float amount);
     public abstract float getHP();
     public abstract float getMana();
