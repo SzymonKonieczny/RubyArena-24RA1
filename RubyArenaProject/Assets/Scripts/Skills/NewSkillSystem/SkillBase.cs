@@ -3,15 +3,48 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 
-
+public enum SkillCastType
+{
+    Passive,
+    EClick,
+    QClick,
+    LeftMouseClick,
+}
+public class BoolRefType
+{
+    public bool value = false;
+}
 public abstract class SkillBase : NetworkBehaviour
 {
+    public BoolRefType spellTriggeringFlag;//for instance a key stroke
     public PlayerCombatManager combatManagerRef;
 
     public PlayerAnimationScript animationScript;
 
-    public InputCollectorScript InputCollector;
+    private void setTriggerFlagRef(InputCollectorScript inputCollectorScript)
+    {
+        if (inputCollectorScript == null)
+        {
+            Debug.LogWarning("inputCollectorScript was null. Cannoit set the triggering flag reference");
+            return;
+        }
+        switch (castType)
+        {
+            case SkillCastType.EClick:
+                spellTriggeringFlag = InputCollector.EClickRef;
+                break;
+            case SkillCastType.QClick:
+                spellTriggeringFlag = InputCollector.QClickRef;
+                break;
+            default:
+                Debug.LogWarning($"{nameof(castType)} is not supported as a triggerFlag");
+                spellTriggeringFlag = new BoolRefType();
+                break;
+        }
+    }
 
+    public InputCollectorScript InputCollector;
+    public SkillCastType castType;
     [SerializeField] public SkillDataSO SkillDataSO;
     protected float cooldown;
     public abstract bool Use();
@@ -42,6 +75,7 @@ public abstract class SkillBase : NetworkBehaviour
         this.combatManagerRef = skillholder.playerCombatManager;
         animationScript = skillholder.animationScript;
         InputCollector = skillholder.inputCollectorScript;
+        setTriggerFlagRef(InputCollector);
     }
 
     /*      General Usage Recommendations :

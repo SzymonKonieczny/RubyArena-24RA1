@@ -5,7 +5,9 @@ using Unity.Netcode;
 
 public class YangBlastSkill : SkillBase
 {
-    Rigidbody rbTest;
+    [SerializeField] PlayerResources resources;
+    public GameObject blastEffect;
+    [SerializeField]  float storedDamage = 0;
     // Start is called before the first frame update
     void Start()
     {
@@ -14,15 +16,24 @@ public class YangBlastSkill : SkillBase
     private void OnTransformParentChanged()
     {
         Init();
-        rbTest = InputCollector.transform.GetComponent<Rigidbody>();
+
+        resources = combatManagerRef.GetComponent<PlayerResources>();
+
+        if (IsServer)
+        {
+            if(resources)
+            {
+                resources.onTakeDamage += (float dmg) => { storedDamage += dmg; };
+            }
+        }
     }
     // Update is called once per frame
     void Update()
     {
-        if (InputCollector == null || combatManagerRef == null)
+        if (InputCollector == null || combatManagerRef == null || cooldown > 0 || !combatManagerRef.IsLocalPlayer)
             return;
 
-        if (InputCollector.EClick && combatManagerRef.IsLocalPlayer)
+        if (spellTriggeringFlag.value)
         {
             Use();
         }
@@ -47,6 +58,12 @@ public class YangBlastSkill : SkillBase
     {
         if (!IsServer) return;
 
+        GameObject skillEntityGO = Instantiate(blastEffect);
+
+        skillEntityGO.GetComponent<NetworkObject>().Spawn();
+        skillEntityGO.transform.SetPositionAndRotation(combatManagerRef.SkillshotSpawnPoint.transform.position + lookDir * 2, Quaternion.LookRotation(lookDir, Vector3.up));
+
+
         Collider[] overlaps = Physics.OverlapSphere(skillOrigin, 5);
         List<PlayerCombatManager> playerCombatManagers = new();
         foreach(var o in overlaps)
@@ -54,7 +71,7 @@ public class YangBlastSkill : SkillBase
             if(o.CompareTag("Player"))
             {
                 var combatManager = o.transform.GetComponent<PlayerCombatManager>();
-                if (combatManager) playerCombatManagers.Add(combatManager);
+                if (combatManager && combatManagerRef != combatManager) playerCombatManagers.Add(combatManager);
             }
         }
         List<PlayerCombatManager> playersInRange = new();
@@ -89,7 +106,8 @@ public class YangBlastSkill : SkillBase
             var SkillDataSO = ScriptableObject.CreateInstance<SkillDataSO>();
 
 
-            SkillDataSO.damage = 40;
+            SkillDataSO.damage = 30 + (int)storedDamage;
+            storedDamage = 0;
             SkillDataSO.ownerId = senderId;
             playerResources.damage(SkillDataSO);
         }
@@ -103,6 +121,8 @@ public class YangBlastSkill : SkillBase
         //if (IsServer) return;
         animationScript.PlayState("Spellcast1");
         //animationScript.Trigger("SpellCastAccepted");
+
+
 
     }
 }

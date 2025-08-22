@@ -15,15 +15,16 @@ public class RootSkill : SkillBase
     private void OnTransformParentChanged()
     {
         Init();
+
         rbTest = InputCollector.transform.GetComponent<Rigidbody>();
     }
     // Update is called once per frame
     void Update()
     {
-        if (InputCollector == null || combatManagerRef == null)
+        if (InputCollector == null || combatManagerRef == null || cooldown > 0 || !combatManagerRef.IsLocalPlayer)
             return;
 
-        if (InputCollector.EClick && combatManagerRef.IsLocalPlayer)
+        if (spellTriggeringFlag.value && combatManagerRef.IsLocalPlayer)
         {
             Use();
         }

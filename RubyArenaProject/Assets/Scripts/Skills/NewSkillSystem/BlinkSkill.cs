@@ -45,6 +45,7 @@ public class BlinkSkill : SkillBase
         if(animationScript == null)
         {
             Init();
+
         }
         //if (IsServer) return;
         animationScript.PlayState("jumping");
@@ -61,10 +62,10 @@ public class BlinkSkill : SkillBase
     private void Update()
     {
         cooldown -= Time.deltaTime;
-        if (InputCollector == null || combatManagerRef == null || cooldown > 0)
+        if (InputCollector == null || combatManagerRef == null || cooldown > 0 || !combatManagerRef.IsLocalPlayer)
             return;
 
-        if (InputCollector.EClick && combatManagerRef.IsLocalPlayer)
+        if (spellTriggeringFlag.value && combatManagerRef.IsLocalPlayer)
         {
             Use();
             cooldown = 5f;

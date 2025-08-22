@@ -8,8 +8,6 @@ public class WeissDashSkill : SkillBase
     public int ForceAdded = 50;
     public override bool Use()
     {
-    
-     
         //animationScript.PlayState("jumping");
         InputCollector.StunTime = 0.3f;
         ServerSideUseServerRPC();
@@ -49,10 +47,10 @@ public class WeissDashSkill : SkillBase
     private void Update()
     {
         cooldown -= Time.deltaTime;
-        if (InputCollector == null || combatManagerRef == null || cooldown > 0)
+        if (InputCollector == null || combatManagerRef == null || cooldown > 0 || !combatManagerRef.IsLocalPlayer)
             return;
 
-        if (InputCollector.EClick && combatManagerRef.IsLocalPlayer)
+        if (spellTriggeringFlag.value)
         {
             Use();
             cooldown = 1f;

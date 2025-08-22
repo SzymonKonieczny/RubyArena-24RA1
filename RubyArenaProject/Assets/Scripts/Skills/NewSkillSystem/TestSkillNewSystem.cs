@@ -8,6 +8,7 @@ public class TestSkillNewSystem : SkillBase
     private void OnTransformParentChanged()
     {
         Init();
+
     }
 
     public override bool Use()
@@ -53,10 +54,10 @@ public class TestSkillNewSystem : SkillBase
     // Update is called once per frame
     void Update()
     {
-        if (InputCollector == null || combatManagerRef == null)
+        if (InputCollector == null || combatManagerRef == null || cooldown > 0 || !combatManagerRef.IsLocalPlayer)
             return;
 
-        if (InputCollector.QClick && combatManagerRef.IsLocalPlayer) 
+        if (spellTriggeringFlag.value && combatManagerRef.IsLocalPlayer) 
         {
             Use();
         }

@@ -11,9 +11,19 @@ public class InputCollectorScript : MonoBehaviour
     public bool LeftClick { private set; get; } = false;
     public bool RightClick { private set; get; } = false;
 
-    public bool QClick { private set; get; } = false;
+    public bool QClick {  
+        private set { QClickRef.value = value;}
+        get { return QClickRef.value; }
+    }
 
-    public bool EClick { private set; get; } = false;
+    public bool EClick
+    {
+        private set { EClickRef.value = value; }
+        get { return EClickRef.value; }
+    }
+
+    public BoolRefType QClickRef { private set; get; } = new BoolRefType();
+    public BoolRefType EClickRef { private set; get; } = new BoolRefType();
 
     public float StunTime = 0;
     /// <summary>

@@ -27,6 +27,7 @@ public class RubyFormSkill : SkillBase
     override public void Init()
     {
         base.Init();
+
         renderers = combatManagerRef.GetComponentsInChildren<SkinnedMeshRenderer>(true);
         ParticleSystem.MainModule main = roseParticles.main;
         main.duration = duration;
@@ -82,10 +83,10 @@ public class RubyFormSkill : SkillBase
     private void Update()
     {
         cooldown -= Time.deltaTime;
-        if (InputCollector == null || combatManagerRef == null || cooldown > 0)
+        if (InputCollector == null || combatManagerRef == null || cooldown > 0 || !combatManagerRef.IsLocalPlayer)
             return;
 
-        if (InputCollector.EClick && combatManagerRef.IsLocalPlayer)
+        if (spellTriggeringFlag.value && combatManagerRef.IsLocalPlayer)
         {
             Use();
             cooldown = 1f;

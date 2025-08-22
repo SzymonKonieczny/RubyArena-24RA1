@@ -13,6 +13,7 @@ public class PlayerResources : UnitResource
     [SerializeField] float MaxHP = 100;
     [SerializeField] float MaxMana = 100;
 
+    public System.Action<float> onTakeDamage;
     private PlayerScript Player; //optimization to call getComponent less
     public void SetMaxHP(float amount)
     {
@@ -33,7 +34,7 @@ public class PlayerResources : UnitResource
         if (!IsServer) return;
 
         Hp.Value -= skillData.damage;
-
+        onTakeDamage.Invoke(skillData.damage);
         if(Player == null)
         {
          if(!TryGetComponent<PlayerScript>(out Player))
