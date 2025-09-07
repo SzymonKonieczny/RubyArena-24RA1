@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 
-public class InputCollectorScript : MonoBehaviour
+public class InputCollectorScript : NetworkBehaviour
 {
     public float VerticalAxis {private set; get; }
     public float HorizontalAxis { private set; get; }
@@ -22,8 +23,15 @@ public class InputCollectorScript : MonoBehaviour
         get { return EClickRef.value; }
     }
 
+    public bool leftClick
+    {
+        private set { leftClickRef.value = value; }
+        get { return leftClickRef.value; }
+    }
     public BoolRefType QClickRef { private set; get; } = new BoolRefType();
     public BoolRefType EClickRef { private set; get; } = new BoolRefType();
+
+    public BoolRefType leftClickRef { private set; get; } = new BoolRefType();
 
     public float StunTime = 0;
     /// <summary>
@@ -34,6 +42,7 @@ public class InputCollectorScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (!this.IsLocalPlayer) return;
         StunTime -= Time.deltaTime;
 
         if (StunTime > 0)
@@ -42,6 +51,8 @@ public class InputCollectorScript : MonoBehaviour
             HorizontalAxis = 0;
             QClick = false;
             EClick = false;
+            leftClick = false;
+
             return;
         }
 
@@ -49,5 +60,6 @@ public class InputCollectorScript : MonoBehaviour
         HorizontalAxis = Input.GetAxis("Horizontal");
         QClick = Input.GetKeyDown(KeyCode.Q);
         EClick = Input.GetKeyDown(KeyCode.E);
+        leftClick = Input.GetMouseButtonDown(0);
     }
 }

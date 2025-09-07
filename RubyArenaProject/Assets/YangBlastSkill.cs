@@ -93,12 +93,10 @@ public class YangBlastSkill : SkillBase
 
         }
 
-        NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(senderId, out NetworkObject networkObject);
-
         foreach (var player in playersInRange)
         {
             var playerResources = player.GetComponent<PlayerResources>();
-            if (!playerResources) continue;
+            if (!playerResources || player.NetworkObject.NetworkObjectId == senderId) continue;
 
             Vector3 toTarget = (player.transform.position - skillOrigin);
             player.playerMove.AddNetworkRbVelocityClientRPC(toTarget.normalized * 10);

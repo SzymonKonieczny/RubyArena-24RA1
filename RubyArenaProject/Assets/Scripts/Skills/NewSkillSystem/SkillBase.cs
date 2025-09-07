@@ -36,6 +36,9 @@ public abstract class SkillBase : NetworkBehaviour
             case SkillCastType.QClick:
                 spellTriggeringFlag = InputCollector.QClickRef;
                 break;
+            case SkillCastType.LeftMouseClick:
+                spellTriggeringFlag = InputCollector.leftClickRef;
+                break;
             default:
                 Debug.LogWarning($"{nameof(castType)} is not supported as a triggerFlag");
                 spellTriggeringFlag = new BoolRefType();
@@ -76,6 +79,8 @@ public abstract class SkillBase : NetworkBehaviour
         animationScript = skillholder.animationScript;
         InputCollector = skillholder.inputCollectorScript;
         setTriggerFlagRef(InputCollector);
+        if(!SkillDataSO) SkillDataSO = ScriptableObject.CreateInstance<SkillDataSO>();
+
     }
 
     /*      General Usage Recommendations :

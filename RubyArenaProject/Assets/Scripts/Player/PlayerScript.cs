@@ -87,43 +87,29 @@ public class PlayerScript : NetworkBehaviour
         var combatManager = GetComponent<PlayerCombatManager>();
         if (combatManager != null)
         {
-            //var assignedSkill = CharacterList.Instance.Chracters[CharacterID.Value % 2].Skill1;
 
-            //combatManager.Skill1 = assignedSkill.Type switch
-            //{
-            //    SkillType.EntitySpawner => new EntitySpawningSkill(),
-            //    SkillType.Dash => null,
-            //    SkillType.Seroid => null,
-            //    _ => null
-            //};
-           // combatManager.Skill1.SkillDataSO = assignedSkill;
-            //combatManager.Skill1.animator = PlayerAnimationScript;
 
             if(IsServer)
             {
 
                 addSkillPrefab(CharacterList.Instance.Chracters[CharacterID.Value % 2].SkillPrefab1, NetworkObject.OwnerClientId);
                 addSkillPrefab(CharacterList.Instance.Chracters[CharacterID.Value % 2].SkillPrefab2, NetworkObject.OwnerClientId);
+                var autoAttackCarrierGO = addSkillPrefab(CharacterList.Instance.Chracters[CharacterID.Value % 2].AutoAttack, NetworkObject.OwnerClientId);
 
-                // var skillPrefab = CharacterList.Instance.Chracters[CharacterID.Value % 2].SkillPrefab1;
-                //
-                // var skillHolder = GetComponent<PlayerSkillHolder>().transform;
-                //
-                // GameObject skillpref = Instantiate(skillPrefab);
-                // var skillprefNetworkObj = skillpref.GetComponent<NetworkObject>();
-                // skillprefNetworkObj.SpawnWithOwnership(NetworkObject.OwnerClientId);
-                // skillprefNetworkObj.TrySetParent(skillHolder);
-
-
-                // var das = skillpref.GetComponent<TestSkillNewSystem>();
+                if (autoAttackCarrierGO != null)
+                {
+                    AutoAttackSkillCarrier autoAttackScript = autoAttackCarrierGO.GetComponent<AutoAttackSkillCarrier>();
+                    autoAttackScript.autoAttackParams.Value = CharacterList.Instance.Chracters[CharacterID.Value % 2].AutoAttackParams;
+                    autoAttackScript.Init(); //Params require reinitialization after applying
+                }
             }
         }
 
     }
 
-    void addSkillPrefab(GameObject prefab, ulong clientID)
+    GameObject addSkillPrefab(GameObject prefab, ulong clientID)
     {
-        if (prefab == null) return;
+        if (prefab == null) return null;
         var skillPrefab = prefab;
 
         var skillHolder = GetComponent<PlayerSkillHolder>().transform;
@@ -132,6 +118,7 @@ public class PlayerScript : NetworkBehaviour
         var skillprefNetworkObj = skillpref.GetComponent<NetworkObject>();
         skillprefNetworkObj.SpawnWithOwnership(clientID);
         skillprefNetworkObj.TrySetParent(skillHolder,false);
+        return skillpref;
     }
     [ServerRpc]
    public void AskToSelectCharacterServerRpc(int selectedCharacterID)
