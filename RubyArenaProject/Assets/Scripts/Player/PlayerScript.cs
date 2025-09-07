@@ -73,7 +73,7 @@ public class PlayerScript : NetworkBehaviour
         {
             Destroy(ActiveModel.gameObject);
         }
-        GameObject ModelGO = Instantiate(CharacterList.Instance.Chracters[CharacterID.Value % 2].Model,ModelAnchor);
+        GameObject ModelGO = Instantiate(CharacterList.Instance.Chracters[CharacterID.Value].Model,ModelAnchor);
         hasCharacter.Value = true;
 
         ModelGO.transform.SetLocalPositionAndRotation(new Vector3(0, -1, 0), Quaternion.Euler(0, 0, 0));
@@ -92,14 +92,14 @@ public class PlayerScript : NetworkBehaviour
             if(IsServer)
             {
 
-                addSkillPrefab(CharacterList.Instance.Chracters[CharacterID.Value % 2].SkillPrefab1, NetworkObject.OwnerClientId);
-                addSkillPrefab(CharacterList.Instance.Chracters[CharacterID.Value % 2].SkillPrefab2, NetworkObject.OwnerClientId);
-                var autoAttackCarrierGO = addSkillPrefab(CharacterList.Instance.Chracters[CharacterID.Value % 2].AutoAttack, NetworkObject.OwnerClientId);
+                addSkillPrefab(CharacterList.Instance.Chracters[CharacterID.Value ].SkillPrefab1, NetworkObject.OwnerClientId);
+                addSkillPrefab(CharacterList.Instance.Chracters[CharacterID.Value ].SkillPrefab2, NetworkObject.OwnerClientId);
+                var autoAttackCarrierGO = addSkillPrefab(CharacterList.Instance.Chracters[CharacterID.Value ].AutoAttack, NetworkObject.OwnerClientId);
 
                 if (autoAttackCarrierGO != null)
                 {
                     AutoAttackSkillCarrier autoAttackScript = autoAttackCarrierGO.GetComponent<AutoAttackSkillCarrier>();
-                    autoAttackScript.autoAttackParams.Value = CharacterList.Instance.Chracters[CharacterID.Value % 2].AutoAttackParams;
+                    autoAttackScript.autoAttackParams.Value = CharacterList.Instance.Chracters[CharacterID.Value].AutoAttackParams;
                     autoAttackScript.Init(); //Params require reinitialization after applying
                 }
             }
