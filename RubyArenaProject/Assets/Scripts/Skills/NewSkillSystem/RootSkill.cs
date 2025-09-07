@@ -42,7 +42,6 @@ public class RootSkill : SkillBase
         ServerSideUseServerRPC(LookDir);
 
 
-        rbTest.AddForce(new Vector3(0, 100, 0),ForceMode.VelocityChange);
         return true;
     }
 
