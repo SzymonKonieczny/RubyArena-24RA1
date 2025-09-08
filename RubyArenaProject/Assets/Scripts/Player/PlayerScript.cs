@@ -109,8 +109,12 @@ public class PlayerScript : NetworkBehaviour
 
     GameObject addSkillPrefab(GameObject prefab, ulong clientID)
     {
-        if (prefab == null) return null;
-        var skillPrefab = prefab;
+        if (prefab == null)
+        {
+            Debug.LogWarning("Null skill prefab. Couldnt instantiate the carrier");
+            return null;
+        }
+            var skillPrefab = prefab;
 
         var skillHolder = GetComponent<PlayerSkillHolder>().transform;
 

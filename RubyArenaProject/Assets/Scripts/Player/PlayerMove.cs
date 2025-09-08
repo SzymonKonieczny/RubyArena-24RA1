@@ -106,7 +106,9 @@ public class Movement : NetworkBehaviour
     }
     public void startDash()
     {
-        StartCoroutine(Dash(Rb.velocity.normalized, speed , 0.2f));
+        Vector3 direction = ((Model.forward * Input.GetAxis("Vertical")) + (Model.right * Input.GetAxis("Horizontal")));
+        StartCoroutine(Dash(direction.normalized, speed , 0.2f));
+        //StartCoroutine(Dash(Rb.velocity.normalized, speed , 0.2f));
     }
 
     void FixedUpdate()
@@ -160,12 +162,12 @@ public class Movement : NetworkBehaviour
         switch (OrientationMode)
         {
             case PlayerOrientationModes.Walking:
-                velocity = ((Orientation.forward * InputCollector.VerticalAxis) + (Orientation.right * InputCollector.HorizontalAxis))
+                velocity = ((Orientation.forward * Input.GetAxis("Vertical")) + (Orientation.right * Input.GetAxis("Horizontal")))
               * speed * Time.fixedDeltaTime;
 
                 break;
             case PlayerOrientationModes.Aiming:
-                velocity = ((Model.forward * InputCollector.VerticalAxis) + (Model.right * InputCollector.HorizontalAxis))
+                velocity = ((Model.forward * Input.GetAxis("Vertical")) + (Model.right * Input.GetAxis("Horizontal")))
              * speed * Time.fixedDeltaTime;
                 break;
         }
