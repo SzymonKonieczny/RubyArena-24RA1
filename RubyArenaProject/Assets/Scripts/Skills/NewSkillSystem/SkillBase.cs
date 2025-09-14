@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
+using System;
 
 public enum SkillCastType
 {
@@ -49,7 +50,10 @@ public abstract class SkillBase : NetworkBehaviour
     public InputCollectorScript InputCollector;
     public SkillCastType castType;
     [SerializeField] public SkillDataSO SkillDataSO;
-    protected float cooldown;
+    [SerializeField] protected float cooldown;
+    [SerializeField] protected float windupTime =0.2f;
+    public NetworkVariable<long> nextAvaliableTicks;
+    protected bool isOnCooldown() => nextAvaliableTicks.Value > DateTime.UtcNow.Ticks;
     public abstract bool Use();
     protected RaycastHit getRayHit()
     {

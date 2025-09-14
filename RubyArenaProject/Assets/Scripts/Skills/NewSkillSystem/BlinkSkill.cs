@@ -20,7 +20,8 @@ public class BlinkSkill : SkillBase
             posOffset = rayHit.point + new Vector3(0, 3, 0);
         }
         animationScript.PlayState("jumping");
-        InputCollector.StunTime = 0.3f;
+        combatManagerRef.SetStunTimer(windupTime);
+
         ServerSideUseServerRPC(); 
         return true;
     }
@@ -36,6 +37,8 @@ public class BlinkSkill : SkillBase
     [ServerRpc]
     void ServerSideUseServerRPC(ServerRpcParams rpcParams = default)
     {
+        if (isOnCooldown()) return;
+        nextAvaliableTicks.Value = System.DateTime.UtcNow.AddSeconds(cooldown).Ticks;
         ServerAnnounceSpellCastClientRPC();
     }
 
@@ -61,14 +64,12 @@ public class BlinkSkill : SkillBase
     }
     private void Update()
     {
-        cooldown -= Time.deltaTime;
-        if (InputCollector == null || combatManagerRef == null || cooldown > 0 || !combatManagerRef.IsLocalPlayer)
+        if (InputCollector == null || combatManagerRef == null || isOnCooldown() || !combatManagerRef.IsLocalPlayer)
             return;
 
         if (spellTriggeringFlag.value && combatManagerRef.IsLocalPlayer)
         {
             Use();
-            cooldown = 5f;
         }
     }
 }

@@ -31,12 +31,16 @@ public class PlayerCombatManager : NetworkBehaviour
     [ClientRpc]
     public void SetStunTimerClientRPC(float time)
     {
-        if (InputCollector.StunTime < 0) 
+        SetStunTimer(time);
+    }
+
+    public void SetStunTimer(float time)
+    {
+        if (InputCollector.StunTime < 0)
             InputCollector.StunTime = 0;
 
         InputCollector.StunTime += time;
     }
-
     private void OnTransformParentChanged()
     {
         Initialize();

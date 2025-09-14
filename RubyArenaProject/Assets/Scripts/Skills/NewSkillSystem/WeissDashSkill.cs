@@ -8,8 +8,9 @@ public class WeissDashSkill : SkillBase
     public int ForceAdded = 50;
     public override bool Use()
     {
-        //animationScript.PlayState("jumping");
-        InputCollector.StunTime = 0.3f;
+        animationScript.PlayState("windUp");
+        combatManagerRef.SetStunTimer(windupTime);
+
         ServerSideUseServerRPC();
         return true;
     }
@@ -21,6 +22,8 @@ public class WeissDashSkill : SkillBase
     [ServerRpc]
     void ServerSideUseServerRPC(ServerRpcParams rpcParams = default)
     {
+        if (isOnCooldown()) return;
+        nextAvaliableTicks.Value = System.DateTime.UtcNow.AddSeconds(cooldown).Ticks;
         ServerAnnounceSpellCastClientRPC();
     }
 
@@ -46,14 +49,12 @@ public class WeissDashSkill : SkillBase
     }
     private void Update()
     {
-        cooldown -= Time.deltaTime;
-        if (InputCollector == null || combatManagerRef == null || cooldown > 0 || !combatManagerRef.IsLocalPlayer)
+        if (InputCollector == null || combatManagerRef == null || isOnCooldown() || !combatManagerRef.IsLocalPlayer)
             return;
 
         if (spellTriggeringFlag.value)
         {
             Use();
-            cooldown = 1f;
         }
     }
 }

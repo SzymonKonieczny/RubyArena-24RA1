@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
+using System;
 
 public class YangBlastSkill : SkillBase
 {
@@ -30,7 +31,7 @@ public class YangBlastSkill : SkillBase
     // Update is called once per frame
     void Update()
     {
-        if (InputCollector == null || combatManagerRef == null || cooldown > 0 || !combatManagerRef.IsLocalPlayer)
+        if (InputCollector == null || combatManagerRef == null || isOnCooldown()  || !combatManagerRef.IsLocalPlayer)
             return;
 
         if (spellTriggeringFlag.value)
@@ -40,23 +41,27 @@ public class YangBlastSkill : SkillBase
     }
 
     public override bool Use()
-{
-    animationScript = combatManagerRef.animationScript;
+    {   
+        animationScript = combatManagerRef.animationScript;
 
-    float windupTime = 0.2f;
-    animationScript.PlayState("WindUp", windupTime);
-    InputCollector.StunTime = windupTime;
-    Vector3 LookDir = getLookDirection();
-    combatManagerRef.playerMove.AddNetworkRbVelocityClientRPC(-LookDir * 5);
-    ServerSideUseServerRPC(LookDir, combatManagerRef.SkillshotSpawnPoint.position, this.NetworkObjectId);
+        animationScript.PlayState("WindUp", windupTime);
+        combatManagerRef.SetStunTimer(windupTime);
 
-    return true;
-}
+        Vector3 LookDir = getLookDirection();
+        combatManagerRef.playerMove.AddNetworkRbVelocityClientRPC(-LookDir * 5);
+        ServerSideUseServerRPC(LookDir, combatManagerRef.SkillshotSpawnPoint.position, this.NetworkObjectId);
+
+        return true;
+    }
 
     [ServerRpc]
     void ServerSideUseServerRPC(Vector3 lookDir, Vector3 skillOrigin,ulong senderId, ServerRpcParams rpcParams = default)
     {
         if (!IsServer) return;
+        if (isOnCooldown()) return;
+
+        nextAvaliableTicks.Value = System.DateTime.UtcNow.AddSeconds(cooldown).Ticks; 
+
 
         GameObject skillEntityGO = Instantiate(blastEffect);
 

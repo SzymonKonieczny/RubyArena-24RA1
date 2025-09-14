@@ -45,15 +45,16 @@ public class AutoAttackSkillCarrier : SkillBase
     {
         base.Init();
         SkillDataSO.damage = autoAttackParams.Value.Damage;
+        cooldown = 1 / autoAttackParams.Value.AttackSpeed;
     }
 
     public override bool Use()
     {
         animationScript = combatManagerRef.animationScript;
-
-        float windupTime = 0.2f;
+       
         animationScript.PlayState("WindUp", windupTime);
-        InputCollector.StunTime = windupTime;
+        combatManagerRef.SetStunTimer(windupTime);
+
         Vector3 LookDir = getLookDirection();
 
         ServerSideUseServerRPC(LookDir, this.NetworkObjectId);
@@ -65,7 +66,8 @@ public class AutoAttackSkillCarrier : SkillBase
     void ServerSideUseServerRPC(Vector3 lookDir, ulong senderId, ServerRpcParams rpcParams = default)
     {
         if (!IsServer) return;
-
+        if (isOnCooldown()) return;
+        nextAvaliableTicks.Value = System.DateTime.UtcNow.AddSeconds(cooldown).Ticks;
         Vector3 skillshotSpawnPos = combatManagerRef.SkillshotSpawnPoint.transform.position;
 
         var ovelappingColliders = Physics.OverlapBox(skillshotSpawnPos + (lookDir * autoAttackParams.Value.Range / 2),
@@ -113,7 +115,7 @@ public class AutoAttackSkillCarrier : SkillBase
     // Update is called once per frame
     void Update()
     {
-        if (InputCollector == null || combatManagerRef == null || cooldown > 0 || !combatManagerRef.IsLocalPlayer)
+        if (InputCollector == null || combatManagerRef == null || isOnCooldown() || !combatManagerRef.IsLocalPlayer)
             return;
 
         if (spellTriggeringFlag.value && combatManagerRef.IsLocalPlayer)

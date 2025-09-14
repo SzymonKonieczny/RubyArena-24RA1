@@ -14,8 +14,9 @@ public class RubyFormSkill : SkillBase
     {
 
 
-        //animationScript.PlayState("jumping");
-        //InputCollector.StunTime = 0.3f;
+        animationScript.PlayState("jumping");
+        combatManagerRef.SetStunTimer(windupTime);
+
         ServerSideUseServerRPC();
         return true;
     }
@@ -35,6 +36,9 @@ public class RubyFormSkill : SkillBase
     [ServerRpc]
     void ServerSideUseServerRPC(ServerRpcParams rpcParams = default)
     {
+        if (!IsServer) return;
+        if (isOnCooldown()) return;
+        nextAvaliableTicks.Value = System.DateTime.UtcNow.AddSeconds(cooldown).Ticks;
         ServerAnnounceSpellCastClientRPC();
     }
 
@@ -82,14 +86,12 @@ public class RubyFormSkill : SkillBase
     }
     private void Update()
     {
-        cooldown -= Time.deltaTime;
-        if (InputCollector == null || combatManagerRef == null || cooldown > 0 || !combatManagerRef.IsLocalPlayer)
+        if (InputCollector == null || combatManagerRef == null || isOnCooldown() || !combatManagerRef.IsLocalPlayer)
             return;
 
         if (spellTriggeringFlag.value && combatManagerRef.IsLocalPlayer)
         {
             Use();
-            cooldown = 1f;
         }
     }
 }

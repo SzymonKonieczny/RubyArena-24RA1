@@ -124,6 +124,8 @@ public class Movement : NetworkBehaviour
     {
         if(IsOwner)
         {
+            if (InputCollector.rightClick)
+                SwitchCameraStyle();
             DoPlayerOrientation();
         }
     }
@@ -194,9 +196,13 @@ public class Movement : NetworkBehaviour
         RequestedVelocityToAdd = Vector3.zero;
 
         velocity.y += Rb.velocity.y;
+
+        if(InputCollector.StunTime >0)
+        {
+            velocity = Vector3.zero;
+        }
         Rb.velocity = velocity;
         RbVelocityNetworkVar.Value = velocity;
-
         if(RequestedForceToAdd != Vector3.zero)
         {
             Rb.AddForce(RequestedForceToAdd, ForceMode.Impulse);

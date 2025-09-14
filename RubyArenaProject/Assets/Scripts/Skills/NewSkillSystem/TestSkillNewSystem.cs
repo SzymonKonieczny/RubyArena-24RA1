@@ -15,9 +15,9 @@ public class TestSkillNewSystem : SkillBase
     {
         animationScript = combatManagerRef.animationScript;
 
-        float windupTime = 0.2f;
         animationScript.PlayState("WindUp", windupTime);
-        InputCollector.StunTime = windupTime;
+        combatManagerRef.SetStunTimer(windupTime);
+
         Vector3 LookDir = getLookDirection();
 
         ServerSideUseServerRPC(LookDir);
@@ -29,6 +29,8 @@ public class TestSkillNewSystem : SkillBase
     void ServerSideUseServerRPC(Vector3 lookDir, ServerRpcParams rpcParams = default)
     {
         if (!IsServer) return;
+        if (isOnCooldown()) return;
+        nextAvaliableTicks.Value = System.DateTime.UtcNow.AddSeconds(cooldown).Ticks;
         GameObject skillEntityGO = Instantiate(blakeShotPrefab);
 
         skillEntityGO.GetComponent<NetworkObject>().Spawn();
@@ -54,7 +56,7 @@ public class TestSkillNewSystem : SkillBase
     // Update is called once per frame
     void Update()
     {
-        if (InputCollector == null || combatManagerRef == null || cooldown > 0 || !combatManagerRef.IsLocalPlayer)
+        if (InputCollector == null || combatManagerRef == null || isOnCooldown() || !combatManagerRef.IsLocalPlayer)
             return;
 
         if (spellTriggeringFlag.value && combatManagerRef.IsLocalPlayer) 

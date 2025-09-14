@@ -93,7 +93,7 @@ public class RootProjectileEntitiy : NetworkBehaviour
             }
             playerCombatManager.SetStunTimerClientRPC(stunTime);
             SwapParticleSystemsClientRPC();
-            this.transform.position = playerCombatManager.transform.position + new Vector3(0,1 , 0);
+            this.transform.position = playerCombatManager.transform.position + new Vector3(0,-1.0f , 0);
             lifeTime = stunTime;
             wasHit = true;
             StartCoroutine(DespawnAfterDelay());

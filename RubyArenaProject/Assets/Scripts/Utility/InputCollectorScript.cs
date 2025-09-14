@@ -28,10 +28,19 @@ public class InputCollectorScript : NetworkBehaviour
         private set { leftClickRef.value = value; }
         get { return leftClickRef.value; }
     }
+
+    public bool rightClick
+    {
+        private set { rightClickRef.value = value; }
+        get { return rightClickRef.value; }
+    }
     public BoolRefType QClickRef { private set; get; } = new BoolRefType();
     public BoolRefType EClickRef { private set; get; } = new BoolRefType();
 
     public BoolRefType leftClickRef { private set; get; } = new BoolRefType();
+
+    public BoolRefType rightClickRef { private set; get; } = new BoolRefType();
+
 
     public float StunTime = 0;
     /// <summary>
@@ -52,7 +61,7 @@ public class InputCollectorScript : NetworkBehaviour
             QClick = false;
             EClick = false;
             leftClick = false;
-
+            //rightClick not affected
             return;
         }
 
@@ -61,5 +70,6 @@ public class InputCollectorScript : NetworkBehaviour
         QClick = Input.GetKeyDown(KeyCode.Q);
         EClick = Input.GetKeyDown(KeyCode.E);
         leftClick = Input.GetMouseButtonDown(0);
+        rightClick = Input.GetMouseButtonDown(1);
     }
 }
