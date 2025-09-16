@@ -44,7 +44,7 @@ public class YangBlastSkill : SkillBase
     {   
         animationScript = combatManagerRef.animationScript;
 
-        animationScript.PlayState("WindUp", windupTime);
+        animationScript.Trigger("WindUp");
         combatManagerRef.SetStunTimer(windupTime);
 
         Vector3 LookDir = getLookDirection();
@@ -122,10 +122,14 @@ public class YangBlastSkill : SkillBase
     void ServerAnnounceSpellCastClientRPC(ulong networkObjId)
     {
         //if (IsServer) return;
-        animationScript.PlayState("Spellcast1");
-        //animationScript.Trigger("SpellCastAccepted");
-
-
-
+        if(IsOwner)
+        {
+           animationScript.Trigger("SpellAcknowledge2");
+        }
+        else
+        {
+            animationScript.Trigger("WindUp");
+            animationScript.Trigger("SpellAcknowledge2");
+        }
     }
 }
