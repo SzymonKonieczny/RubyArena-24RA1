@@ -8,7 +8,7 @@ public class WeissDashSkill : SkillBase
     public int ForceAdded = 50;
     public override bool Use()
     {
-        animationScript.PlayState("windUp");
+        animationScript.Trigger("WindUp");
         combatManagerRef.SetStunTimer(windupTime);
 
         ServerSideUseServerRPC();
@@ -41,6 +41,12 @@ public class WeissDashSkill : SkillBase
         {
             //combatManagerRef.playerMove.AddNetworkRbForceClientRPC((combatManagerRef.playerMove.Orientation.forward * ForceAdded ) + new Vector3(0, 1f, 0));
             combatManagerRef.playerMove.startDash();
+            animationScript.Trigger("SpellAcknowledge1");
+        }
+        else
+        {
+            animationScript.Trigger("WindUp");
+            animationScript.Trigger("SpellAcknowledge1");
         }
     }
     private void Start()
