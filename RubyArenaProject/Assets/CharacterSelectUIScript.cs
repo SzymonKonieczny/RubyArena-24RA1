@@ -33,5 +33,8 @@ public class CharacterSelectUIScript : MonoBehaviour
     void onSelectedCharacter(CharacterCardScript selected)
     {
         playerScript.AskToSelectCharacterServerRpc(selected.currentCharacter.characterID);
+
+        UnityEngine.Cursor.visible = false;
+        UnityEngine.Cursor.lockState = CursorLockMode.Locked;
     }
 }

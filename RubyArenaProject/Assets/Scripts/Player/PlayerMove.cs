@@ -45,7 +45,9 @@ public class Movement : NetworkBehaviour
         playerScript = GetComponent<PlayerScript>();
         playerResources = GetComponent<PlayerResources>();
 
-        if(IsOwner)
+
+
+        if (IsOwner)
         {
             if (OrientationMode == PlayerOrientationModes.Walking)
             {
@@ -71,6 +73,11 @@ public class Movement : NetworkBehaviour
         }
     }
 
+
+    public void SnapModelToCameraDir()
+    {
+        Model.forward = Camera.main.transform.forward.ScaleVec(new Vector3(1, 0, 1)).normalized;
+    }
     [ClientRpc]
     public void PlayerDeathClientRPC()
     {
@@ -106,7 +113,17 @@ public class Movement : NetworkBehaviour
     }
     public void startDash()
     {
-        Vector3 direction = ((Model.forward * Input.GetAxis("Vertical")) + (Model.right * Input.GetAxis("Horizontal")));
+        Vector3 direction = new();
+        switch (OrientationMode)
+        {
+            case PlayerOrientationModes.Aiming:
+                direction = ((Model.forward * Input.GetAxis("Vertical")) + (Model.right * Input.GetAxis("Horizontal"))); 
+                break;
+            case PlayerOrientationModes.Walking:
+                direction = Model.forward * Mathf.Abs( (Input.GetAxis("Vertical") + Input.GetAxis("Horizontal"))/2);
+                break;
+        }
+
         StartCoroutine(Dash(direction.normalized, speed , 0.2f));
         //StartCoroutine(Dash(Rb.velocity.normalized, speed , 0.2f));
     }
@@ -139,6 +156,9 @@ public class Movement : NetworkBehaviour
             AimingCameraPos.gameObject.SetActive(true);
 
             cameraPos = AimingCameraPos;
+
+            //Set model rotation to current camera look
+            SnapModelToCameraDir();
             NormalCameraPos.gameObject.SetActive(false);
         }
         else

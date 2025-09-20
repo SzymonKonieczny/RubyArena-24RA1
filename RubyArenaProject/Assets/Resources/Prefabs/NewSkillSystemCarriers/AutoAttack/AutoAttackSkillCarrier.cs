@@ -54,7 +54,7 @@ public class AutoAttackSkillCarrier : SkillBase
        
         animationScript.PlayState("WindUp", windupTime);
         combatManagerRef.SetStunTimer(windupTime);
-
+        
         Vector3 LookDir = getLookDirection();
 
         ServerSideUseServerRPC(LookDir, this.NetworkObjectId);
@@ -107,9 +107,19 @@ public class AutoAttackSkillCarrier : SkillBase
     void ServerAnnounceSpellCastClientRPC(ulong networkObjId)
     {
         //if (IsServer) return;
-        animationScript.PlayState("Spellcast1");
         //animationScript.Trigger("SpellCastAccepted");
-
+        if (IsOwner)
+        {
+            //combatManagerRef.playerMove.AddNetworkRbForceClientRPC((combatManagerRef.playerMove.Orientation.forward * ForceAdded ) + new Vector3(0, 1f, 0));
+            animationScript.Trigger("AutoAttackAcknowledge");
+            combatManagerRef.playerMove.SnapModelToCameraDir();
+            combatManagerRef.SetStunTimer(cooldown);
+        }
+        else
+        {
+            animationScript.Trigger("WindUp");
+            animationScript.Trigger("AutoAttackAcknowledge");
+        }
     }
 
     // Update is called once per frame

@@ -51,7 +51,9 @@ public class PlayerScript : NetworkBehaviour
         {
             CanvasManger.Instance.CharacterSelect.gameObject.SetActive(true);
             CanvasManger.Instance.playerScript = this;
-    //        playerCombatManager.Initialize();
+
+
+            //        playerCombatManager.Initialize();
         }
         playerCombatManager.Initialize();
         playerResources.Initialize();
