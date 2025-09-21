@@ -55,10 +55,11 @@ public class YangBlastSkill : SkillBase
     }
 
     [ServerRpc]
-    void ServerSideUseServerRPC(Vector3 lookDir, Vector3 skillOrigin,ulong senderId, ServerRpcParams rpcParams = default)
+     void ServerSideUseServerRPC(Vector3 lookDir, Vector3 skillOrigin,ulong senderId, ServerRpcParams rpcParams = default)
     {
         if (!IsServer) return;
         if (isOnCooldown()) return;
+       
 
         nextAvaliableTicks.Value = System.DateTime.UtcNow.AddSeconds(cooldown).Ticks; 
 

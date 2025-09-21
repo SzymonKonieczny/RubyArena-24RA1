@@ -40,6 +40,7 @@ public class PlayerCombatManager : NetworkBehaviour
             InputCollector.StunTime = 0;
 
         InputCollector.StunTime += time;
+
     }
     private void OnTransformParentChanged()
     {
@@ -147,7 +148,7 @@ public class PlayerCombatManager : NetworkBehaviour
 
         RequestedSpell.ChangeSkilRequestState(SkillRequestState.Accepted);
 
-        InputCollector.StunTime = RequestedSpell.SkillDataSO.castTime;
+        SetStunTimer(RequestedSpell.SkillDataSO.castTime);
         Debug.Log($"Stunning for {InputCollector.StunTime}");
     }
 

@@ -102,7 +102,6 @@ public class PlayerScript : NetworkBehaviour
                 {
                     AutoAttackSkillCarrier autoAttackScript = autoAttackCarrierGO.GetComponent<AutoAttackSkillCarrier>();
                     autoAttackScript.autoAttackParams.Value = CharacterList.Instance.Chracters[CharacterID.Value].AutoAttackParams;
-                    autoAttackScript.Init(); //Params require reinitialization after applying
                 }
             }
         }
