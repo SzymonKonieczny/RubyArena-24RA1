@@ -89,19 +89,16 @@ public class PlayerScript : NetworkBehaviour
         var combatManager = GetComponent<PlayerCombatManager>();
         if (combatManager != null)
         {
-
-
             if(IsServer)
             {
-
                 addSkillPrefab(CharacterList.Instance.Chracters[CharacterID.Value ].SkillPrefab1, NetworkObject.OwnerClientId);
                 addSkillPrefab(CharacterList.Instance.Chracters[CharacterID.Value ].SkillPrefab2, NetworkObject.OwnerClientId);
                 var autoAttackCarrierGO = addSkillPrefab(CharacterList.Instance.Chracters[CharacterID.Value ].AutoAttack, NetworkObject.OwnerClientId);
-
                 if (autoAttackCarrierGO != null)
                 {
                     AutoAttackSkillCarrier autoAttackScript = autoAttackCarrierGO.GetComponent<AutoAttackSkillCarrier>();
                     autoAttackScript.autoAttackParams.Value = CharacterList.Instance.Chracters[CharacterID.Value].AutoAttackParams;
+                    autoAttackScript.Init();
                 }
             }
         }

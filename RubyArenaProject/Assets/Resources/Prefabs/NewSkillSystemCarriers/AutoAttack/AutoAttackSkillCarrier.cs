@@ -39,9 +39,10 @@ public class AutoAttackSkillCarrier : SkillBase
 
     private void Start()
     {
-        autoAttackParams.OnValueChanged += autoAttackDataUpdate;
+        autoAttackParams.OnValueChanged += (AutoAttackParams outdated, AutoAttackParams updated) =>autoAttackDataUpdate();
+        
     }
-    private void autoAttackDataUpdate(AutoAttackParams outdated, AutoAttackParams updated)
+    private void autoAttackDataUpdate()
     {
         SkillDataSO.damage = autoAttackParams.Value.Damage;
         cooldown = 1.0f / autoAttackParams.Value.AttackSpeed;
@@ -53,6 +54,7 @@ public class AutoAttackSkillCarrier : SkillBase
     public override void Init()
     {
         base.Init();
+        autoAttackDataUpdate();
     }
 
     public override bool Use()
@@ -74,6 +76,8 @@ public class AutoAttackSkillCarrier : SkillBase
     {
         if (!IsServer) return;
         if (isOnCooldown()) return;
+
+        Debug.Log($"{SkillDataSO.damage} damage, {SkillDataSO.coolDown} cd");
         nextAvaliableTicks.Value = System.DateTime.UtcNow.AddSeconds(cooldown).Ticks;
         Vector3 skillshotSpawnPos = combatManagerRef.SkillshotSpawnPoint.transform.position;
 
@@ -81,7 +85,7 @@ public class AutoAttackSkillCarrier : SkillBase
             new Vector3(2, 1, autoAttackParams.Value.Range / 2), Quaternion.LookRotation(lookDir));
 
         Assets.Scripts.Utility.DebugUtils.DrawBox(skillshotSpawnPos + (lookDir* autoAttackParams.Value.Range / 2),
-            new Vector3(2, 1, autoAttackParams.Value.Range / 2), Quaternion.LookRotation(lookDir), Color.red); 
+            new Vector3(1, 1, autoAttackParams.Value.Range / 2), Quaternion.LookRotation(lookDir), Color.red); 
          //Gizmos.DrawWireCube(skillshotSpawnPos + (combatManagerRef.transform.forward * autoAttackParams.Value.Range / 2), new Vector3(2, 1, autoAttackParams.Value.Range / 2));
 
         //check for which of them are players
