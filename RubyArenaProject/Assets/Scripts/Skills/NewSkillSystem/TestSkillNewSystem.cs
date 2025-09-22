@@ -30,14 +30,14 @@ public class TestSkillNewSystem : SkillBase
     {
         if (!IsServer) return;
         if (isOnCooldown()) return;
-        nextAvaliableTicks.Value = System.DateTime.UtcNow.AddSeconds(cooldown).Ticks;
+        setCooldown(cooldown);
+
         GameObject skillEntityGO = Instantiate(blakeShotPrefab);
 
         skillEntityGO.GetComponent<NetworkObject>().Spawn();
         skillEntityGO.transform.SetPositionAndRotation(combatManagerRef.SkillshotSpawnPoint.transform.position + lookDir * 2, Quaternion.LookRotation(lookDir, Vector3.up));
         var skillEntity = skillEntityGO.GetComponent<BaseSkillEntityBehavior>();
-        skillEntity.SkillDataSO = ScriptableObject.CreateInstance<SkillDataSO>();
-        skillEntity.SkillDataSO.damage = 5;
+        skillEntity.SkillDataSO = SkillDataSO;
         ServerAnnounceSpellCastClientRPC(0);
     }
     async void SpawnEntityDelayed()

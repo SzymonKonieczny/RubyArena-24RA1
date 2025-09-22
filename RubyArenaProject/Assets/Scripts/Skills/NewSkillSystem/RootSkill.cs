@@ -49,7 +49,8 @@ public class RootSkill : SkillBase
     {
         if (!IsServer) return;
         if (isOnCooldown()) return;
-        nextAvaliableTicks.Value = System.DateTime.UtcNow.AddSeconds(cooldown).Ticks;
+        setCooldown(cooldown);
+
         GameObject skillEntityGO = Instantiate(projectile);
 
         skillEntityGO.GetComponent<NetworkObject>().Spawn();

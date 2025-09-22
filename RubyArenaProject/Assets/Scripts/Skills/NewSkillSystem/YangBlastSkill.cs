@@ -61,8 +61,7 @@ public class YangBlastSkill : SkillBase
         if (isOnCooldown()) return;
        
 
-        nextAvaliableTicks.Value = System.DateTime.UtcNow.AddSeconds(cooldown).Ticks; 
-
+        setCooldown(cooldown);
 
         GameObject skillEntityGO = Instantiate(blastEffect);
 
@@ -110,7 +109,7 @@ public class YangBlastSkill : SkillBase
             var SkillDataSO = ScriptableObject.CreateInstance<SkillDataSO>();
 
 
-            SkillDataSO.damage = 30 + (int)storedDamage;
+            SkillDataSO.damage = damage + (int)storedDamage;
             storedDamage = 0;
             SkillDataSO.ownerId = senderId;
             playerResources.damage(SkillDataSO);

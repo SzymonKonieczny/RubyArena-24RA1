@@ -44,6 +44,7 @@ public class AutoAttackSkillCarrier : SkillBase
     }
     private void autoAttackDataUpdate()
     {
+        damage = autoAttackParams.Value.Damage;
         SkillDataSO.damage = autoAttackParams.Value.Damage;
         cooldown = 1.0f / autoAttackParams.Value.AttackSpeed;
     }
@@ -61,7 +62,7 @@ public class AutoAttackSkillCarrier : SkillBase
     {
         animationScript = combatManagerRef.animationScript;
        
-        animationScript.PlayState("WindUp", windupTime);
+        animationScript.Trigger("WindUp");
         combatManagerRef.SetStunTimer(windupTime);
         
         Vector3 LookDir = getLookDirection();
@@ -77,8 +78,8 @@ public class AutoAttackSkillCarrier : SkillBase
         if (!IsServer) return;
         if (isOnCooldown()) return;
 
-        Debug.Log($"{SkillDataSO.damage} damage, {SkillDataSO.coolDown} cd");
-        nextAvaliableTicks.Value = System.DateTime.UtcNow.AddSeconds(cooldown).Ticks;
+        setCooldown(cooldown);
+
         Vector3 skillshotSpawnPos = combatManagerRef.SkillshotSpawnPoint.transform.position;
 
         var ovelappingColliders = Physics.OverlapBox(skillshotSpawnPos + (lookDir * autoAttackParams.Value.Range / 2),

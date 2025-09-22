@@ -38,7 +38,8 @@ public class RubyFormSkill : SkillBase
     {
         if (!IsServer) return;
         if (isOnCooldown()) return;
-        nextAvaliableTicks.Value = System.DateTime.UtcNow.AddSeconds(cooldown).Ticks;
+        setCooldown(cooldown);
+
         ServerAnnounceSpellCastClientRPC();
     }
 

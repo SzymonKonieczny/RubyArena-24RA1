@@ -52,6 +52,8 @@ public abstract class SkillBase : NetworkBehaviour
     [SerializeField] public SkillDataSO SkillDataSO;
     [SerializeField] protected float cooldown =0;
     [SerializeField] protected float windupTime =0.2f;
+    [SerializeField] protected int damage =0;
+
     public NetworkVariable<long> nextAvaliableTicks;
     protected bool isOnCooldown() => nextAvaliableTicks.Value > DateTime.UtcNow.Ticks;
     public abstract bool Use();
@@ -60,6 +62,10 @@ public abstract class SkillBase : NetworkBehaviour
         var ray = Camera.main.ScreenPointToRay(new Vector3((float)Screen.width / 2f, (float)Screen.height / 2f));
         Physics.Raycast(ray, out RaycastHit raycastHit);
         return raycastHit;
+    }
+    public void setCooldown(float cooldown)
+    {
+        nextAvaliableTicks.Value = System.DateTime.UtcNow.AddSeconds(cooldown).Ticks;
     }
     protected Vector3 getLookDirection()
     {
@@ -84,6 +90,7 @@ public abstract class SkillBase : NetworkBehaviour
         InputCollector = skillholder.inputCollectorScript;
         setTriggerFlagRef(InputCollector);
         if(!SkillDataSO) SkillDataSO = ScriptableObject.CreateInstance<SkillDataSO>();
+        SkillDataSO.damage = damage;
 
     }
 

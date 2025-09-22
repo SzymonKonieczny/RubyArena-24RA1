@@ -19,7 +19,7 @@ public class SniperShotSkillCarrier : SkillBase
     {
         animationScript = combatManagerRef.animationScript;
 
-        animationScript.PlayState("WindUp", windupTime);
+        animationScript.Trigger("WindUp");
         combatManagerRef.SetStunTimer(windupTime);
 
         Vector3 LookDir = getLookDirection();
@@ -34,7 +34,8 @@ public class SniperShotSkillCarrier : SkillBase
     {
         if (!IsServer) return;
         if (isOnCooldown()) return;
-        nextAvaliableTicks.Value = System.DateTime.UtcNow.AddSeconds(cooldown).Ticks;
+        setCooldown(cooldown);
+
 
         var collider = Physics.Raycast(new Ray(combatManagerRef.SkillshotSpawnPoint.position, lookDir),out RaycastHit hit, 500);
         
@@ -55,9 +56,18 @@ public class SniperShotSkillCarrier : SkillBase
     [ClientRpc]
     void ServerAnnounceSpellCastClientRPC(ulong networkObjId)
     {
-        //if (IsServer) return;
-        animationScript.PlayState("Spellcast1");
-        //animationScript.Trigger("SpellCastAccepted");
+        if (IsOwner)
+        {
+            //combatManagerRef.playerMove.AddNetworkRbForceClientRPC((combatManagerRef.playerMove.Orientation.forward * ForceAdded ) + new Vector3(0, 1f, 0));
+            animationScript.Trigger("SpellAcknowledge1");
+            combatManagerRef.playerMove.SnapModelToCameraDir();
+        }
+        else
+        {
+            animationScript.Trigger("WindUp");
+            animationScript.Trigger("SpellAcknowledge1");
+
+        }
 
     }
 

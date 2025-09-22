@@ -23,7 +23,8 @@ public class WeissDashSkill : SkillBase
     void ServerSideUseServerRPC(ServerRpcParams rpcParams = default)
     {
         if (isOnCooldown()) return;
-        nextAvaliableTicks.Value = System.DateTime.UtcNow.AddSeconds(cooldown).Ticks;
+        setCooldown(cooldown);
+
         ServerAnnounceSpellCastClientRPC();
     }
 
