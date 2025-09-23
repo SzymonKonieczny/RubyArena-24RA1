@@ -12,8 +12,9 @@ public class PlayerResources : UnitResource
     
     [SerializeField] float MaxHP = 100;
     [SerializeField] float MaxMana = 100;
+    [SerializeField] ParticleSystem bleedingEffect;
 
-    public System.Action<float> onTakeDamage;
+    public System.Action<float> onTakeDamage ;
     private PlayerScript Player; //optimization to call getComponent less
     public void SetMaxHP(float amount)
     {
@@ -75,8 +76,16 @@ public class PlayerResources : UnitResource
             Mana.Value = MaxMana;
         }
 
-        if (!IsOwner) return;
+        Hp.OnValueChanged += (float preV, float newV) =>
+        {
+            if (preV > newV)
+            {
+                bleedingEffect.emission.SetBurst(0, new ParticleSystem.Burst(0, (preV - newV) * 3));
+                bleedingEffect.Play();
+            }
+        };
 
+        if (!IsOwner) return;
 
         HP_Slider = GameObject.FindGameObjectWithTag("HealthBar")?.GetComponent<Slider>();
       
@@ -89,6 +98,8 @@ public class PlayerResources : UnitResource
         Hp.OnValueChanged += (float preV, float newV) =>
         {
             HP_Slider.value = newV / MaxHP;
+
+    
         };
 
         Hp.OnValueChanged.Invoke(0, MaxHP);

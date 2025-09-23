@@ -5,15 +5,18 @@ using Unity.Netcode;
 
 public class SniperShotSkillCarrier : SkillBase
 {
+    [SerializeField] ISkillEffect shotEffect;
     private void OnTransformParentChanged()
     {
         Init();
+        shotEffect = combatManagerRef.transform.GetComponentInChildren<ISkillEffect>();
     }
     public override void Init()
     {
         base.Init();
         SkillDataSO.damage = 40;
     }
+ 
 
     public override bool Use()
     {
@@ -60,13 +63,14 @@ public class SniperShotSkillCarrier : SkillBase
         {
             //combatManagerRef.playerMove.AddNetworkRbForceClientRPC((combatManagerRef.playerMove.Orientation.forward * ForceAdded ) + new Vector3(0, 1f, 0));
             animationScript.Trigger("SpellAcknowledge1");
+            shotEffect.PlayEffect(0);
             combatManagerRef.playerMove.SnapModelToCameraDir();
         }
         else
         {
             animationScript.Trigger("WindUp");
             animationScript.Trigger("SpellAcknowledge1");
-
+            shotEffect.PlayEffect(0);
         }
 
     }

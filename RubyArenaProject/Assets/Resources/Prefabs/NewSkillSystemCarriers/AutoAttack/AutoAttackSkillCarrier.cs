@@ -36,14 +36,28 @@ public struct AutoAttackParams : INetworkSerializable, System.IEquatable<AutoAtt
 public class AutoAttackSkillCarrier : SkillBase
 {
     public NetworkVariable< AutoAttackParams> autoAttackParams = new();
+    
+    [ServerRpc]
+    private void ParamsSyncRequestServerRpc() //Could be set before networkSpawn, but that would cause dumb if-ology in the spawning logic
+    {
+        autoAttackParams.SetDirty(true);
+    }
 
     private void Start()
     {
         autoAttackParams.OnValueChanged += (AutoAttackParams outdated, AutoAttackParams updated) =>autoAttackDataUpdate();
-        
+        autoAttackDataUpdate();
+        if (IsOwner)
+        {
+          ParamsSyncRequestServerRpc();
+        }
     }
     private void autoAttackDataUpdate()
     {
+        if(IsOwner)
+        {
+            Debug.Log($"Logging : {autoAttackParams.Value.Damage} dmg {autoAttackParams.Value.AttackSpeed} as");
+        }
         damage = autoAttackParams.Value.Damage;
         SkillDataSO.damage = autoAttackParams.Value.Damage;
         cooldown = 1.0f / autoAttackParams.Value.AttackSpeed;
