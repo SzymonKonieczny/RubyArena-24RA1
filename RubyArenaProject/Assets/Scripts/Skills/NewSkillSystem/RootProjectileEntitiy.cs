@@ -7,6 +7,7 @@ public class RootProjectileEntitiy : NetworkBehaviour
     [SerializeField] SkillDataSO data;
     [SerializeField] float lifeTime;
     [SerializeField] float stunTime;
+    [SerializeField] float speed;
     bool wasHit = false;
     [SerializeField] GameObject flyingParticles;
     [SerializeField] GameObject playerHitParticles;
@@ -53,7 +54,7 @@ public class RootProjectileEntitiy : NetworkBehaviour
         lifeTime-= Time.deltaTime;
         if (!wasHit)
         {
-            transform.position = transform.position + transform.forward.normalized * 10 * Time.deltaTime;
+            transform.position = transform.position + transform.forward.normalized * speed * Time.fixedDeltaTime;
         }
     }
     public override void OnNetworkDespawn()

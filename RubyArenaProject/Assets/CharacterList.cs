@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class CharacterList : MonoBehaviour
 {
-    public List<CharacterModelSO> Chracters = new();
+    [SerializeField] public List<CharacterCardSO> Characters;
 
     public static CharacterList Instance;
 

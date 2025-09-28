@@ -6,6 +6,9 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "NewChracter", menuName = "ScriptableObjects/CharacterModelSO", order = 1)]
 public class CharacterModelSO : ScriptableObject
 {
+
+    [SerializeField] public Sprite Icon;
+
     [SerializeField] public GameObject Model;
     [SerializeField] public GameObject AutoAttack;
     [SerializeField] public GameObject SkillPrefab1;

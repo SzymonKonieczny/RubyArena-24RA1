@@ -17,4 +17,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/PlayTestGround.unity
     guid: d06d3dac4ac7b9a4d8421d55ebd5b32d
+  - enabled: 1
+    path: Assets/Scenes/MultiplayerLobby.unity
+    guid: 3daf646813255ba4781621bb7b02c454
   m_configObjects: {}

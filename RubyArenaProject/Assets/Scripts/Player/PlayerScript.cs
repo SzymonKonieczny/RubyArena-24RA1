@@ -24,7 +24,7 @@ public class PlayerScript : NetworkBehaviour
     {
         playerMove = GetComponent<Movement>();
         playerCombatManager = GetComponent<PlayerCombatManager>();
-        transform.position = new Vector3(25,20,12);
+        transform.position = new Vector3(0,1,0);
         CharacterID.OnValueChanged += (int pre, int post) =>
         {
             InitializeCharacter();
@@ -49,8 +49,8 @@ public class PlayerScript : NetworkBehaviour
         }
         else // if we are the local player
         {
-            CanvasManger.Instance.CharacterSelect.gameObject.SetActive(true);
-            CanvasManger.Instance.playerScript = this;
+            PersistentCanvasManger.Instance.CharacterSelect.gameObject.SetActive(true);
+            PersistentCanvasManger.Instance.playerScript = this;
 
 
             //        playerCombatManager.Initialize();
@@ -68,14 +68,14 @@ public class PlayerScript : NetworkBehaviour
             return;
 
         if(IsLocalPlayer) //Only when I have selected a champ, my local UI changes!
-            CanvasManger.Instance.CharacterSelect.gameObject.SetActive(false);
+            PersistentCanvasManger.Instance.CharacterSelect.gameObject.SetActive(false);
 
 
         if (ActiveModel != null)
         {
             Destroy(ActiveModel.gameObject);
         }
-        GameObject ModelGO = Instantiate(CharacterList.Instance.Chracters[CharacterID.Value].Model,ModelAnchor);
+        GameObject ModelGO = Instantiate(CharacterList.Instance.Characters[CharacterID.Value].characterModel.Model,ModelAnchor);
         hasCharacter.Value = true;
 
         ModelGO.transform.SetLocalPositionAndRotation(new Vector3(0, -1, 0), Quaternion.Euler(0, 0, 0));
@@ -91,13 +91,13 @@ public class PlayerScript : NetworkBehaviour
         {
             if(IsServer)
             {
-                addSkillPrefab(CharacterList.Instance.Chracters[CharacterID.Value ].SkillPrefab1, NetworkObject.OwnerClientId);
-                addSkillPrefab(CharacterList.Instance.Chracters[CharacterID.Value ].SkillPrefab2, NetworkObject.OwnerClientId);
-                var autoAttackCarrierGO = addSkillPrefab(CharacterList.Instance.Chracters[CharacterID.Value ].AutoAttack, NetworkObject.OwnerClientId);
+                addSkillPrefab(CharacterList.Instance.Characters[CharacterID.Value ].characterModel.SkillPrefab1, NetworkObject.OwnerClientId);
+                addSkillPrefab(CharacterList.Instance.Characters[CharacterID.Value ].characterModel.SkillPrefab2, NetworkObject.OwnerClientId);
+                var autoAttackCarrierGO = addSkillPrefab(CharacterList.Instance.Characters[CharacterID.Value ].characterModel.AutoAttack, NetworkObject.OwnerClientId);
                 if (autoAttackCarrierGO != null)
                 {
                     AutoAttackSkillCarrier autoAttackScript = autoAttackCarrierGO.GetComponent<AutoAttackSkillCarrier>();
-                    autoAttackScript.autoAttackParams.Value = CharacterList.Instance.Chracters[CharacterID.Value].AutoAttackParams;
+                    autoAttackScript.autoAttackParams.Value = CharacterList.Instance.Characters[CharacterID.Value].characterModel.AutoAttackParams;
                     autoAttackScript.Init();
                 }
             }

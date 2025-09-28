@@ -2,7 +2,7 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class CanvasManger : MonoBehaviour
+public class PersistentCanvasManger : MonoBehaviour
 {
 
     [SerializeField] Slider Healthbar;
@@ -15,13 +15,12 @@ public class CanvasManger : MonoBehaviour
         get { return _playerScript; }
         set
         {
-            CharacterSelect.playerScript = value;
             _playerScript = value;
         }
     }
 
 
-    public static CanvasManger Instance;
+    public static PersistentCanvasManger Instance;
     // Start is called before the first frame update
     private void Start()
     {

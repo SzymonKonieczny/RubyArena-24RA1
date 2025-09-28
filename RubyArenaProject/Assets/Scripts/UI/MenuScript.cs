@@ -24,7 +24,10 @@ public class MenuScript : MonoBehaviour
     {
         await UnityServices.InitializeAsync();
 
-        await AuthenticationService.Instance.SignInAnonymouslyAsync();
+        if(!AuthenticationService.Instance.IsSignedIn)
+        {
+            await AuthenticationService.Instance.SignInAnonymouslyAsync();
+        }
     }
 
     public async void StartHost()
@@ -50,7 +53,7 @@ public class MenuScript : MonoBehaviour
         StartMap();
 
     }
-    public async void StartMap()
+    public void StartMap()
     {
         NetworkManager.Singleton.StartHost();
         NetworkManager.Singleton.SceneManager.LoadScene(SceneName, LoadSceneMode.Single);
@@ -68,10 +71,6 @@ public class MenuScript : MonoBehaviour
             NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
         }
         NetworkManager.Singleton.StartClient();
-
-    }
-    private async void Start()
-    {
 
     }
 
