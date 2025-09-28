@@ -56,43 +56,10 @@ public class PlayerCombatManager : NetworkBehaviour
         animationScript = GetComponent<PlayerAnimationScript>();
         playerMove = GetComponent<Movement>();
         NetworkObject = GetComponent<NetworkObject>();
-       /*Skill1 = Skill1SO.Type switch
-        {
-            SkillType.EntitySpawner => new EntitySpawningSkill(),
-            SkillType.Dash => null,
-            SkillType.Seroid => null,
-            _ => null
-        };
-        Skill1.SkillDataSO = Skill1SO;
-        Skill1.animator = animationScript;
-
-        Skill2 = Skill2SO.Type switch
-        {
-            SkillType.EntitySpawner => new EntitySpawningSkill(),
-            SkillType.Dash => null,
-            SkillType.Seroid => null,
-            _ => null
-        };
-        Skill2.SkillDataSO = Skill2SO;
-        Skill2.animator = animationScript;*/
+       
 
     }
 
-   /* private void OnDrawGizmos()
-    {
-        var ray = Camera.main.ScreenPointToRay(new Vector3((float)Screen.width / 2f, (float)Screen.height / 2f));
-        Physics.Raycast(ray, out RaycastHit raycastHit);
-        Vector3 SkillDir =  (raycastHit.point- ray.origin).normalized; 
-        ray.direction = SkillDir;
-        Gizmos.color=Color.black;
-        Gizmos.DrawLine(ray.origin, raycastHit.point);
-        Gizmos.color = Color.green;
-        Gizmos.DrawLine(ray.origin, raycastHit.point);
-
-
-        Gizmos.color = Color.blue;
-        Gizmos.DrawRay(ray.origin, SkillDir);
-    }*/
     // Update is called once per frame
     void Update()
     {
@@ -100,33 +67,11 @@ public class PlayerCombatManager : NetworkBehaviour
        
         SkillCooldown -= Time.deltaTime;
 
-        if (playerScript.isStunnedNetworkVar.Value || !canCombat.Value) return;
+        if ( !canCombat.Value) return;
         // canCombat is also checked when accepting/rejecting a spell
 
         return;
-/*
-        // Old system
-        var ray = Camera.main.ScreenPointToRay(new Vector3((float)Screen.width / 2f, (float)Screen.height / 2f));
-        Vector3 SkillDir = new();
-        if (Physics.Raycast(ray, out RaycastHit raycastHit))
-        {
-            SkillDir  =   (raycastHit.point - SkillshotSpawnPoint.position).normalized;
-        }
-        else
-        {
-            SkillDir = ray.direction;
-        }
 
-        if (InputCollector.QClick && Skill1.CanCast())
-        {
-            Skill1.ChangeSkilRequestState(SkillRequestState.Requested);
-            SpawnSkillEntityServerRPC(1, SkillshotSpawnPoint.position, SkillDir);
-        }
-        if (InputCollector.EClick && Skill2.CanCast())
-        {
-            Skill2.ChangeSkilRequestState(SkillRequestState.Requested);
-            SpawnSkillEntityServerRPC(2, SkillshotSpawnPoint.position, SkillDir);
-        }*/
 
     }
 

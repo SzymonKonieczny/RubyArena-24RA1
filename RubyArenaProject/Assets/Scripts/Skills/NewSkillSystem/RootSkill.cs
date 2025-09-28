@@ -21,10 +21,10 @@ public class RootSkill : SkillBase
     // Update is called once per frame
     void Update()
     {
-        if (InputCollector == null || combatManagerRef == null || isOnCooldown() || !combatManagerRef.IsLocalPlayer)
+        if (InputCollector == null || combatManagerRef == null || isOnCooldown() || !combatManagerRef.IsOwner)
             return;
 
-        if (spellTriggeringFlag.value && combatManagerRef.IsLocalPlayer)
+        if (spellTriggeringFlag.value && combatManagerRef.IsOwner)
         {
             Use();
         }

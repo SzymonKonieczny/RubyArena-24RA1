@@ -130,7 +130,6 @@ public class Movement : NetworkBehaviour
 
     void FixedUpdate()
     {
-        if (playerScript.isStunnedNetworkVar.Value) return;
 
         if (IsOwner)
         {

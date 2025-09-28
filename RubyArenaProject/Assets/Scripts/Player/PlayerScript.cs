@@ -8,16 +8,14 @@ using UnityEngine.Rendering.HighDefinition.Attributes;
 public class PlayerScript : NetworkBehaviour
 {
     [SerializeField] Transform[] CameraTransforms;
-    public NetworkVariable<bool> isStunnedNetworkVar = new NetworkVariable<bool>();
     public Transform ModelAnchor;
-    public NetworkVariable<int> CharacterID= new NetworkVariable<int>(-1); 
-    public NetworkVariable<bool> hasCharacter = new(false);
 
     [SerializeField] PlayerAnimationScript PlayerAnimationScript;
     [SerializeField] PlayerCombatManager playerCombatManager;
     public Transform ActiveModel;
     public PlayerResources playerResources;
     public Movement playerMove;
+    public NetworkVariable<int> characterID = new(0);
 
 
     public override void OnNetworkSpawn()
@@ -25,23 +23,11 @@ public class PlayerScript : NetworkBehaviour
         playerMove = GetComponent<Movement>();
         playerCombatManager = GetComponent<PlayerCombatManager>();
         transform.position = new Vector3(0,1,0);
-        CharacterID.OnValueChanged += (int pre, int post) =>
-        {
-            InitializeCharacter();
-        };
         playerResources = GetComponent<PlayerResources>();
-        
-        
-        if (IsServer)
+        InitializeCharacter();
+
+        if (!IsOwner)
         {
-            CharacterID.Value = -1;
-        }
-
-
-
-        if (!IsLocalPlayer)
-        {
-            InitializeCharacter(); //for every character already in the game, try to initialize their characters 
             foreach (Transform t in CameraTransforms)
             {
                 Destroy(t.GetComponent<CinemachineFreeLook>());
@@ -49,34 +35,25 @@ public class PlayerScript : NetworkBehaviour
         }
         else // if we are the local player
         {
-            PersistentCanvasManger.Instance.CharacterSelect.gameObject.SetActive(true);
             PersistentCanvasManger.Instance.playerScript = this;
-
-
             //        playerCombatManager.Initialize();
         }
         playerCombatManager.Initialize();
         playerResources.Initialize();
 
-        isStunnedNetworkVar.Value = true; //We start stunned for as long as we are choosing our champ
-
 
     }
     void InitializeCharacter()
     {
-        if (CharacterID.Value == -1) //means character wasnt yet selected
-            return;
+        int CharacterID = this.characterID.Value;
 
-        if(IsLocalPlayer) //Only when I have selected a champ, my local UI changes!
-            PersistentCanvasManger.Instance.CharacterSelect.gameObject.SetActive(false);
-
-
+        if (CharacterID < 0 || CharacterID >= CharacterList.Instance.Characters.Count)
+            return; //This means they dont have a character (post-lobby jointer potentially)
         if (ActiveModel != null)
         {
             Destroy(ActiveModel.gameObject);
         }
-        GameObject ModelGO = Instantiate(CharacterList.Instance.Characters[CharacterID.Value].characterModel.Model,ModelAnchor);
-        hasCharacter.Value = true;
+        GameObject ModelGO = Instantiate(CharacterList.Instance.Characters[CharacterID].characterModel.Model,ModelAnchor);
 
         ModelGO.transform.SetLocalPositionAndRotation(new Vector3(0, -1, 0), Quaternion.Euler(0, 0, 0));
         ActiveModel = ModelGO.transform;
@@ -91,13 +68,13 @@ public class PlayerScript : NetworkBehaviour
         {
             if(IsServer)
             {
-                addSkillPrefab(CharacterList.Instance.Characters[CharacterID.Value ].characterModel.SkillPrefab1, NetworkObject.OwnerClientId);
-                addSkillPrefab(CharacterList.Instance.Characters[CharacterID.Value ].characterModel.SkillPrefab2, NetworkObject.OwnerClientId);
-                var autoAttackCarrierGO = addSkillPrefab(CharacterList.Instance.Characters[CharacterID.Value ].characterModel.AutoAttack, NetworkObject.OwnerClientId);
+                addSkillPrefab(CharacterList.Instance.Characters[CharacterID ].characterModel.SkillPrefab1, NetworkObject.OwnerClientId);
+                addSkillPrefab(CharacterList.Instance.Characters[CharacterID ].characterModel.SkillPrefab2, NetworkObject.OwnerClientId);
+                var autoAttackCarrierGO = addSkillPrefab(CharacterList.Instance.Characters[CharacterID ].characterModel.AutoAttack, NetworkObject.OwnerClientId);
                 if (autoAttackCarrierGO != null)
                 {
                     AutoAttackSkillCarrier autoAttackScript = autoAttackCarrierGO.GetComponent<AutoAttackSkillCarrier>();
-                    autoAttackScript.autoAttackParams.Value = CharacterList.Instance.Characters[CharacterID.Value].characterModel.AutoAttackParams;
+                    autoAttackScript.autoAttackParams.Value = CharacterList.Instance.Characters[CharacterID].characterModel.AutoAttackParams;
                     autoAttackScript.Init();
                 }
             }
@@ -122,15 +99,7 @@ public class PlayerScript : NetworkBehaviour
         skillprefNetworkObj.TrySetParent(skillHolder,false);
         return skillpref;
     }
-    [ServerRpc]
-   public void AskToSelectCharacterServerRpc(int selectedCharacterID)
-    {
-        if (!IsServer || hasCharacter.Value) return;
 
-        CharacterID.Value = selectedCharacterID;
-        isStunnedNetworkVar.Value = false; //After character selection we un-stun the player
-
-    }
 
     void Update()
     {

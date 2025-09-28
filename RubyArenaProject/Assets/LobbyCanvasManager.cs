@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Unity.Netcode;
+using UnityEngine.SceneManagement;
+
 public class LobbyCanvasManager : NetworkBehaviour
 {
     [SerializeField] GameObject playerInLobbyCardPrefab;
@@ -74,5 +76,11 @@ public class LobbyCanvasManager : NetworkBehaviour
     {
         LocalPlayerStateManager.LocalInstance.chosenCharacter.Value = Random.RandomRange(0, 3);
     }
+    public void StartGame()
+    {
+        UpdateStartButton(null);
+        if (!IsServer) return;
+        NetworkManager.Singleton.SceneManager.LoadScene("PlayTestGround", LoadSceneMode.Single);
 
+    }
 }
