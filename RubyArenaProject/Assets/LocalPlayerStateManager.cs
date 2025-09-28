@@ -14,7 +14,7 @@ public class LocalPlayerStateManager : NetworkBehaviour
             LocalInstance = this;
         }
 
-        if (!(IsServer || IsOwner)) return; 
+        if (!IsServer) return; 
         chosenCharacter.OnValueChanged += (_, _) =>
         {
             ServerPlayerStateManager.Instance.onPlayerStatesChanged.Invoke(this);

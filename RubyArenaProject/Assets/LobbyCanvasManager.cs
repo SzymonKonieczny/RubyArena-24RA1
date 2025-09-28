@@ -9,21 +9,24 @@ public class LobbyCanvasManager : NetworkBehaviour
     [SerializeField] NetworkObject PlayersListNO;
     [SerializeField] CharacterSelectUIScript characterSelect;
     [SerializeField] Button startButton;
-    [SerializeField] TMPro.TextMeshPro startButtonText;
+    [SerializeField] TMPro.TMP_Text startButtonText;
 
     public Dictionary<ulong, PlayerInLobbyIcon> playersInLobby = new();
+    void PostServerPlayerStateManagerInitialize()
+    {
+        ServerPlayerStateManager.Instance.onPlayerStatesChanged += UpdateStartButton;
+    }
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
-
+         
         startButton.interactable = IsServer;
-        ServerPlayerStateManager.Instance.onPlayerStatesChanged += UpdateStartButton;
         if (!IsServer) return;
 
 
         NetworkManager.Singleton.OnClientConnectedCallback += SpawnCardForJoiningPlayer;
         NetworkManager.Singleton.OnClientDisconnectCallback += DespawnCardForLeavingPlayer;
-
+        PostServerPlayerStateManagerInitialize();
         foreach (var player in ServerPlayerStateManager.Instance.playerStates)
         {
             SpawnCardForJoiningPlayer(player.Key);
@@ -35,7 +38,7 @@ public class LobbyCanvasManager : NetworkBehaviour
         int allPlayers = ServerPlayerStateManager.Instance.playerStates.Count;
         foreach (var player in ServerPlayerStateManager.Instance.playerStates)
         {
-            if (player.Value.chosenCharacter.Value > 0)
+            if (player.Value.chosenCharacter.Value >= 0)
                 ready += 1;
         }
         startButtonText.text = $"Start {ready}/{allPlayers}";

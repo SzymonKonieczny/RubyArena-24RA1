@@ -12,36 +12,45 @@ public class ServerPlayerStateManager : NetworkBehaviour
     public Action<LocalPlayerStateManager> onPlayerStatesChanged; //LocalPlayerStateManagers hook and unhook themselves on their own
 
     // Start is called before the first frame update
-    private void Start()
+    private void Awake()
     {
         if (Instance == null)
         {
             Instance = this;
-            NetworkManager.Singleton.OnClientConnectedCallback += OnConnectedPlayer;
-
         }
         else
         {
             Destroy(this);
         }
-
-    } 
-    public override void OnNetworkSpawn()
+    }
+    void Start()
     {
-        base.OnNetworkSpawn();
+        NetworkManager.Singleton.OnClientConnectedCallback += OnConnectedPlayer;
+        NetworkManager.Singleton.OnClientDisconnectCallback += OnDisconnectedPlayer;
+    }
+    public override void OnNetworkDespawn()
+    {
+        base.OnNetworkDespawn();
         if(!IsServer)
         {
             NetworkManager.Singleton.OnClientConnectedCallback -= OnConnectedPlayer;
-           // Destroy(this);
+            NetworkManager.Singleton.OnClientDisconnectCallback -= OnDisconnectedPlayer;
+            // Destroy(this);
         }
     }
+    void OnDisconnectedPlayer(ulong clientId)
+    {
+        playerStates.Remove(clientId);
+    }
+
+
     void OnConnectedPlayer(ulong clientId)
     {
         var obj = Instantiate(playerStateCarrier);
         var state = obj.GetComponent<LocalPlayerStateManager>();
 
 
-        state.NetworkObject.SpawnWithOwnership(clientId); // spawns and associates ownership
+        state.NetworkObject.SpawnWithOwnership(clientId); 
         
         playerStates[clientId] = state;
 
