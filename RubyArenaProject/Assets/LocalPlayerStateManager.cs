@@ -17,7 +17,7 @@ public class LocalPlayerStateManager : NetworkBehaviour
         if (!IsServer) return; 
         chosenCharacter.OnValueChanged += (_, _) =>
         {
-            ServerPlayerStateManager.Instance.onPlayerStatesChanged.Invoke(this);
+            ServerPlayerStateManager.Instance.onPlayerStatesChanged?.Invoke(this);
         };
     }
     public override void OnNetworkDespawn()

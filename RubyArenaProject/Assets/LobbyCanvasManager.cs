@@ -26,7 +26,7 @@ public class LobbyCanvasManager : NetworkBehaviour
 
         NetworkManager.Singleton.OnClientConnectedCallback += SpawnCardForJoiningPlayer;
         NetworkManager.Singleton.OnClientDisconnectCallback += DespawnCardForLeavingPlayer;
-        PostServerPlayerStateManagerInitialize();
+
         foreach (var player in ServerPlayerStateManager.Instance.playerStates)
         {
             SpawnCardForJoiningPlayer(player.Key);

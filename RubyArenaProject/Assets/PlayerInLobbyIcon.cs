@@ -7,7 +7,7 @@ using System;
 
 public class PlayerInLobbyIcon : NetworkBehaviour
 {
-    public NetworkVariable<int> chosenCharacterId = new NetworkVariable<int>(-1,writePerm: NetworkVariableWritePermission.Owner); //Could be us, could be other players
+    public NetworkVariable<int> chosenCharacterId = new NetworkVariable<int>(value : -1,writePerm: NetworkVariableWritePermission.Owner); //Could be us, could be other players
     public Button Button;
     public Image Icon;
     public Action OnButtonClick;

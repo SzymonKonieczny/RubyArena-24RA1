@@ -23,20 +23,19 @@ public class ServerPlayerStateManager : NetworkBehaviour
             Destroy(this);
         }
     }
-    void Start()
+    public override void OnNetworkSpawn()
     {
+        if (!IsServer) return;
+
         NetworkManager.Singleton.OnClientConnectedCallback += OnConnectedPlayer;
         NetworkManager.Singleton.OnClientDisconnectCallback += OnDisconnectedPlayer;
     }
     public override void OnNetworkDespawn()
     {
         base.OnNetworkDespawn();
-        if(!IsServer)
-        {
-            NetworkManager.Singleton.OnClientConnectedCallback -= OnConnectedPlayer;
-            NetworkManager.Singleton.OnClientDisconnectCallback -= OnDisconnectedPlayer;
-            // Destroy(this);
-        }
+        if (!IsServer) return;
+        NetworkManager.Singleton.OnClientConnectedCallback -= OnConnectedPlayer;
+        NetworkManager.Singleton.OnClientDisconnectCallback -= OnDisconnectedPlayer;
     }
     void OnDisconnectedPlayer(ulong clientId)
     {
