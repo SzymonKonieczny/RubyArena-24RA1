@@ -33,7 +33,6 @@ public class CharacterSelectUIScript : MonoBehaviour
     {;
         LocalPlayerStateManager.LocalInstance.chosenCharacter.Value = selected.currentCharacter.characterID;
       //  playerScript.AskToSelectCharacterServerRpc(selected.currentCharacter.characterID);
-      //  UnityEngine.Cursor.visible = false;
-      //  UnityEngine.Cursor.lockState = CursorLockMode.Locked;
+
     }
 }

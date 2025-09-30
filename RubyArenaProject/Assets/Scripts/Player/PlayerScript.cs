@@ -37,6 +37,7 @@ public class PlayerScript : NetworkBehaviour
         {
             PersistentCanvasManger.Instance.playerScript = this;
             //        playerCombatManager.Initialize();
+
         }
         playerCombatManager.Initialize();
         playerResources.Initialize();
