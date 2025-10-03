@@ -83,7 +83,7 @@ public class Movement : NetworkBehaviour
     {
         if (GameModeManager.Instance().CurrentGameMode == GameModeType.OneVOne)
         {
-            transform.position = new Vector3(25, 20, 12);
+            transform.position = new Vector3(1, 1, 1);
         }
     }
 

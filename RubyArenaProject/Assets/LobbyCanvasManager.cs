@@ -80,7 +80,7 @@ public class LobbyCanvasManager : NetworkBehaviour
     {
         UpdateStartButton(null);
         if (!IsServer) return;
-        NetworkManager.Singleton.SceneManager.LoadScene("PlayTestGround", LoadSceneMode.Single);
+        NetworkManager.Singleton.SceneManager.LoadScene("AmityArena", LoadSceneMode.Single);
 
     }
 }
