@@ -19,7 +19,7 @@ public abstract class SkillBase : NetworkBehaviour
 {
     public BoolRefType spellTriggeringFlag;//for instance a key stroke
     public PlayerCombatManager combatManagerRef;
-
+    public LayerMask rayCastMask;
     public PlayerAnimationScript animationScript;
 
     private void setTriggerFlagRef(InputCollectorScript inputCollectorScript)
@@ -60,7 +60,7 @@ public abstract class SkillBase : NetworkBehaviour
     protected RaycastHit getRayHit()
     {
         var ray = Camera.main.ScreenPointToRay(new Vector3((float)Screen.width / 2f, (float)Screen.height / 2f));
-        Physics.Raycast(ray, out RaycastHit raycastHit);
+        Physics.Raycast(ray, out RaycastHit raycastHit, rayCastMask);
         return raycastHit;
     }
     public void setCooldown(float cooldown)
@@ -71,7 +71,7 @@ public abstract class SkillBase : NetworkBehaviour
     {
         var ray = Camera.main.ScreenPointToRay(new Vector3((float)Screen.width / 2f, (float)Screen.height / 2f));
         Vector3 SkillDir = new();
-        if (Physics.Raycast(ray, out RaycastHit raycastHit))
+        if (Physics.Raycast(ray, out RaycastHit raycastHit, rayCastMask))
         {
             SkillDir = (raycastHit.point - this.combatManagerRef.SkillshotSpawnPoint.position).normalized;
         }

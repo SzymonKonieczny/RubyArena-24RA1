@@ -13,11 +13,11 @@ public class BlinkSkill : SkillBase
         if (rayHit.distance > 10 || rayHit.distance == 0 )
         {
             var ray = Camera.main.ScreenPointToRay(new Vector3((float)Screen.width / 2f, (float)Screen.height / 2f));
-            posOffset =  ray.direction.normalized * 10 + new Vector3(0, 3, 0);
+            posOffset =  ray.direction.normalized * 10 + new Vector3(0, 2, 0);
         }
         else
         {
-            posOffset = rayHit.point + new Vector3(0, 3, 0);
+            posOffset = rayHit.point + new Vector3(0, 2, 0);
         }
         animationScript.PlayState("jumping");
         combatManagerRef.SetStunTimer(windupTime);
