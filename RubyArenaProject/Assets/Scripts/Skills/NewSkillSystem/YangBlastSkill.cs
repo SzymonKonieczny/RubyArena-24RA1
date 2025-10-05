@@ -9,10 +9,11 @@ public class YangBlastSkill : SkillBase
     [SerializeField] PlayerResources resources;
     public GameObject blastEffect;
     [SerializeField]  float storedDamage = 0;
+    [SerializeField] ISkillEffect FlamingGloves;
     // Start is called before the first frame update
     void Start()
     {
-
+        FlamingGloves = combatManagerRef.GetComponentInChildren<ISkillEffect>();
     }
     private void OnTransformParentChanged()
     {
@@ -20,11 +21,18 @@ public class YangBlastSkill : SkillBase
 
         resources = combatManagerRef.GetComponent<PlayerResources>();
 
-        if (IsServer)
+       // if (IsServer)
         {
             if(resources)
             {
-                resources.onTakeDamage += (float dmg) => { storedDamage += dmg; };
+                resources.Hp.OnValueChanged += (float oldV, float newV) => {
+                    if (newV > oldV) return; //no damage taken, heals
+                    storedDamage += oldV-newV; 
+                    if(storedDamage > 30)
+                    {
+                        FlamingGloves.PlayEffect(0);
+                    }
+                };
             }
         }
     }
@@ -131,5 +139,6 @@ public class YangBlastSkill : SkillBase
             animationScript.Trigger("WindUp");
             animationScript.Trigger("SpellAcknowledge2");
         }
+        FlamingGloves.PlayEffect(1);
     }
 }

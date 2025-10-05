@@ -34,8 +34,8 @@ public class PlayerResources : UnitResource
     {
         if (!IsServer) return;
 
-        Hp.Value -= skillData.damage;
-        onTakeDamage.Invoke(skillData.damage);
+        Hp.Value -= skillData?.damage ?? 0;
+        onTakeDamage?.Invoke(skillData.damage);
         if(Player == null)
         {
          if(!TryGetComponent<PlayerScript>(out Player))
