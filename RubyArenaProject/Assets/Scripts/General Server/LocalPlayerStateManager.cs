@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
+using System;
+
 public class LocalPlayerStateManager : NetworkBehaviour
 {
     public static LocalPlayerStateManager LocalInstance;
@@ -28,5 +30,6 @@ public class LocalPlayerStateManager : NetworkBehaviour
 
     public NetworkVariable<int> chosenCharacter = new(-1, writePerm: NetworkVariableWritePermission.Owner);
     public NetworkVariable<bool> isLobbyReady = new(false, writePerm: NetworkVariableWritePermission.Owner);
-
+    public PlayerSkillHolder localPlayerRef;
+    public Action localPlayerInitialized;
 }

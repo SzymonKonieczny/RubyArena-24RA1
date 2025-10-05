@@ -15,6 +15,7 @@ public class PlayerScript : NetworkBehaviour
     public Transform ActiveModel;
     public PlayerResources playerResources;
     public Movement playerMove;
+    private PlayerSkillHolder skillHolder;
     public NetworkVariable<int> characterID = new(0);
 
 
@@ -24,6 +25,7 @@ public class PlayerScript : NetworkBehaviour
         playerCombatManager = GetComponent<PlayerCombatManager>();
         transform.position = new Vector3(0,1,0);
         playerResources = GetComponent<PlayerResources>();
+        skillHolder = GetComponent<PlayerSkillHolder>();
         InitializeCharacter();
 
         if (!IsOwner)
@@ -32,16 +34,19 @@ public class PlayerScript : NetworkBehaviour
             {
                 Destroy(t.GetComponent<CinemachineFreeLook>());
             }
+
+
         }
         else // if we are the local player
         {
             PersistentCanvasManger.Instance.playerScript = this;
             //        playerCombatManager.Initialize();
+            LocalPlayerStateManager.LocalInstance.localPlayerRef = skillHolder;
+            LocalPlayerStateManager.LocalInstance.localPlayerInitialized?.Invoke();
 
         }
         playerCombatManager.Initialize();
         playerResources.Initialize();
-
 
     }
     void InitializeCharacter()

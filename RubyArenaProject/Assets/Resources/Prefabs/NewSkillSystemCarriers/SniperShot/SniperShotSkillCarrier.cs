@@ -63,14 +63,14 @@ public class SniperShotSkillCarrier : SkillBase
         {
             //combatManagerRef.playerMove.AddNetworkRbForceClientRPC((combatManagerRef.playerMove.Orientation.forward * ForceAdded ) + new Vector3(0, 1f, 0));
             animationScript.Trigger("SpellAcknowledge1");
-            shotEffect.PlayEffect(0);
+            shotEffect?.PlayEffect(0);
             combatManagerRef.playerMove.SnapModelToCameraDir();
         }
         else
         {
             animationScript.Trigger("WindUp");
             animationScript.Trigger("SpellAcknowledge1");
-            shotEffect.PlayEffect(0);
+            shotEffect?.PlayEffect(0);
         }
 
     }

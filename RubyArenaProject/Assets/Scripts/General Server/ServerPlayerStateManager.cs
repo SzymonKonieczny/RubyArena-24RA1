@@ -10,7 +10,7 @@ public class ServerPlayerStateManager : NetworkBehaviour
     public GameObject playerStateCarrier;
     public Dictionary<ulong, LocalPlayerStateManager> playerStates = new();
     public Action<LocalPlayerStateManager> onPlayerStatesChanged; //LocalPlayerStateManagers hook and unhook themselves on their own
-
+    public string lobbyJoinCode;
     // Start is called before the first frame update
     private void Awake()
     {

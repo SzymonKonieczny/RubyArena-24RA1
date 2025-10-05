@@ -12,6 +12,7 @@ public class LobbyCanvasManager : NetworkBehaviour
     [SerializeField] CharacterSelectUIScript characterSelect;
     [SerializeField] Button startButton;
     [SerializeField] TMPro.TMP_Text startButtonText;
+    [SerializeField] private TMPro.TMP_Text DisplayJoinCode;
 
     public Dictionary<ulong, PlayerInLobbyIcon> playersInLobby = new();
     void PostServerPlayerStateManagerInitialize()
@@ -24,7 +25,7 @@ public class LobbyCanvasManager : NetworkBehaviour
          
         startButton.interactable = IsServer;
         if (!IsServer) return;
-
+        DisplayJoinCode.text = ServerPlayerStateManager.Instance.lobbyJoinCode;
 
         NetworkManager.Singleton.OnClientConnectedCallback += SpawnCardForJoiningPlayer;
         NetworkManager.Singleton.OnClientDisconnectCallback += DespawnCardForLeavingPlayer;

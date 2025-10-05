@@ -98,8 +98,6 @@ public class PlayerResources : UnitResource
         Hp.OnValueChanged += (float preV, float newV) =>
         {
             HP_Slider.value = newV / MaxHP;
-
-    
         };
 
         Hp.OnValueChanged.Invoke(0, MaxHP);

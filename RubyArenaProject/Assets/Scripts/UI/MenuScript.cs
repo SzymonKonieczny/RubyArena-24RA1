@@ -18,7 +18,6 @@ public class MenuScript : MonoBehaviour
     [SerializeField] private Toggle useRelay;
 
     [SerializeField] private TMPro.TMP_InputField InputJoinCode;
-    [SerializeField] private TMPro.TMP_Text DisplayJoinCode;
     [SerializeField] public string SceneName = "Starting Scene";
     async Task InitServices()
     {
@@ -39,7 +38,7 @@ public class MenuScript : MonoBehaviour
             await InitServices();
             Allocation allocation = await RelayService.Instance.CreateAllocationAsync(3);
             string code = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
-            DisplayJoinCode.text = code;
+            ServerPlayerStateManager.Instance.lobbyJoinCode = code;
             var relayServerData = new RelayServerData(allocation, "dtls");
 
             NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);

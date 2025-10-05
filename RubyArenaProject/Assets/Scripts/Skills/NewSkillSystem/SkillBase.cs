@@ -50,7 +50,7 @@ public abstract class SkillBase : NetworkBehaviour
     public InputCollectorScript InputCollector;
     public SkillCastType castType;
     [SerializeField] public SkillDataSO SkillDataSO;
-    [SerializeField] protected float cooldown =0;
+    [SerializeField] public float cooldown =0;
     [SerializeField] protected float windupTime =0.2f;
     [SerializeField] protected int damage =0;
 
