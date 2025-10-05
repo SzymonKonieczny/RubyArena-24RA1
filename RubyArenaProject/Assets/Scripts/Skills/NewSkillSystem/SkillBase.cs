@@ -89,9 +89,13 @@ public abstract class SkillBase : NetworkBehaviour
         animationScript = skillholder.animationScript;
         InputCollector = skillholder.inputCollectorScript;
         setTriggerFlagRef(InputCollector);
-        if(!SkillDataSO) SkillDataSO = ScriptableObject.CreateInstance<SkillDataSO>();
-        SkillDataSO.damage = damage;
+        if (!SkillDataSO)
+        {
+            SkillDataSO = ScriptableObject.CreateInstance<SkillDataSO>();
 
+        }
+        SkillDataSO.damage = damage;
+        SkillDataSO.castTime = windupTime;
     }
 
     /*      General Usage Recommendations :

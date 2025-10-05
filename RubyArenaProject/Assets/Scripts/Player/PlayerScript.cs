@@ -23,7 +23,7 @@ public class PlayerScript : NetworkBehaviour
     {
         playerMove = GetComponent<Movement>();
         playerCombatManager = GetComponent<PlayerCombatManager>();
-        transform.position = new Vector3(0,1,0);
+        transform.position = new Vector3(0,3,0);
         playerResources = GetComponent<PlayerResources>();
         skillHolder = GetComponent<PlayerSkillHolder>();
         InitializeCharacter();

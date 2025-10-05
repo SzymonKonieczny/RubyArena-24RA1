@@ -59,7 +59,6 @@ public class PlayerCombatManager : NetworkBehaviour
        
 
     }
-
     // Update is called once per frame
     void Update()
     {
@@ -73,102 +72,6 @@ public class PlayerCombatManager : NetworkBehaviour
         return;
 
 
-    }
-
-    [ClientRpc]
-    void RequestedSpellAnswerClientRPC(bool wasAccepted, int skillID)
-    {
-        if (!IsOwner) return; //Only the requestee
-        var RequestedSpell = skillID switch
-        {
-            1 => Skill1,
-            2 => Skill2,
-            _ => null
-        };
-        if (!wasAccepted)
-        {
-            RequestedSpell.ChangeSkilRequestState(SkillRequestState.NotRequested);
-            return;
-        }
-
-        RequestedSpell.ChangeSkilRequestState(SkillRequestState.Accepted);
-
-        SetStunTimer(RequestedSpell.SkillDataSO.castTime);
-        Debug.Log($"Stunning for {InputCollector.StunTime}");
-    }
-
-    [Rpc(SendTo.ClientsAndHost)]
-    void TellClientsToAnimateSkillClientRPC(int skillId)
-    {
-        if (IsOwner) return; //All clients other than the requestee, who need to be notified of 
-        //a spell being cast
-        var RequestedSpell = skillId switch
-        {
-            1 => Skill1,
-            2 => Skill2,
-            _ => null
-        };
-        RequestedSpell.ChangeSkilRequestState(SkillRequestState.Accepted);
-
-    }
-    [Rpc(SendTo.Server)]
-    void SpawnSkillEntityServerRPC(int id, Vector3 Position, Vector3 Direction)
-    {
-        if (!IsServer) return;
-
-        if (!canCombat.Value)
-        {
-            RequestedSpellAnswerClientRPC(false, id);
-        }
-        else
-        {
-            RequestedSpellAnswerClientRPC(true, id);
-        }
-
-        var RequestedSpell = id switch 
-        {
-           1 => Skill1,
-           2 => Skill2,
-            _ => null
-        };
-
-        
-        if (RequestedSpell == null) return;
-
-        switch (RequestedSpell.SkillDataSO.Type)
-        {
-            case SkillType.EntitySpawner:
-                StartCoroutine(SpawnEntityAfterDelay(RequestedSpell,
-                    Position, Direction));
-
-                break;
-            case SkillType.Seroid:
-                break;
-            case SkillType.Dash:
-                break;
-        }
-
-        TellClientsToAnimateSkillClientRPC(id);
-
-        //EditorApplication.isPaused = true;
-
-        SkillManagerScript.SkillList[0].Invoke(1);
-    }
-
-    IEnumerator SpawnEntityAfterDelay( BaseSkill RequestedSpell,
-        Vector3 Position, Vector3 Direction)
-    {
-        yield return new WaitForSeconds(RequestedSpell.SkillDataSO.castTime);
-        GameObject SkillEntity = Instantiate(RequestedSpell.SkillDataSO.SkillEntityToSpawn);
-
-        SkillEntity.GetComponent<NetworkObject>().Spawn();
-        SkillEntity.transform.SetPositionAndRotation(Position + Direction*2, Quaternion.LookRotation(Direction,Vector3.up));
-
-        var baseSkillEntityBehacvior = SkillEntity.GetComponent<BaseSkillEntityBehavior>();
-        baseSkillEntityBehacvior.SkillDataSO = RequestedSpell.SkillDataSO;
-        baseSkillEntityBehacvior.SkillDataSO.ownerId = NetworkObject.OwnerClientId;
-
-        // EditorApplication.isPaused = true;
     }
 
     private void OnTriggerEnter(Collider other)

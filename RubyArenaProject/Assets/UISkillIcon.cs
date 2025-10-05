@@ -11,6 +11,7 @@ public class UISkillIcon : MonoBehaviour
     [SerializeField]  SkillBase skill;
     [SerializeField]  DateTime nextAvaliable;
     [SerializeField]  float cooldown;
+    [SerializeField] Image icon;
     // Start is called before the first frame update
     void Awake() //should be called before any network stuff
     {
@@ -38,11 +39,12 @@ public class UISkillIcon : MonoBehaviour
             nextAvaliable = new DateTime(newV);
         };
         cooldown = skill.cooldown;
+        icon.sprite = skill.SkillDataSO.Icon;
     }
 
     void Update()
     {
         float secondsRemaming = Mathf.Clamp((float)(nextAvaliable - DateTime.UtcNow).TotalSeconds,0,99);
-        slider.value = 1 - (secondsRemaming/cooldown);
+        slider.value = Mathf.Clamp((secondsRemaming/cooldown),0,1);
     }
 }

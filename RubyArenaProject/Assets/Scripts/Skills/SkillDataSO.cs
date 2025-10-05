@@ -17,17 +17,8 @@ public class SkillDataSO : ScriptableObject
 
     public float castTime;
 
-    public float coolDown;
-    public float windUpTime = 0.1f;
     public Sprite Icon;
 
-    /// <summary>
-    /// a prefab with a derived class of SkillBehavior
-    /// </summary>
-    public GameObject SkillEntityToSpawn;
-
-    public string animationWindUpName;
-    public string animationCastName;
 
 
 

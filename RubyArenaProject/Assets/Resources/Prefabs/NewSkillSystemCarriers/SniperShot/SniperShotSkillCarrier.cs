@@ -14,7 +14,7 @@ public class SniperShotSkillCarrier : SkillBase
     public override void Init()
     {
         base.Init();
-        SkillDataSO.damage = 40;
+        SkillDataSO.damage = damage;
     }
  
 
@@ -40,7 +40,7 @@ public class SniperShotSkillCarrier : SkillBase
         setCooldown(cooldown);
 
 
-        var collider = Physics.Raycast(new Ray(combatManagerRef.SkillshotSpawnPoint.position, lookDir),out RaycastHit hit, 500);
+        var collider = Physics.Raycast(new Ray(combatManagerRef.SkillshotSpawnPoint.position, lookDir),out RaycastHit hit, 500,rayCastMask);
         
         if(hit.collider.CompareTag("Player"))
         {
