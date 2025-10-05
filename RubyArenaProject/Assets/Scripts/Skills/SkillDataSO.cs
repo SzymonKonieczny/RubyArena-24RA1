@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.UI;
 
 [CreateAssetMenu(fileName = "Skill", menuName = "ScriptableObjects/SkillData", order = 1)]
 public class SkillDataSO : ScriptableObject
@@ -18,7 +19,7 @@ public class SkillDataSO : ScriptableObject
 
     public float coolDown;
     public float windUpTime = 0.1f;
-
+    public Sprite Icon;
 
     /// <summary>
     /// a prefab with a derived class of SkillBehavior

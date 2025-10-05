@@ -68,6 +68,11 @@ public class PlayerResources : UnitResource
         Mana.Value -= amount;
 
     }
+    public override void OnNetworkSpawn()
+    {
+        base.OnNetworkSpawn();
+        Initialize();
+    }
     public void Initialize()
     {
         if(IsServer)
@@ -87,7 +92,8 @@ public class PlayerResources : UnitResource
 
         if (!IsOwner) return;
 
-        HP_Slider = GameObject.FindGameObjectWithTag("HealthBar")?.GetComponent<Slider>();
+        var GO = GameObject.FindGameObjectWithTag("HealthBar");
+        HP_Slider= GO?.GetComponent<Slider>();
       
 
         Mana.OnValueChanged += (float preV, float newV) =>

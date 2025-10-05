@@ -14,7 +14,7 @@ public class UISkillIcon : MonoBehaviour
     // Start is called before the first frame update
     void Awake() //should be called before any network stuff
     {
-        if(LocalPlayerStateManager.LocalInstance.localPlayerRef)
+        if(LocalPlayerStateManager.LocalInstance.localPlayerRef) // Inconsistent function call order forced my hand, forgive me God
         {
             Init();
         }
@@ -40,7 +40,6 @@ public class UISkillIcon : MonoBehaviour
         cooldown = skill.cooldown;
     }
 
-    // Update is called once per frame
     void Update()
     {
         float secondsRemaming = Mathf.Clamp((float)(nextAvaliable - DateTime.UtcNow).TotalSeconds,0,99);

@@ -22,6 +22,17 @@ public abstract class SkillBase : NetworkBehaviour
     public LayerMask rayCastMask;
     public PlayerAnimationScript animationScript;
 
+
+
+    public InputCollectorScript InputCollector;
+    public SkillCastType castType;
+    [SerializeField] public SkillDataSO SkillDataSO;
+    [SerializeField] public float cooldown =0;
+    [SerializeField] protected float windupTime =0.2f;
+    [SerializeField] protected int damage =0;
+    public NetworkVariable<long> nextAvaliableTicks;
+    protected bool isOnCooldown() => nextAvaliableTicks.Value > DateTime.UtcNow.Ticks;
+    public abstract bool Use();
     private void setTriggerFlagRef(InputCollectorScript inputCollectorScript)
     {
         if (inputCollectorScript == null)
@@ -46,17 +57,6 @@ public abstract class SkillBase : NetworkBehaviour
                 break;
         }
     }
-
-    public InputCollectorScript InputCollector;
-    public SkillCastType castType;
-    [SerializeField] public SkillDataSO SkillDataSO;
-    [SerializeField] public float cooldown =0;
-    [SerializeField] protected float windupTime =0.2f;
-    [SerializeField] protected int damage =0;
-
-    public NetworkVariable<long> nextAvaliableTicks;
-    protected bool isOnCooldown() => nextAvaliableTicks.Value > DateTime.UtcNow.Ticks;
-    public abstract bool Use();
     protected RaycastHit getRayHit()
     {
         var ray = Camera.main.ScreenPointToRay(new Vector3((float)Screen.width / 2f, (float)Screen.height / 2f));
