@@ -19,7 +19,7 @@ public abstract class SkillBase : NetworkBehaviour
 {
     public BoolRefType spellTriggeringFlag;//for instance a key stroke
     public PlayerCombatManager combatManagerRef;
-    public LayerMask rayCastMask;
+    public LayerMask rayCastMask = 385;
     public PlayerAnimationScript animationScript;
 
 
@@ -74,11 +74,15 @@ public abstract class SkillBase : NetworkBehaviour
         if (Physics.Raycast(ray, out RaycastHit raycastHit, rayCastMask))
         {
             SkillDir = (raycastHit.point - this.combatManagerRef.SkillshotSpawnPoint.position).normalized;
+        Debug.DrawLine(ray.origin,
+            raycastHit.point, Color.red, 3f);
+
         }
         else
         {
             SkillDir = ray.direction;
         }
+
         return SkillDir;
     }
     virtual public void Init()

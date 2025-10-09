@@ -40,8 +40,8 @@ public class SniperShotSkillCarrier : SkillBase
         setCooldown(cooldown);
 
 
-        var collider = Physics.Raycast(new Ray(combatManagerRef.SkillshotSpawnPoint.position, lookDir),out RaycastHit hit, 500,rayCastMask);
-        
+        var collider = Physics.Raycast(new Ray(combatManagerRef.SkillshotSpawnPoint.position, lookDir),out RaycastHit hit, 500);
+        Debug.DrawLine(combatManagerRef.SkillshotSpawnPoint.position, combatManagerRef.SkillshotSpawnPoint.position + (lookDir * 100), Color.green,3f);
         if(hit.collider.CompareTag("Player"))
         {
             var playerResources = hit.collider.transform.GetComponent<UnitResource>();

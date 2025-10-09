@@ -8,13 +8,13 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/MultiplayerStartScene.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/StartingScene.unity
     guid: 9de7c31cc10bb05489eb0f9de1d63553
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Terrain Test.unity
     guid: a565024e639a1f14cb8a97f8a946cac2
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/PlayTestGround.unity
     guid: d06d3dac4ac7b9a4d8421d55ebd5b32d
   - enabled: 1
