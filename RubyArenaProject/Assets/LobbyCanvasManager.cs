@@ -46,7 +46,6 @@ public class LobbyCanvasManager : NetworkBehaviour
         }
         startButtonText.text = $"Start {ready}/{allPlayers}";
         startButton.interactable = (ready == allPlayers) && IsServer;
-
     }
     void DespawnCardForLeavingPlayer(ulong clientId)
     {

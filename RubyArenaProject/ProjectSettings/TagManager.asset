@@ -6,6 +6,8 @@ TagManager:
   tags:
   - HealthBar
   - NonFightArea
+  - GameModeManager
+  - GameModeRelatedObject
   layers:
   - Default
   - TransparentFX

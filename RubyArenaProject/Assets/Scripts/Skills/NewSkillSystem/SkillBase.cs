@@ -19,7 +19,7 @@ public abstract class SkillBase : NetworkBehaviour
 {
     public BoolRefType spellTriggeringFlag;//for instance a key stroke
     public PlayerCombatManager combatManagerRef;
-    public LayerMask rayCastMask = 385;
+    public LayerMask rayCastMask;
     public PlayerAnimationScript animationScript;
 
 
