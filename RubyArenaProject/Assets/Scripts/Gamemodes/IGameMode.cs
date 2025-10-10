@@ -4,6 +4,6 @@ using UnityEngine;
 
 public interface IGameMode
 {
-    public void RegisterPlayer(long networkId);
-    public void RegisterObject(long networkId);
+    public void RegisterPlayer(ulong networkId);
+    public void RegisterObject(ulong networkId);
 }

@@ -47,7 +47,11 @@ public class PlayerScript : NetworkBehaviour
         }
         playerCombatManager.Initialize();
         playerResources.Initialize();
+        GameObject GM = GameObject.FindWithTag("GameModeManager");
+        if (GM == null) return;
 
+        IGameMode GameMode = GM.GetComponent<IGameMode>();
+        GameMode.RegisterPlayer(NetworkObject.NetworkObjectId);
     }
     void InitializeCharacter()
     {

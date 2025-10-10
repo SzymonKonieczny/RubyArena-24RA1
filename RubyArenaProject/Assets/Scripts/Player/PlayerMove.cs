@@ -45,8 +45,6 @@ public class Movement : NetworkBehaviour
         playerScript = GetComponent<PlayerScript>();
         playerResources = GetComponent<PlayerResources>();
 
-
-
         if (IsOwner)
         {
             if (OrientationMode == PlayerOrientationModes.Walking)
@@ -60,19 +58,7 @@ public class Movement : NetworkBehaviour
                 cameraPos = AimingCameraPos;
             }
         }
-       
-       if(IsServer)
-        {
-            playerResources.Hp.OnValueChanged += (float prev, float newV) =>
-            {
-                if (newV <= 0)
-                {
-                    GameModeManager.Instance().OnPlayerDeath.Invoke(playerScript);
-                }
-            };
-        }
     }
-
 
     public void SnapModelToCameraDir()
     {
@@ -87,6 +73,11 @@ public class Movement : NetworkBehaviour
         }
     }
 
+    [ClientRpc]
+    public void RequestTeleportClientRPC(Vector3 newPosition)
+    {
+        transform.position = newPosition;
+    }
     [ClientRpc]
     public void AddNetworkRbVelocityClientRPC(Vector3 vel)
     {
@@ -232,14 +223,14 @@ public class Movement : NetworkBehaviour
 
     void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.tag == ("Ground"))
+        if (collision.gameObject.tag == ("Terrain"))
         {
             isGrounded = true;
         }
     }
     void OnCollisionExit(Collision collision)
     {
-        if (collision.gameObject.tag == ("Ground"))
+        if (collision.gameObject.tag == ("Terrain"))
         {
             isGrounded = false;
         }
@@ -258,13 +249,6 @@ public class Movement : NetworkBehaviour
     }
     void doAiming()
     {
-        /*
-        Vector3 viewDirection = transform.position - new Vector3(cameraPos.position.x, transform.position.y,
-                                                                       cameraPos.position.z);
-        Orientation.forward = viewDirection.normalized;
-
-        Vector3 DirToCombatLook = CombatLookAt.position - cameraPos.position;
-        CombatLookAt.forward = DirToCombatLook.normalized;*/
 
         var ray = Camera.main.ScreenPointToRay(new Vector3((float)Screen.width / 2f, (float)Screen.height / 2f));
         Vector3 lookatDir;

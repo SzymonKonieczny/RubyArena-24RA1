@@ -8,16 +8,38 @@ public class TestGameModeManager : MonoBehaviour, IGameMode
     Dictionary<PlayerScript, int> scoreBoard = new();
     [SerializeField] int pointsToWin = 3;
     [SerializeField] List<Transform> capturePointSpawnPositions = new();
-    public void RegisterObject(long networkId)
+    [SerializeField] Transform playerRespawn;
+    public void RegisterObject(ulong networkId)
     {
+        if (!NetworkManager.Singleton.IsServer) return;
 
     }
 
-    public void RegisterPlayer(long networkId)
+    public void RegisterPlayer(ulong networkId)
     {
+        if (!NetworkManager.Singleton.IsServer) return;
+        if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(networkId, out NetworkObject playerNO))
+        {
+
+            PlayerScript playerScript = playerNO.GetComponent<PlayerScript>();
+            playerScript.playerResources.Hp.OnValueChanged += (float prev, float newV) =>
+                {
+                    if (newV <= 0)
+                    {
+                        OnPlayerDeath(playerScript);
+                    }
+                };
+        }
+        Debug.Log($"PLAYER WITH ID {networkId} REGISTERED!");
 
     }
 
+    void OnPlayerDeath(PlayerScript playerScript)
+    {
+        playerScript.playerMove.RequestTeleportClientRPC(playerRespawn.position);
+        playerScript.playerResources.Hp.Value = playerScript.playerResources.getMaxHP();
+
+    }
     // Start is called before the first frame update
     void Start()
     {
