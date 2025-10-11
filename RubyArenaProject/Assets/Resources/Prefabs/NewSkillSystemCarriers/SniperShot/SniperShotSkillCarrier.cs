@@ -27,13 +27,13 @@ public class SniperShotSkillCarrier : SkillBase
 
         Vector3 LookDir = getLookDirection();
 
-        ServerSideUseServerRPC(LookDir, this.NetworkObjectId);
+        ServerSideUseServerRPC(LookDir, combatManagerRef.NetworkObjectId);
 
         return true;
     }
 
     [ServerRpc]
-    void ServerSideUseServerRPC(Vector3 lookDir, ulong senderId, ServerRpcParams rpcParams = default)
+    void ServerSideUseServerRPC(Vector3 lookDir, ulong ownerNetworkObjectId, ServerRpcParams rpcParams = default)
     {
         if (!IsServer) return;
         if (isOnCooldown()) return;
@@ -45,10 +45,10 @@ public class SniperShotSkillCarrier : SkillBase
         if(hit.collider.CompareTag("Player"))
         {
             var playerResources = hit.collider.transform.GetComponent<UnitResource>();
-            if (!playerResources || playerResources.NetworkObject.NetworkObjectId == senderId) return;
+            if (!playerResources || playerResources.NetworkObject.NetworkObjectId == ownerNetworkObjectId) return;
 
 
-            SkillDataSO.ownerId = senderId;
+            SkillDataSO.ownerNetworkObjectId = ownerNetworkObjectId;
             playerResources.damage(SkillDataSO);
         }
 

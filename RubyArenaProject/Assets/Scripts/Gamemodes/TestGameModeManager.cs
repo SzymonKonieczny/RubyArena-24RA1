@@ -9,6 +9,8 @@ public class TestGameModeManager : MonoBehaviour, IGameMode
     [SerializeField] int pointsToWin = 3;
     [SerializeField] List<Transform> capturePointSpawnPositions = new();
     [SerializeField] Transform playerRespawn;
+
+    [SerializeField] GameModeCaptureOwnedObjective capturePoint;
     public void RegisterObject(ulong networkId)
     {
         if (!NetworkManager.Singleton.IsServer) return;
@@ -22,23 +24,42 @@ public class TestGameModeManager : MonoBehaviour, IGameMode
         {
 
             PlayerScript playerScript = playerNO.GetComponent<PlayerScript>();
-            playerScript.playerResources.Hp.OnValueChanged += (float prev, float newV) =>
-                {
-                    if (newV <= 0)
-                    {
-                        OnPlayerDeath(playerScript);
-                    }
-                };
+            playerScript.playerResources.onPlayerDeath+=OnPlayerDeath;
+            playerScript.playerResources.onDamageDealt += OnPlayerDamaged;
+            playerScript.playerMove.RequestTeleportClientRPC(playerRespawn.position);
         }
         Debug.Log($"PLAYER WITH ID {networkId} REGISTERED!");
 
     }
-
-    void OnPlayerDeath(PlayerScript playerScript)
+  
+    void OnPlayerDamaged(ulong dealerNoId,ulong recieveNoId,float hpBefore, float hpAfter)
     {
-        playerScript.playerMove.RequestTeleportClientRPC(playerRespawn.position);
-        playerScript.playerResources.Hp.Value = playerScript.playerResources.getMaxHP();
 
+    }
+    void OnPlayerDeath(ulong killerNoId, ulong killedNoId)
+    {
+        NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(killerNoId, out NetworkObject killerPlayerNO);
+        NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(killedNoId, out NetworkObject killedPlayerNO);
+        if(killerPlayerNO== null )
+        {
+            Debug.LogError($" Killed player unobtainable");
+            return;
+        }
+
+        PlayerScript killerPlayerScript = killerPlayerNO.GetComponent<PlayerScript>();
+        PlayerScript killedPlayerScript = killedPlayerNO.GetComponent<PlayerScript>();
+
+        killedPlayerScript.playerMove.RequestTeleportClientRPC(playerRespawn.position);
+        killedPlayerScript.playerResources.Hp.Value = killedPlayerScript.playerResources.getMaxHP();
+
+        if ( killerPlayerNO == null)
+        {
+            Debug.LogError($"Killer player unobtainable, probably skill doesnt set its data. Killer {killerPlayerNO}, Killed {killedPlayerNO}");
+            return;
+        }
+        capturePoint.playerAssignedToCapturePoint.Value = killerNoId;
+        capturePoint.active.Value = true;
+        MoveCapture();
     }
     // Start is called before the first frame update
     void Start()
@@ -48,7 +69,7 @@ public class TestGameModeManager : MonoBehaviour, IGameMode
         var gameModeGameObjects= GameObject.FindGameObjectsWithTag("GameModeRelatedObject");
         foreach(var GMGO in gameModeGameObjects)
         {
-            GameModeCaptureObjective capturePoint = GMGO.GetComponent<GameModeCaptureObjective>();
+            capturePoint = GMGO.GetComponent<GameModeCaptureOwnedObjective>();
             if(capturePoint != null)
             {
                 capturePoint.onPlayerCapturedObjective += playerCapturedPoint;
@@ -58,11 +79,28 @@ public class TestGameModeManager : MonoBehaviour, IGameMode
             }    
         }
     }
-    void playerCapturedPoint(ulong playerObjectId, GameModeCaptureObjective capturedPoint)
+    int MoveCapture()
+    {
+        int randomIndex = Random.Range(0, capturePointSpawnPositions.Count);
+        while (true)
+        {
+            if (Vector3.Distance(capturePoint.transform.position, capturePointSpawnPositions[randomIndex].position) < 1)
+            {
+                continue;
+            }
+            capturePoint.transform.position = capturePointSpawnPositions[randomIndex].position;
+            break;
+        }
+        return randomIndex;
+    }
+    void playerCapturedPoint(ulong playerObjectId, GameModeCaptureOwnedObjective capturedPoint)
     {
 
         if(NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(playerObjectId, out NetworkObject playerNO))
         {
+            capturePoint.active.Value = false;
+            capturePoint.playerAssignedToCapturePoint.Value = capturePoint.NetworkObjectId; //capturePoint will never be a player so this a non-player networkId
+
             PlayerScript player = playerNO.transform.GetComponent<PlayerScript>();
             if (player == null) return;
            if( !scoreBoard.TryAdd(player,1))
@@ -77,8 +115,7 @@ public class TestGameModeManager : MonoBehaviour, IGameMode
                 return;
             }
 
-            int randomIndex = Random.Range(0, capturePointSpawnPositions.Count);
-            capturedPoint.transform.position = capturePointSpawnPositions[randomIndex].position;
+            MoveCapture();
         }
 
     }

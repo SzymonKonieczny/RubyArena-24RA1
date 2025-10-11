@@ -4,6 +4,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 using Unity.Netcode;
+using System;
 
 public class PlayerResources : UnitResource
 {
@@ -13,8 +14,9 @@ public class PlayerResources : UnitResource
     [SerializeField] float MaxHP = 100;
     [SerializeField] float MaxMana = 100;
     [SerializeField] ParticleSystem bleedingEffect;
+    public Action<ulong,ulong,float, float> onDamageDealt; //DamageDealer,DamageReciever,HpBefore,HpAfter
+    public Action<ulong, ulong> onPlayerDeath; //Killer, Killed
 
-    public System.Action<float> onTakeDamage ;
     private PlayerScript Player; //optimization to call getComponent less
     public void SetMaxHP(float amount)
     {
@@ -33,22 +35,13 @@ public class PlayerResources : UnitResource
     public override void damage(SkillDataSO skillData)
     {
         if (!IsServer) return;
-
+        float hpBefore = Hp.Value;
         Hp.Value -= skillData?.damage ?? 0;
-        onTakeDamage?.Invoke(skillData.damage);
-        if(Player == null)
+        onDamageDealt?.Invoke(skillData.ownerNetworkObjectId, this.NetworkObject.NetworkObjectId, hpBefore, Hp.Value);
+        if(Hp.Value <=0)
         {
-         if(!TryGetComponent<PlayerScript>(out Player))
-            {
-                Debug.LogError("Unable to get this player");
-            }
+            onPlayerDeath?.Invoke(skillData.ownerNetworkObjectId, this.NetworkObject.NetworkObjectId);
         }
-        PlayerScript? DamageDealer = null;
-        if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(skillData.ownerId, out NetworkObject networkObject))
-        {
-           DamageDealer = networkObject.GetComponent<PlayerScript>();
-        }
-        GameModeManager.Instance().OnPlayerTakeDmg.Invoke(Player, skillData.damage, DamageDealer);
     }
 
     public override float getHP()

@@ -64,14 +64,7 @@ public class Movement : NetworkBehaviour
     {
         Model.forward = Camera.main.transform.forward.ScaleVec(new Vector3(1, 0, 1)).normalized;
     }
-    [ClientRpc]
-    public void PlayerDeathClientRPC()
-    {
-        if (GameModeManager.Instance().CurrentGameMode == GameModeType.OneVOne)
-        {
-            transform.position = new Vector3(1, 1, 1);
-        }
-    }
+
 
     [ClientRpc]
     public void RequestTeleportClientRPC(Vector3 newPosition)

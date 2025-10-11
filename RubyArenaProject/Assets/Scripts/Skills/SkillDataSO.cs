@@ -13,7 +13,7 @@ public class SkillDataSO : ScriptableObject
     // or an Enum so its easier to keep track of in editor, and then cast that enum to an int ?
     public int damage;
 
-    public ulong ownerId;
+    public ulong ownerNetworkObjectId;
 
     public float castTime;
 

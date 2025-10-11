@@ -81,13 +81,13 @@ public class AutoAttackSkillCarrier : SkillBase
         
         Vector3 LookDir = getLookDirection();
 
-        ServerSideUseServerRPC(LookDir, this.NetworkObjectId);
+        ServerSideUseServerRPC(LookDir, combatManagerRef.NetworkObjectId);
 
         return true;
     }
 
     [ServerRpc]
-    void ServerSideUseServerRPC(Vector3 lookDir, ulong senderId, ServerRpcParams rpcParams = default)
+    void ServerSideUseServerRPC(Vector3 lookDir, ulong senderNetworkObjectId, ServerRpcParams rpcParams = default)
     {
         if (!IsServer) return;
         if (isOnCooldown()) return;
@@ -119,10 +119,10 @@ public class AutoAttackSkillCarrier : SkillBase
         foreach (var player in playerCombatManagers)
         {
             var playerResources = player.GetComponent<UnitResource>();
-            if (!playerResources || player.NetworkObject.NetworkObjectId == senderId) continue;
+            if (!playerResources || player.NetworkObject.NetworkObjectId == senderNetworkObjectId) continue;
 
 
-            SkillDataSO.ownerId = senderId;
+            SkillDataSO.ownerNetworkObjectId = senderNetworkObjectId;
             playerResources.damage(SkillDataSO);
         }
 

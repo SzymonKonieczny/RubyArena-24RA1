@@ -57,13 +57,13 @@ public class YangBlastSkill : SkillBase
 
         Vector3 LookDir = getLookDirection();
         combatManagerRef.playerMove.AddNetworkRbVelocityClientRPC(-LookDir * 5);
-        ServerSideUseServerRPC(LookDir, combatManagerRef.SkillshotSpawnPoint.position, this.NetworkObjectId);
+        ServerSideUseServerRPC(LookDir, combatManagerRef.SkillshotSpawnPoint.position, combatManagerRef.NetworkObjectId);
 
         return true;
     }
 
     [ServerRpc]
-     void ServerSideUseServerRPC(Vector3 lookDir, Vector3 skillOrigin,ulong senderId, ServerRpcParams rpcParams = default)
+     void ServerSideUseServerRPC(Vector3 lookDir, Vector3 skillOrigin,ulong senderNetworkObjectId, ServerRpcParams rpcParams = default)
     {
         if (!IsServer) return;
         if (isOnCooldown()) return;
@@ -109,7 +109,7 @@ public class YangBlastSkill : SkillBase
         foreach (var player in playersInRange)
         {
             var playerResources = player.GetComponent<PlayerResources>();
-            if (!playerResources || player.NetworkObject.NetworkObjectId == senderId) continue;
+            if (!playerResources || player.NetworkObject.NetworkObjectId == senderNetworkObjectId) continue;
 
             Vector3 toTarget = (player.transform.position - skillOrigin);
             player.playerMove.AddNetworkRbVelocityClientRPC(toTarget.normalized * 10);
@@ -119,7 +119,7 @@ public class YangBlastSkill : SkillBase
 
             SkillDataSO.damage = damage + (int)storedDamage;
             storedDamage = 0;
-            SkillDataSO.ownerId = senderId;
+            SkillDataSO.ownerNetworkObjectId = senderNetworkObjectId;
             playerResources.damage(SkillDataSO);
         }
 
