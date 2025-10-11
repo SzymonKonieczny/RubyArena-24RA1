@@ -139,7 +139,7 @@ public class AutoAttackSkillCarrier : SkillBase
             //combatManagerRef.playerMove.AddNetworkRbForceClientRPC((combatManagerRef.playerMove.Orientation.forward * ForceAdded ) + new Vector3(0, 1f, 0));
             animationScript.Trigger("AutoAttackAcknowledge");
             combatManagerRef.playerMove.SnapModelToCameraDir();
-            combatManagerRef.SetStunTimer(cooldown);
+            //combatManagerRef.SetStunTimer(windupTime);
         }
         else
         {
