@@ -44,6 +44,8 @@ public class UISkillIcon : MonoBehaviour
         skill.nextAvaliableTicks.OnValueChanged += (long oldV, long newV) =>
         {
             nextAvaliable = new DateTime(newV);
+            Debug.Log($"Cooldown on UI is {(DateTime.UtcNow - new DateTime(newV)).TotalSeconds}s away");
+
         };
         cooldown = skill.cooldown;
         icon.sprite = skill.SkillDataSO.Icon;
