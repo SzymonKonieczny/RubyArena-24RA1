@@ -1,0 +1,58 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1105 &110500000
+HumanTemplate:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: yang
+  m_BoneTemplate:
+    Chest: Bip_01 Spine1
+    Head: Point_Head
+    Hips: Bip_01 Pelvis
+    Jaw: Point_Eyebrow_L
+    Left Index Distal: Bip_01 L Finger02
+    Left Index Intermediate: Bip_01 L Finger01
+    Left Index Proximal: Bip_01 L Finger0
+    Left Little Distal: Bip_01 L Finger22
+    Left Little Intermediate: Bip_01 L Finger21
+    Left Little Proximal: Bip_01 L Finger2
+    Left Middle Distal: Bip_01 L Finger12
+    Left Middle Intermediate: Bip_01 L Finger11
+    Left Middle Proximal: Bip_01 L Finger1
+    Left Thumb Distal: Bip_01 L Finger02
+    Left Thumb Intermediate: Bip_01 L Finger01
+    Left Thumb Proximal: Bip_01 L Finger0
+    LeftEye: Point_Eye_L
+    LeftFoot: Bip_01 L Foot
+    LeftHand: Bip_01 L Hand
+    LeftLowerArm: Bip_01 L Forearm
+    LeftLowerLeg: Bip_01 L Calf
+    LeftShoulder: Bip_01 L Clavicle
+    LeftToes: Bip_01 L Toe0
+    LeftUpperArm: Bip_01 L UpperArm
+    LeftUpperLeg: Bip_01 L Thigh
+    Neck: Bip_01 Neck
+    Right Index Distal: Bip_01 R Finger02
+    Right Index Intermediate: Bip_01 R Finger01
+    Right Index Proximal: Bip_01 R Finger0
+    Right Little Distal: Bip_01 R Finger22
+    Right Little Intermediate: Bip_01 R Finger21
+    Right Little Proximal: Bip_01 R Finger2
+    Right Middle Distal: Bip_01 R Finger12
+    Right Middle Intermediate: Bip_01 R Finger11
+    Right Middle Proximal: Bip_01 R Finger1
+    Right Thumb Distal: Bip_01 R Finger02
+    Right Thumb Intermediate: Bip_01 R Finger01
+    Right Thumb Proximal: Bip_01 R Finger0
+    RightEye: Point_Eye_R
+    RightFoot: Bip_01 R Foot
+    RightHand: Bip_01 R Hand
+    RightLowerArm: Bip_01 R Forearm
+    RightLowerLeg: Bip_01 R Calf
+    RightShoulder: Bip_01 R Clavicle
+    RightToes: Bip_01 R Toe0
+    RightUpperArm: Bip_01 R UpperArm
+    RightUpperLeg: Bip_01 R Thigh
+    Spine: Bip_01 Spine
