@@ -4,6 +4,7 @@ using UnityEngine;
 using Unity.Netcode;
 using Cinemachine;
 using UnityEngine.Rendering.HighDefinition.Attributes;
+using UnityEngine.SceneManagement;
 
 public class PlayerScript : NetworkBehaviour
 {
@@ -18,12 +19,17 @@ public class PlayerScript : NetworkBehaviour
     private PlayerSkillHolder skillHolder;
     public NetworkVariable<int> characterID = new(0);
 
-
+    private void Start()
+    {
+    }
     public override void OnNetworkSpawn()
+    {
+        InitializePlayer();
+    }
+    void InitializePlayer()
     {
         playerMove = GetComponent<Movement>();
         playerCombatManager = GetComponent<PlayerCombatManager>();
-        transform.position = new Vector3(0,3,0);
         playerResources = GetComponent<PlayerResources>();
         skillHolder = GetComponent<PlayerSkillHolder>();
         InitializeCharacter();
@@ -34,24 +40,26 @@ public class PlayerScript : NetworkBehaviour
             {
                 Destroy(t.GetComponent<CinemachineFreeLook>());
             }
-
-
         }
         else // if we are the local player
         {
             PersistentCanvasManger.Instance.playerScript = this;
-            //        playerCombatManager.Initialize();
             LocalPlayerStateManager.LocalInstance.localPlayerRef = skillHolder;
             LocalPlayerStateManager.LocalInstance.localPlayerInitialized?.Invoke();
-
         }
         playerCombatManager.Initialize();
         playerResources.Initialize();
+        NetworkManager.Singleton.SceneManager.OnLoadEventCompleted += onLoadComplete;
+    }    
+    void onLoadComplete(string sceneName, LoadSceneMode loadSceneMode, List<ulong> clientsCompleted, List<ulong> clientsTimedOut)
+    {
+
         GameObject GM = GameObject.FindWithTag("GameModeManager");
         if (GM == null) return;
 
         IGameMode GameMode = GM.GetComponent<IGameMode>();
         GameMode.RegisterPlayer(NetworkObject.NetworkObjectId);
+        NetworkManager.Singleton.SceneManager.OnLoadEventCompleted -= onLoadComplete;
     }
     void InitializeCharacter()
     {

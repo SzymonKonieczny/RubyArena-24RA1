@@ -6,7 +6,6 @@ using Unity.Netcode;
 public class RootSkill : SkillBase
 {
     [SerializeField] GameObject projectile;
-    Rigidbody rbTest;
     // Start is called before the first frame update
     void Start()
     {
@@ -16,7 +15,6 @@ public class RootSkill : SkillBase
     {
         Init();
 
-        rbTest = InputCollector.transform.GetComponent<Rigidbody>();
     }
     // Update is called once per frame
     void Update()
@@ -34,7 +32,7 @@ public class RootSkill : SkillBase
     {
         animationScript = combatManagerRef.animationScript;
 
-        animationScript.PlayState("WindUp", windupTime);
+        animationScript.Trigger("WindUp");
         combatManagerRef.SetStunTimer(windupTime);
         Vector3 LookDir = getLookDirection();
 
@@ -68,9 +66,15 @@ public class RootSkill : SkillBase
     [ClientRpc]
     void ServerAnnounceSpellCastClientRPC(ulong networkObjId)
     {
-        //if (IsServer) return;
-        animationScript.PlayState("Spellcast1");
-        //animationScript.Trigger("SpellCastAccepted");
+        if (IsOwner)
+        {
+            animationScript.Trigger("SpellAcknowledge2");
+        }
+        else
+        {
+            animationScript.Trigger("WindUp");
+            animationScript.Trigger("SpellAcknowledge2");
+        }
 
     }
 

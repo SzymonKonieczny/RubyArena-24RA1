@@ -5,17 +5,19 @@ using UnityEngine;
 using UnityEngine.UI;
 using Unity.Netcode;
 using System;
+using UnityEngine.SceneManagement;
 
 public class PlayerResources : UnitResource
 {
     [SerializeField] Slider HP_Slider;
     [SerializeField] Slider Mana_Slider;
-    
+
     [SerializeField] float MaxHP = 100;
     [SerializeField] float MaxMana = 100;
     [SerializeField] ParticleSystem bleedingEffect;
     public Action<ulong,ulong,float, float> onDamageDealt; //DamageDealer,DamageReciever,HpBefore,HpAfter
     public Action<ulong, ulong> onPlayerDeath; //Killer, Killed
+    GameObject HealthBarObject;
 
     private PlayerScript Player; //optimization to call getComponent less
     public void SetMaxHP(float amount)
@@ -66,6 +68,7 @@ public class PlayerResources : UnitResource
         base.OnNetworkSpawn();
         Initialize();
     }
+
     public void Initialize()
     {
         if(IsServer)
@@ -82,12 +85,15 @@ public class PlayerResources : UnitResource
                 bleedingEffect.Play();
             }
         };
-
+        NetworkManager.Singleton.SceneManager.OnLoadEventCompleted += onLoadComplete;
+    }
+    void onLoadComplete(string sceneName, LoadSceneMode loadSceneMode, List<ulong> clientsCompleted, List<ulong> clientsTimedOut)
+    {
         if (!IsOwner) return;
 
-        var GO = GameObject.FindGameObjectWithTag("HealthBar");
-        HP_Slider= GO?.GetComponent<Slider>();
-      
+        HealthBarObject = GameObject.FindGameObjectWithTag("HealthBar");
+        HP_Slider = HealthBarObject?.GetComponent<Slider>();
+
 
         Mana.OnValueChanged += (float preV, float newV) =>
         {
@@ -100,8 +106,9 @@ public class PlayerResources : UnitResource
         };
 
         Hp.OnValueChanged.Invoke(0, MaxHP);
-
+        NetworkManager.Singleton.SceneManager.OnLoadEventCompleted -= onLoadComplete;
     }
 
-   
+
+
 }

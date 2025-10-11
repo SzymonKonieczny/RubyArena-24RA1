@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 
-public class TestGameModeManager : MonoBehaviour, IGameMode
+public class TestGameModeManager : NetworkBehaviour, IGameMode
 {
     Dictionary<PlayerScript, int> scoreBoard = new();
     [SerializeField] int pointsToWin = 3;
     [SerializeField] List<Transform> capturePointSpawnPositions = new();
     [SerializeField] Transform playerRespawn;
-
+    [SerializeField] TMPro.TMP_Text victoryText;
+    NetworkVariable<ulong> winningPlayerNetworkObjectId= new NetworkVariable<ulong>();
     [SerializeField] GameModeCaptureOwnedObjective capturePoint;
     public void RegisterObject(ulong networkId)
     {
@@ -64,6 +65,8 @@ public class TestGameModeManager : MonoBehaviour, IGameMode
     // Start is called before the first frame update
     void Start()
     {
+        winningPlayerNetworkObjectId.OnValueChanged += AnnounceWinner;
+
         if (!NetworkManager.Singleton.IsServer) return;
 
         var gameModeGameObjects= GameObject.FindGameObjectsWithTag("GameModeRelatedObject");
@@ -86,6 +89,7 @@ public class TestGameModeManager : MonoBehaviour, IGameMode
         {
             if (Vector3.Distance(capturePoint.transform.position, capturePointSpawnPositions[randomIndex].position) < 1)
             {
+                randomIndex = Random.Range(0, capturePointSpawnPositions.Count);
                 continue;
             }
             capturePoint.transform.position = capturePointSpawnPositions[randomIndex].position;
@@ -98,7 +102,7 @@ public class TestGameModeManager : MonoBehaviour, IGameMode
 
         if(NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(playerObjectId, out NetworkObject playerNO))
         {
-            capturePoint.playerAssignedToCapturePoint.Value = capturePoint.NetworkObjectId; //capturePoint will never be a player so this a non-player networkId
+            capturePoint.playerAssignedToCapturePoint.Value = this.NetworkObjectId; //Manager will never be a player so this a non-player networkId
             capturePoint.active.Value = false;
 
             PlayerScript player = playerNO.transform.GetComponent<PlayerScript>();
@@ -111,7 +115,8 @@ public class TestGameModeManager : MonoBehaviour, IGameMode
            if(scoreBoard[player] >= pointsToWin)
             {
                 capturedPoint.NetworkObject.Despawn();
-                Debug.Log($"Player {capturedPoint.gameObject} won!");
+                Debug.Log($"Player networkobjId: {player.NetworkObjectId} won!");
+                OnVictory(player);
                 return;
             }
 
@@ -119,7 +124,23 @@ public class TestGameModeManager : MonoBehaviour, IGameMode
         }
 
     }
+    void AnnounceWinner(ulong oldV, ulong winnerNOId)
+    {
+        if (winnerNOId == 0) return;
 
+        if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(winnerNOId, out NetworkObject playerNO))
+        {
+            PlayerScript player = playerNO.transform.GetComponent<PlayerScript>();
+            string name = CharacterList.Instance.Characters[player.characterID.Value].name;
+            victoryText.text = name + " Won ! You can restart to play again xd";
+        }
+
+    }
+    void OnVictory(PlayerScript victor )
+    {
+        winningPlayerNetworkObjectId.Value = victor.NetworkObjectId;
+
+    }
     // Update is called once per frame
     void Update()
     {
