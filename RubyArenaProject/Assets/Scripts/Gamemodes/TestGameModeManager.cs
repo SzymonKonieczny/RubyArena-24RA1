@@ -98,8 +98,8 @@ public class TestGameModeManager : MonoBehaviour, IGameMode
 
         if(NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(playerObjectId, out NetworkObject playerNO))
         {
-            capturePoint.active.Value = false;
             capturePoint.playerAssignedToCapturePoint.Value = capturePoint.NetworkObjectId; //capturePoint will never be a player so this a non-player networkId
+            capturePoint.active.Value = false;
 
             PlayerScript player = playerNO.transform.GetComponent<PlayerScript>();
             if (player == null) return;

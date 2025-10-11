@@ -20,13 +20,13 @@ public class TestSkillNewSystem : SkillBase
 
         Vector3 LookDir = getLookDirection();
 
-        ServerSideUseServerRPC(LookDir);
+        ServerSideUseServerRPC(LookDir, combatManagerRef.NetworkObjectId);
 
         return true;
     }
 
     [ServerRpc]
-    void ServerSideUseServerRPC(Vector3 lookDir, ServerRpcParams rpcParams = default)
+    void ServerSideUseServerRPC(Vector3 lookDir,ulong senderNetworkObjectId, ServerRpcParams rpcParams = default)
     {
         if (!IsServer) return;
         if (isOnCooldown()) return;
@@ -37,6 +37,7 @@ public class TestSkillNewSystem : SkillBase
         skillEntityGO.GetComponent<NetworkObject>().Spawn();
         skillEntityGO.transform.SetPositionAndRotation(combatManagerRef.SkillshotSpawnPoint.transform.position + lookDir * 2, Quaternion.LookRotation(lookDir, Vector3.up));
         var skillEntity = skillEntityGO.GetComponent<BaseSkillEntityBehavior>();
+        this.SkillDataSO.ownerNetworkObjectId = senderNetworkObjectId;
         skillEntity.SkillDataSO = SkillDataSO;
         ServerAnnounceSpellCastClientRPC(0);
     }
