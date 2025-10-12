@@ -11,7 +11,7 @@ public class UISkillIcon : MonoBehaviour
     [SerializeField]  public SkillCastType skillType;
     [SerializeField] Slider slider;
     [SerializeField]  SkillBase skill;
-    [SerializeField]  DateTime nextAvaliable;
+    [SerializeField]  double nextAvaliableTime;
     [SerializeField]  float cooldown;
     [SerializeField] Image icon;
     // Start is called before the first frame update
@@ -41,10 +41,9 @@ public class UISkillIcon : MonoBehaviour
                 skill = s;
             }
         }
-        skill.nextAvaliableTicks.OnValueChanged += (long oldV, long newV) =>
+        skill.nextAvaliable.OnValueChanged += (double oldV, double newV) =>
         {
-            nextAvaliable = new DateTime(newV);
-            Debug.Log($"Cooldown on UI is {(DateTime.UtcNow - new DateTime(newV)).TotalSeconds}s away");
+            nextAvaliableTime = newV;
 
         };
         cooldown = skill.cooldown;
@@ -53,7 +52,8 @@ public class UISkillIcon : MonoBehaviour
 
     void Update()
     {
-        float secondsRemaming = Mathf.Clamp((float)(nextAvaliable - DateTime.UtcNow).TotalSeconds,0,99);
+        double serverTime = NetworkManager.Singleton.NetworkTimeSystem.ServerTime;
+        float secondsRemaming = Mathf.Clamp((float)(nextAvaliableTime - serverTime),0,99);
         slider.value = Mathf.Clamp((secondsRemaming/cooldown),0,1);
     }
 }

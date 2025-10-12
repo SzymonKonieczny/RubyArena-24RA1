@@ -20,13 +20,7 @@ public class YangBlastSkill : SkillBase
         Init();
 
         resources = combatManagerRef.GetComponent<PlayerResources>();
-        if(resources!= null)
-        {
-            nextAvaliableTicks.OnValueChanged += (long oldV, long newV) =>
-            {
-                Debug.Log($"Cooldown on Skill is {(DateTime.UtcNow - new DateTime(newV)).TotalSeconds}s away");
-            };
-        }
+
        // if (IsServer)
         {
             if(resources)

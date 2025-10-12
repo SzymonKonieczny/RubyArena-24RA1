@@ -30,8 +30,8 @@ public abstract class SkillBase : NetworkBehaviour
     [SerializeField] public float cooldown =0;
     [SerializeField] protected float windupTime =0.2f;
     [SerializeField] protected int damage =0;
-    public NetworkVariable<long> nextAvaliableTicks;
-    protected bool isOnCooldown() => nextAvaliableTicks.Value > DateTime.UtcNow.Ticks;
+    public NetworkVariable<double> nextAvaliable;
+    protected bool isOnCooldown() => nextAvaliable.Value > NetworkManager.NetworkTimeSystem.ServerTime;
     public abstract bool Use();
     private void setTriggerFlagRef(InputCollectorScript inputCollectorScript)
     {
@@ -65,7 +65,7 @@ public abstract class SkillBase : NetworkBehaviour
     }
     public void setCooldown(float cooldown)
     {
-        nextAvaliableTicks.Value = System.DateTime.UtcNow.AddSeconds(cooldown).Ticks;
+        nextAvaliable.Value = NetworkManager.NetworkTimeSystem.ServerTime + cooldown;
     }
     protected Vector3 getLookDirection()
     {
