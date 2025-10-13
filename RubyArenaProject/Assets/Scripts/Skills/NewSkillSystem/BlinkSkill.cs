@@ -55,7 +55,9 @@ public class BlinkSkill : SkillBase
 
         }
         //if (IsServer) return;
-        animationScript.PlayState("jumping");
+        animationScript.Trigger("WindUp");
+        animationScript.Trigger("SpellAcknowledge2");
+
         effect.Play();
         if (IsOwner)
         {
