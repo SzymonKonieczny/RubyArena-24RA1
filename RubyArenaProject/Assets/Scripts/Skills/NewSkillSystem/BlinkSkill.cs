@@ -5,19 +5,22 @@ using Unity.Netcode;
 
 public class BlinkSkill : SkillBase
 {
-    Vector3 posOffset;
+    Vector3 jumpPositionRequest;
     [SerializeField] ParticleSystem effect;
     public override bool Use()
     {
         RaycastHit rayHit = getRayHit();
-        if (rayHit.distance > 10 || rayHit.distance == 0 )
+        var worldPosCamera = Camera.main.ScreenToWorldPoint(new Vector3((float)Screen.width / 2f, (float)Screen.height / 2f));
+        if (Vector3.Distance(combatManagerRef.transform.position, rayHit.point) > 15 || rayHit.distance == 0 )
         {
             var ray = Camera.main.ScreenPointToRay(new Vector3((float)Screen.width / 2f, (float)Screen.height / 2f));
-            posOffset =  ray.direction.normalized * 10 + new Vector3(0, 2, 0);
+            jumpPositionRequest = combatManagerRef.transform.position+ ( ray.direction.normalized * 15 + new Vector3(0, 2, 0));
+            Debug.DrawLine(worldPosCamera, worldPosCamera +  ray.direction.normalized * 10, Color.green, 3);
         }
         else
         {
-            posOffset = rayHit.point + new Vector3(0, 2, 0);
+            jumpPositionRequest = rayHit.point + new Vector3(0, 2, 0); 
+            Debug.DrawLine(worldPosCamera, rayHit.point, Color.green, 3);
         }
         animationScript.PlayState("jumping");
         combatManagerRef.SetStunTimer(windupTime);
@@ -32,7 +35,7 @@ public class BlinkSkill : SkillBase
     IEnumerator Jump(Vector3 position)
     {
         yield return new WaitForSeconds(0.2f);
-        combatManagerRef.transform.position += position;
+        combatManagerRef.transform.position = position;
     }
     [ServerRpc]
     void ServerSideUseServerRPC(ServerRpcParams rpcParams = default)
@@ -56,7 +59,7 @@ public class BlinkSkill : SkillBase
         effect.Play();
         if (IsOwner)
         {
-            StartCoroutine(Jump(posOffset));
+            StartCoroutine(Jump(jumpPositionRequest));
         }
     }
     private void Start()
