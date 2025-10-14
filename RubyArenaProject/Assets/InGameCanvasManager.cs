@@ -13,6 +13,11 @@ public class InGameCanvasManager : MonoBehaviour
         UnityEngine.Cursor.lockState = CursorLockMode.Locked;
         canvasRoot.SetActive(false);
     }
+    private void OnDestroy()
+    {
+        UnityEngine.Cursor.visible = transform;
+        UnityEngine.Cursor.lockState = CursorLockMode.None;
+    }
     // Update is called once per frame
     void Update()
     {

@@ -52,6 +52,7 @@ public class GameModeCaptureOwnedObjective : NetworkBehaviour
 
          };
     }
+
     private void FixedUpdate()
     {
         if (!IsServer || !active.Value) return;

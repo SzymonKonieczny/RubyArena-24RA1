@@ -19,14 +19,17 @@ public class MenuScript : MonoBehaviour
 
     [SerializeField] private TMPro.TMP_InputField InputJoinCode;
     [SerializeField] public string SceneName = "Starting Scene";
+    [SerializeField] bool serviesInitialized = false;
     async Task InitServices()
     {
+        if (serviesInitialized) return;
         await UnityServices.InitializeAsync();
 
         if(!AuthenticationService.Instance.IsSignedIn)
         {
             await AuthenticationService.Instance.SignInAnonymouslyAsync();
         }
+        serviesInitialized = true;
     }
 
     public async void StartHost()
@@ -81,5 +84,14 @@ public class MenuScript : MonoBehaviour
     {
         var config = NetworkManager.Singleton.NetworkConfig;
         Debug.Log($"TickRate: {config.TickRate}, Transport: {config.NetworkTransport.GetType().Name}, Prefabs: {config.Prefabs.NetworkPrefabsLists.Count}");
+        foreach(var prefabList in config.Prefabs.NetworkPrefabsLists)
+        {
+            string listStr = "";
+            foreach (var prefab in prefabList.PrefabList)
+            {
+                listStr += prefab.Prefab.name + "\n";
+            }
+            Debug.LogError($"Registered : {listStr}");
+        }
     }
 }

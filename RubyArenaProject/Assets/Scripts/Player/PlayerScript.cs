@@ -18,6 +18,7 @@ public class PlayerScript : NetworkBehaviour
     public Movement playerMove;
     private PlayerSkillHolder skillHolder;
     public NetworkVariable<int> characterID = new(0);
+    public List<NetworkObject> spawnedObjects = new();
 
     private void Start()
     {
@@ -28,6 +29,7 @@ public class PlayerScript : NetworkBehaviour
     }
     void InitializePlayer()
     {
+
         playerMove = GetComponent<Movement>();
         playerCombatManager = GetComponent<PlayerCombatManager>();
         playerResources = GetComponent<PlayerResources>();
@@ -113,11 +115,24 @@ public class PlayerScript : NetworkBehaviour
 
         GameObject skillpref = Instantiate(skillPrefab);
         var skillprefNetworkObj = skillpref.GetComponent<NetworkObject>();
+        spawnedObjects.Add(skillprefNetworkObj);
         skillprefNetworkObj.SpawnWithOwnership(clientID);
         skillprefNetworkObj.TrySetParent(skillHolder,false);
         return skillpref;
     }
+    public override void OnNetworkDespawn()
+    {
+        base.OnNetworkDespawn();
+        if (!IsServer) return;
 
+        foreach (var obj in spawnedObjects)
+        {
+            if(obj!=null && obj.IsSpawned)
+            {
+                obj.Despawn();
+            }
+        }
+    }
 
     void Update()
     {

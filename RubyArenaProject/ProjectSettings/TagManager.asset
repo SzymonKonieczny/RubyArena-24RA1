@@ -8,6 +8,7 @@ TagManager:
   - NonFightArea
   - GameModeManager
   - GameModeRelatedObject
+  - LobbyCanvas
   layers:
   - Default
   - TransparentFX

@@ -89,6 +89,11 @@ public abstract class SkillBase : NetworkBehaviour
     {
        
         PlayerSkillHolder skillholder = gameObject.GetComponentInParent<PlayerSkillHolder>();
+        if(skillholder == null)
+        {
+            Debug.Log("Unable to find the player skillholder. Probably due to despawnings");
+            return;
+        }
         this.combatManagerRef = skillholder.playerCombatManager;
         animationScript = skillholder.animationScript;
         InputCollector = skillholder.inputCollectorScript;
@@ -100,6 +105,10 @@ public abstract class SkillBase : NetworkBehaviour
         }
         SkillDataSO.damage = damage;
         SkillDataSO.castTime = windupTime;
+    }
+    private void Awake()
+    {
+
     }
 
     /*      General Usage Recommendations :

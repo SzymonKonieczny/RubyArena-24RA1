@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Unity.Netcode;
 using System;
+using UnityEngine.SceneManagement;
 
 public class PlayerInLobbyIcon : NetworkBehaviour
 {
@@ -11,11 +12,15 @@ public class PlayerInLobbyIcon : NetworkBehaviour
     public Button Button;
     public Image Icon;
     public Action OnButtonClick;
+    LobbyCanvasManager lobbyCanvas;
     public override void OnNetworkSpawn()
-    { 
+    {
         base.OnNetworkSpawn();
-
-        if(chosenCharacterId.Value >0) //catch up if they were in the lobby before us
+        InitializeIcon();
+    }
+    void InitializeIcon()
+    {
+        if (chosenCharacterId.Value > 0) //catch up if they were in the lobby before us
         {
             Icon.sprite = CharacterList.Instance.Characters[chosenCharacterId.Value].image;
         }
@@ -26,12 +31,24 @@ public class PlayerInLobbyIcon : NetworkBehaviour
         LocalPlayerStateManager.LocalInstance.chosenCharacter.OnValueChanged += UpdateUIIcon;
         Button.gameObject.SetActive(IsOwner);
 
-        if(IsOwner)
+        if (IsOwner)
         {
-            LobbyCanvasManager lobbyCanvas = GameObject.FindAnyObjectByType<LobbyCanvasManager>();
-            Button.onClick.AddListener(lobbyCanvas.SwitchCharacterSelectUI);
+            Button.onClick.AddListener(TemporaryFunctionBecauseSceneLoadingCallbacksDoNotFireAndOnNetworkSpawnCanFireBeforeTheSceneIsDoneLoadingXd);
+            var canvasGO = GameObject.FindGameObjectWithTag("LobbyCanvas");
+            lobbyCanvas = canvasGO.GetComponent<LobbyCanvasManager>();
         }
     }
+    void TemporaryFunctionBecauseSceneLoadingCallbacksDoNotFireAndOnNetworkSpawnCanFireBeforeTheSceneIsDoneLoadingXd()
+    {
+        if(lobbyCanvas == null)
+        {
+            var canvasGO = GameObject.FindGameObjectWithTag("LobbyCanvas");
+            lobbyCanvas = canvasGO.GetComponent<LobbyCanvasManager>();
+        }
+        lobbyCanvas.SwitchCharacterSelectUI();
+    }
+
+
     void UpdateUIIcon(int prevV, int newV)
     {
         if (!IsOwner) return;
@@ -42,7 +59,6 @@ public class PlayerInLobbyIcon : NetworkBehaviour
     {
         base.OnNetworkDespawn();
         LocalPlayerStateManager.LocalInstance.chosenCharacter.OnValueChanged -= UpdateUIIcon;
-
     }
 
 }

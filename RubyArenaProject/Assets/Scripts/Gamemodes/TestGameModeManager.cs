@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
+using UnityEngine.SceneManagement;
 
 public class TestGameModeManager : NetworkBehaviour, IGameMode
 {
@@ -81,6 +82,9 @@ public class TestGameModeManager : NetworkBehaviour, IGameMode
                 capturePoint.transform.position = capturePointSpawnPositions[randomIndex].position;
             }    
         }
+
+        StartCoroutine(BackToLobbyCoroutine());
+
     }
     int MoveCapture()
     {
@@ -138,7 +142,14 @@ public class TestGameModeManager : NetworkBehaviour, IGameMode
     }
     void OnVictory(PlayerScript victor )
     {
+        if (!IsServer) return;
         winningPlayerNetworkObjectId.Value = victor.NetworkObjectId;
+        StartCoroutine(BackToLobbyCoroutine());
+    }
+    IEnumerator BackToLobbyCoroutine()
+    {
+        yield return new WaitForSeconds(10);
+        NetworkManager.Singleton.SceneManager.LoadScene("MultiplayerLobby", LoadSceneMode.Single);
 
     }
     // Update is called once per frame
