@@ -1,0 +1,43 @@
+Welcome to RUBY ARENA champion spotlight, featuring: Yang
+
+Like every other character in the game, Yang has 2 special abilities and a default attack.
+
+Her default attack is a short range, low cooldown attack dealing 15 points of damage.
+
+Her movement ability is a short dash. When used, Yang will dash towards the direction she is currently running.
+
+Yang's damaging ability has an active and a passive part. Passively, when Yang receives damage, she gains stacks of "Rage". Actively she shoots a burst of flames from her gauntlets, damaging enemies in a cone in front of her, consuming the stacks, and dealing additional damage for every stack. Additionally, when the stacks go above 30, her gauntlets set ablaze.
+
+
+----------
+Welcome to RUBY ARENA champion spotlight, featuring: Weiss: The Ice Queen 
+
+Like every other character in the game, Weiss has 2 special abilities and a default attack.
+
+Her default attack is a medium range, medium cooldown attack dealing damage to all enemies in front of her.
+
+Her movement ability is a short dash. When used, Weiss will dash towards the direction she is currently running.
+
+Weiss does not have a usual damaging ability, instead her last ability is a skillshot that, upon hitting another character will lock them in a glyph prison, stunning them for 2 seconds. When stunned the enemy cannot move, attack or use their abilities.
+
+
+-----------
+Welcome to RUBY ARENA champion spotlight, featuring: Ruby: The silver eyed warrior.
+
+Like every other character in the game, Ruby has 2 special abilities and a default attack.
+
+Her default attack is a long range, high cooldown attack dealing damage to all enemies in front of her.
+
+Rubys' movement ability is Rose Form. Ruby uses her semblance and transforms into a cloud of rose petals for 5 seconds. When in Rose Form, Ruby can fly, negating gravity, and gains a huge movement speed boost. Its important to remember that she can still use other abilities during Rose Form.
+
+For her damaging ability, Ruby uses her weapon as a sniper rifle, and shoots a single shot that travels instantly, dealing significant damage to the first enemy hit.
+-------------
+Welcome to RUBY ARENA champion spotlight, featuring: Blake Belladona.
+
+Like every other character in the game, Blake has 2 special abilities and a default attack.
+
+Her default attack is a long range, low cooldown attack dealing damage to all enemies in front of her.
+
+Blakes' movement ability is Blink. She teleports in the direction the player is looking at.
+
+Her damaging ability is Slash. Blake slashes her weapons creating a small shockwave that travels forward and dealing a small amount of damage.   With the short cooldown she can rain fire on any enemy approaching her!

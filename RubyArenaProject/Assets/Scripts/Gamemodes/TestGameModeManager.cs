@@ -83,7 +83,6 @@ public class TestGameModeManager : NetworkBehaviour, IGameMode
             }    
         }
 
-        StartCoroutine(BackToLobbyCoroutine());
 
     }
     int MoveCapture()
@@ -148,7 +147,7 @@ public class TestGameModeManager : NetworkBehaviour, IGameMode
     }
     IEnumerator BackToLobbyCoroutine()
     {
-        yield return new WaitForSeconds(10);
+        yield return new WaitForSeconds(5);
         NetworkManager.Singleton.SceneManager.LoadScene("MultiplayerLobby", LoadSceneMode.Single);
 
     }
