@@ -22,3 +22,23 @@ public class MovementEditor : Editor
         }
     }
 }
+[CustomEditor(typeof(SkillsUIManager))]
+
+public class SkillsUIEditor : Editor
+{
+    public override void OnInspectorGUI()
+    {
+        // Draw the default inspector
+        DrawDefaultInspector();
+
+        // Get a reference to the script
+        SkillsUIManager myScript = (SkillsUIManager)target;
+
+        // Add a button to the Inspector
+        if (GUILayout.Button("Recalculate"))
+        {
+            // Call the function
+            myScript.Recalculate();
+        }
+    }
+}

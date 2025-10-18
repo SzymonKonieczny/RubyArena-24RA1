@@ -39,12 +39,13 @@ public class PlayerObjectSpawner : NetworkBehaviour
 
     void SpawnPlayer(ulong clientId)
     {
-        var obj = Instantiate(playerPrefab);
+        int chosenChampId = ServerPlayerStateManager.Instance.playerStates[clientId].chosenCharacter.Value;
 
+        var obj = Instantiate(playerPrefab);
         var objNO = obj.GetComponent<NetworkObject>();
         spawnedObjects.Add(objNO);
         var playerScript = obj.GetComponent<PlayerScript>();
-        playerScript.characterID.Value = ServerPlayerStateManager.Instance.playerStates[clientId].chosenCharacter.Value;
+        playerScript.characterID.Value = chosenChampId;
         objNO.SpawnWithOwnership(clientId);
     }
 

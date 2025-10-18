@@ -30,7 +30,7 @@ public class CharacterSelectUIScript : MonoBehaviour
 
     }
     void onSelectedCharacter(CharacterCardScript selected)
-    {;
+    {
         LocalPlayerStateManager.LocalInstance.chosenCharacter.Value = selected.currentCharacter.characterID;
       //  playerScript.AskToSelectCharacterServerRpc(selected.currentCharacter.characterID);
 

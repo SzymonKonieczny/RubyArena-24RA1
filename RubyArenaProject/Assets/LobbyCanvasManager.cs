@@ -72,10 +72,7 @@ public class LobbyCanvasManager : NetworkBehaviour
     {
         characterSelect.gameObject.SetActive(!characterSelect.gameObject.activeInHierarchy);
     }
-    public void TESTChangeChamp()
-    {
-        LocalPlayerStateManager.LocalInstance.chosenCharacter.Value = Random.RandomRange(0, 3);
-    }
+
     public void StartGame()
     {
         UpdateStartButton(null);

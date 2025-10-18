@@ -13,6 +13,7 @@ public class PlayerInLobbyIcon : NetworkBehaviour
     public Image Icon;
     public Action OnButtonClick;
     LobbyCanvasManager lobbyCanvas;
+    public Sprite defaultIcon;
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
@@ -20,23 +21,33 @@ public class PlayerInLobbyIcon : NetworkBehaviour
     }
     void InitializeIcon()
     {
-        if (chosenCharacterId.Value > 0) //catch up if they were in the lobby before us
+        if (IsOwner)
+        {
+            int? lastChosenChamp = LocalPlayerStateManager.LocalInstance?.chosenCharacter?.Value;
+            chosenCharacterId.Value = lastChosenChamp ?? -1;
+            Button.onClick.AddListener(TemporaryFunctionBecauseSceneLoadingCallbacksDoNotFireAndOnNetworkSpawnCanFireBeforeTheSceneIsDoneLoadingXd);
+            var canvasGO = GameObject.FindGameObjectWithTag("LobbyCanvas");
+            lobbyCanvas = canvasGO.GetComponent<LobbyCanvasManager>();
+
+        }
+
+        if (chosenCharacterId.Value >= 0) //catch up if they were in the lobby before us
         {
             Icon.sprite = CharacterList.Instance.Characters[chosenCharacterId.Value].image;
         }
         chosenCharacterId.OnValueChanged += (int prevV, int newV) =>
         {
+            if (newV < 0)
+            {
+                Icon.sprite = defaultIcon;
+                return;
+            }
             Icon.sprite = CharacterList.Instance.Characters[newV].image;
         };
         LocalPlayerStateManager.LocalInstance.chosenCharacter.OnValueChanged += UpdateUIIcon;
         Button.gameObject.SetActive(IsOwner);
 
-        if (IsOwner)
-        {
-            Button.onClick.AddListener(TemporaryFunctionBecauseSceneLoadingCallbacksDoNotFireAndOnNetworkSpawnCanFireBeforeTheSceneIsDoneLoadingXd);
-            var canvasGO = GameObject.FindGameObjectWithTag("LobbyCanvas");
-            lobbyCanvas = canvasGO.GetComponent<LobbyCanvasManager>();
-        }
+   
     }
     void TemporaryFunctionBecauseSceneLoadingCallbacksDoNotFireAndOnNetworkSpawnCanFireBeforeTheSceneIsDoneLoadingXd()
     {

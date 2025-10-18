@@ -11,6 +11,9 @@ public class TestGameModeManager : NetworkBehaviour, IGameMode
     [SerializeField] List<Transform> capturePointSpawnPositions = new();
     [SerializeField] Transform playerRespawn;
     [SerializeField] TMPro.TMP_Text victoryText;
+    [SerializeField] TMPro.TMP_Text scoreDisplay;
+    Dictionary<ulong, int> clientScoreBoard = new();
+
     NetworkVariable<ulong> winningPlayerNetworkObjectId= new NetworkVariable<ulong>();
     [SerializeField] GameModeCaptureOwnedObjective capturePoint;
     public void RegisterObject(ulong networkId)
@@ -82,8 +85,30 @@ public class TestGameModeManager : NetworkBehaviour, IGameMode
                 capturePoint.transform.position = capturePointSpawnPositions[randomIndex].position;
             }    
         }
-
-
+    }
+    [ClientRpc]
+    void setScoreboardPointClientRPC(ulong clientNOId, int score)
+    {
+       if(clientScoreBoard.ContainsKey(clientNOId))
+        {
+            clientScoreBoard[clientNOId] = score;
+        }
+        else
+        {
+            clientScoreBoard.Add(clientNOId, score);
+        }
+        string scoreboardDisplayString = "";
+       foreach(var pair in clientScoreBoard)
+       {
+            PlayerScript playerScript = NetworkManager.SpawnManager.SpawnedObjects[pair.Key]?.GetComponent<PlayerScript>();
+            int? champId = playerScript?.characterID.Value;
+            if(champId.HasValue && champId.Value >= 0)
+            {
+                string champName = CharacterList.Instance.Characters[champId.Value].name;
+                scoreboardDisplayString += $"{champName}: {pair.Value}\n";
+            }
+       }
+        scoreDisplay.text = scoreboardDisplayString;
     }
     int MoveCapture()
     {
@@ -113,8 +138,9 @@ public class TestGameModeManager : NetworkBehaviour, IGameMode
            if( !scoreBoard.TryAdd(player,1))
             {
                 scoreBoard[player] += 1;
-            }
 
+            }
+            
            if(scoreBoard[player] >= pointsToWin)
             {
                 capturedPoint.NetworkObject.Despawn();
@@ -122,6 +148,7 @@ public class TestGameModeManager : NetworkBehaviour, IGameMode
                 OnVictory(player);
                 return;
             }
+            setScoreboardPointClientRPC(playerObjectId, scoreBoard[player]);
 
             MoveCapture();
         }
@@ -135,7 +162,7 @@ public class TestGameModeManager : NetworkBehaviour, IGameMode
         {
             PlayerScript player = playerNO.transform.GetComponent<PlayerScript>();
             string name = CharacterList.Instance.Characters[player.characterID.Value].name;
-            victoryText.text = name + " Won ! You can restart to play again xd";
+            victoryText.text = name + " Won ! \n You will return to the lobby shortly";
         }
 
     }
