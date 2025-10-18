@@ -27,7 +27,7 @@ public class PlayerInLobbyIcon : NetworkBehaviour
             chosenCharacterId.Value = lastChosenChamp ?? -1;
             Button.onClick.AddListener(TemporaryFunctionBecauseSceneLoadingCallbacksDoNotFireAndOnNetworkSpawnCanFireBeforeTheSceneIsDoneLoadingXd);
             var canvasGO = GameObject.FindGameObjectWithTag("LobbyCanvas");
-            lobbyCanvas = canvasGO.GetComponent<LobbyCanvasManager>();
+            lobbyCanvas = canvasGO?.GetComponent<LobbyCanvasManager>();
 
         }
 
@@ -44,8 +44,8 @@ public class PlayerInLobbyIcon : NetworkBehaviour
             }
             Icon.sprite = CharacterList.Instance.Characters[newV].image;
         };
-        LocalPlayerStateManager.LocalInstance.chosenCharacter.OnValueChanged += UpdateUIIcon;
         Button.gameObject.SetActive(IsOwner);
+        LocalPlayerStateManager.LocalInstance.chosenCharacter.OnValueChanged += UpdateUIIcon;
 
    
     }
@@ -54,9 +54,9 @@ public class PlayerInLobbyIcon : NetworkBehaviour
         if(lobbyCanvas == null)
         {
             var canvasGO = GameObject.FindGameObjectWithTag("LobbyCanvas");
-            lobbyCanvas = canvasGO.GetComponent<LobbyCanvasManager>();
+            lobbyCanvas = canvasGO?.GetComponent<LobbyCanvasManager>();
         }
-        lobbyCanvas.SwitchCharacterSelectUI();
+        lobbyCanvas?.SwitchCharacterSelectUI();
     }
 
 

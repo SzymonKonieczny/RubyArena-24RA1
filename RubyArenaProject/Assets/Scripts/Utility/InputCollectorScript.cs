@@ -41,7 +41,6 @@ public class InputCollectorScript : NetworkBehaviour
 
     public BoolRefType rightClickRef { private set; get; } = new BoolRefType();
 
-    public TMPro.TMP_Text debugTimerDisplay;
 
     public float StunTime = 0;
     /// <summary>
@@ -50,7 +49,6 @@ public class InputCollectorScript : NetworkBehaviour
     private void Start()
     {
         GameObject debugTimerDisplayGO = GameObject.Find("DebugStunTimer");
-        debugTimerDisplay = debugTimerDisplayGO.GetComponent<TMPro.TMP_Text>();
     }
 
     // Update is called once per frame
@@ -59,7 +57,6 @@ public class InputCollectorScript : NetworkBehaviour
         if (!this.IsOwner) return;
         StunTime -= Time.deltaTime;
 
-        debugTimerDisplay.text = $"{StunTime.ToString("F2")}s";
 
         if (StunTime > 0)
         {
