@@ -118,10 +118,10 @@ public class YangBlastSkill : SkillBase
 
 
             SkillDataSO.damage = damage + (int)storedDamage;
-            storedDamage = 0;
             SkillDataSO.ownerNetworkObjectId = senderNetworkObjectId;
             playerResources.damage(SkillDataSO);
         }
+        storedDamage = 0;
 
         ServerAnnounceSpellCastClientRPC(0);
     }
