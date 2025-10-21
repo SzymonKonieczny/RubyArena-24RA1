@@ -1,3 +1,27 @@
+Welcome to the Ruby Arena game overview.
+
+The game currently has 4 playable characters: Ruby, Weiss, Blake and Yang.
+
+Each of them has 1 movement ability, 1 damaging ability, and 1 default attack. We will only go over 2 of them here, to keep this overview short. For more in-depth spotlight of each huntress please refer to their champion spotlights.
+
+Default attacks differ between characters in their cooldown, damage, and range, otherwise they work the same. They damage all enemies in front of the character, and within the attacks range.
+
+Ruby:
+
+Her default attack is a long range, long cooldown and high damage attack.
+
+Ruby's movement ability is temporarily transforming into Rose Form. When in Rose Form she gains massive a movement speed boost and is not affected by gravity. Please note that she can still use her other abilities during Rose Form.
+
+For her damaging ability, Ruby uses her weapon as a sniper rifle, and shoots a single shot that travels instantly, dealing significant damage to the first enemy hit.
+
+Weiss:
+
+Her default attack is a medium range, low cooldown, medium damage attack. Weiss is special in that her attacks are her only source of damage
+
+Her movement ability is a short dash. When used, Weiss will dash towards the direction she is currently running.
+
+Weiss does not have a usual damaging ability, instead her last ability is a skillshot that, upon hitting another character will lock them in a glyph prison, stunning them for a short duration. When stunned the enemy cannot move, attack or use their abilities.
+-------------------------
 Welcome to RUBY ARENA champion spotlight, featuring: Yang
 
 Like every other character in the game, Yang has 2 special abilities and a default attack.
@@ -38,6 +62,6 @@ Like every other character in the game, Blake has 2 special abilities and a defa
 
 Her default attack is a long range, low cooldown attack dealing damage to all enemies in front of her.
 
-Blakes' movement ability is Blink. She teleports in the direction the player is looking at.
+Blakes' movement ability is Blink. She teleports in the direction the player is looking.
 
 Her damaging ability is Slash. Blake slashes her weapons creating a small shockwave that travels forward and dealing a small amount of damage.   With the short cooldown she can rain fire on any enemy approaching her!
