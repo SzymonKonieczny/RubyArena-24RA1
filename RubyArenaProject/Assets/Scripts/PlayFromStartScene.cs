@@ -10,7 +10,7 @@ using UnityEngine.SceneManagement;
 [InitializeOnLoad]
 public class PlayFromStartScene
 {
-    static string startScenePath = "Assets/Scenes/MultiplayerStartScene.unity"; 
+    static string startScenePath = "Assets/Scenes/InitializerScene.unity"; //"Assets/Scenes/MultiplayerStartScene.unity"; 
 
     static PlayFromStartScene()
     {
