@@ -10,17 +10,18 @@ Ruby:
 
 Her default attack is a long range, long cooldown and high damage attack.
 
-Ruby's movement ability is temporarily transforming into Rose Form. When in Rose Form she gains massive a movement speed boost and is not affected by gravity. Please note that she can still use her other abilities during Rose Form.
+Ruby's movement ability is temporarily transforming into Rose Form. When in Rose Form she gains a massive movement speed boost and is not affected by gravity. Please note that she can still use her other abilities during Rose Form.
 
 For her damaging ability, Ruby uses her weapon as a sniper rifle, and shoots a single shot that travels instantly, dealing significant damage to the first enemy hit.
 
-Weiss:
+Yang:
 
-Her default attack is a medium range, low cooldown, medium damage attack. Weiss is special in that her attacks are her only source of damage
+Yang's default attack is a low cooldown low range and low damage attack.
 
-Her movement ability is a short dash. When used, Weiss will dash towards the direction she is currently running.
+Her movement ability is a short dash. When used, Yang will dash towards the direction she is currently running.
 
-Weiss does not have a usual damaging ability, instead her last ability is a skillshot that, upon hitting another character will lock them in a glyph prison, stunning them for a short duration. When stunned the enemy cannot move, attack or use their abilities.
+Yang's damaging ability has an active and a passive part. Passively, when Yang receives damage, she gains stacks of "Rage". Actively she shoots a burst of flames from her gauntlets, damaging enemies in a cone in front of her, consuming the stacks, and dealing extra damage for every stack. Additionally, when the stacks go above 30, her gauntlets set ablaze.
+
 -------------------------
 Welcome to RUBY ARENA champion spotlight, featuring: Yang
 
