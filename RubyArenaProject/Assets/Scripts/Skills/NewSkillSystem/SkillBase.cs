@@ -101,10 +101,11 @@ public abstract class SkillBase : NetworkBehaviour
         if (!SkillDataSO)
         {
             SkillDataSO = ScriptableObject.CreateInstance<SkillDataSO>();
-
         }
         SkillDataSO.damage = damage;
         SkillDataSO.castTime = windupTime;
+        Debug.Log($"Damage set to {SkillDataSO.damage} for {gameObject.name}");
+
     }
     private void Awake()
     {

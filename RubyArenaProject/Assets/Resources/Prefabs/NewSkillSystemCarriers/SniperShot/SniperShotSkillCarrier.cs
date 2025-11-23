@@ -15,8 +15,9 @@ public class SniperShotSkillCarrier : SkillBase
     {
         base.Init();
         SkillDataSO.damage = damage;
+        Debug.Log($"Damage set to {SkillDataSO.damage}");
     }
- 
+
 
     public override bool Use()
     {

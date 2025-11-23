@@ -54,12 +54,9 @@ public class AutoAttackSkillCarrier : SkillBase
     }
     private void autoAttackDataUpdate()
     {
-        if(IsOwner)
-        {
-            Debug.Log($"Logging : {autoAttackParams.Value.Damage} dmg {autoAttackParams.Value.AttackSpeed} as");
-        }
         damage = autoAttackParams.Value.Damage;
         SkillDataSO.damage = autoAttackParams.Value.Damage;
+        Debug.Log($"Damage set to {SkillDataSO.damage}");
         cooldown = 1.0f / autoAttackParams.Value.AttackSpeed;
     }
     private void OnTransformParentChanged()
@@ -70,6 +67,10 @@ public class AutoAttackSkillCarrier : SkillBase
     {
         base.Init();
         autoAttackDataUpdate();
+        if (IsOwner)
+        {
+            Debug.Log($"Logging : {SkillDataSO.damage} dmg {cooldown} as");
+        }
     }
 
     public override bool Use()

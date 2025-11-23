@@ -46,8 +46,11 @@ public class UISkillIcon : MonoBehaviour
             nextAvaliableTime = newV;
 
         };
-        cooldown = skill.cooldown;
-        icon.sprite = skill.SkillDataSO.Icon;
+        if (skill)
+        {
+            cooldown = skill.cooldown;
+            icon.sprite = skill.SkillDataSO.Icon;
+        }
         LocalPlayerStateManager.LocalInstance.localPlayerInitialized -= Init;
     }
 
