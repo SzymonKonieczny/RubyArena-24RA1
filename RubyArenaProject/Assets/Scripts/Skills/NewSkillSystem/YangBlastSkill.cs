@@ -114,12 +114,13 @@ public class YangBlastSkill : SkillBase
             Vector3 toTarget = (player.transform.position - skillOrigin);
             player.playerMove.AddNetworkRbVelocityClientRPC(toTarget.normalized * 10);
 
-            var SkillDataSO = ScriptableObject.CreateInstance<SkillDataSO>();
 
-
-            SkillDataSO.damage = damage + (int)storedDamage;
-            SkillDataSO.ownerNetworkObjectId = senderNetworkObjectId;
-            playerResources.damage(SkillDataSO);
+            var data = new SkillInstanceData
+            {
+                damage = this.damage + (int)storedDamage,
+                ownerNetworkObjectId = senderNetworkObjectId
+            };
+            playerResources.damage(data);
         }
         storedDamage = 0;
 

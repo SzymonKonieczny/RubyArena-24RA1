@@ -3,6 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 
+public struct SkillInstanceData
+{
+    public SkillType Type;
+    public int damage;
+    public ulong ownerNetworkObjectId;
+}
 public abstract class UnitResource : NetworkBehaviour
 {
 
@@ -14,7 +20,7 @@ public abstract class UnitResource : NetworkBehaviour
     /// 
     /// </summary>
     /// <param name="skillData">Takes SkillDataSO, to track the damage dealer</param>
-    public abstract void damage(SkillDataSO skillData);
+    public abstract void damage(SkillInstanceData skillData);
 
     public abstract void takeMana(float amount);
     public abstract float getHP();

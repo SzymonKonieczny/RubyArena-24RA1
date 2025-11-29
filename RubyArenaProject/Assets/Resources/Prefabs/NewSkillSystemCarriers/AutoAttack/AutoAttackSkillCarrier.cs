@@ -55,8 +55,6 @@ public class AutoAttackSkillCarrier : SkillBase
     private void autoAttackDataUpdate()
     {
         damage = autoAttackParams.Value.Damage;
-        SkillDataSO.damage = autoAttackParams.Value.Damage;
-        Debug.Log($"Damage set to {SkillDataSO.damage}");
         cooldown = 1.0f / autoAttackParams.Value.AttackSpeed;
     }
     private void OnTransformParentChanged()
@@ -69,7 +67,7 @@ public class AutoAttackSkillCarrier : SkillBase
         autoAttackDataUpdate();
         if (IsOwner)
         {
-            Debug.Log($"Logging : {SkillDataSO.damage} dmg {cooldown} as");
+            Debug.Log($"Logging : {damage} dmg {cooldown} as");
         }
     }
 
@@ -122,9 +120,12 @@ public class AutoAttackSkillCarrier : SkillBase
             var playerResources = player.GetComponent<UnitResource>();
             if (!playerResources || player.NetworkObject.NetworkObjectId == senderNetworkObjectId) continue;
 
-
-            SkillDataSO.ownerNetworkObjectId = senderNetworkObjectId;
-            playerResources.damage(SkillDataSO);
+            var data = new SkillInstanceData
+            {
+                damage = this.damage,
+                ownerNetworkObjectId = senderNetworkObjectId
+            };
+            playerResources.damage(data);
         }
 
         ServerAnnounceSpellCastClientRPC(0);

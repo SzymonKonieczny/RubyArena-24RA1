@@ -34,11 +34,11 @@ public class PlayerResources : UnitResource
     }
 
 
-    public override void damage(SkillDataSO skillData)
+    public override void damage(SkillInstanceData skillData)
     {
         if (!IsServer) return;
         float hpBefore = Hp.Value;
-        Hp.Value -= skillData?.damage ?? 0;
+        Hp.Value -= skillData.damage;
         onDamageDealt?.Invoke(skillData.ownerNetworkObjectId, this.NetworkObject.NetworkObjectId, hpBefore, Hp.Value);
         if(Hp.Value <=0)
         {

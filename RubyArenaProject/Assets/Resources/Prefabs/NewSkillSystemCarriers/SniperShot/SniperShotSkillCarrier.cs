@@ -48,9 +48,12 @@ public class SniperShotSkillCarrier : SkillBase
             var playerResources = hit.collider.transform.GetComponent<UnitResource>();
             if (!playerResources || playerResources.NetworkObject.NetworkObjectId == ownerNetworkObjectId) return;
 
-
-            SkillDataSO.ownerNetworkObjectId = ownerNetworkObjectId;
-            playerResources.damage(SkillDataSO);
+            var data = new SkillInstanceData
+            {
+                damage = this.damage,
+                ownerNetworkObjectId = ownerNetworkObjectId
+            };
+            playerResources.damage(data);
         }
 
 

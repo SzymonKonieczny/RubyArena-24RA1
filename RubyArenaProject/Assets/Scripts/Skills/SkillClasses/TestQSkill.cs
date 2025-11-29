@@ -105,7 +105,13 @@ public class TestQSkill : BaseSkillEntityBehaviorSkillShot //make it into a base
             {
                 MovePlayerAroundClientRPC(networkObject.NetworkObjectId);
                 var playerRes =  networkObject.GetComponent<PlayerResources>();
-                playerRes.damage(SkillDataSO);
+
+                SkillInstanceData data = new SkillInstanceData
+                {
+                    damage = SkillDataSO.damage,
+                    ownerNetworkObjectId = ownerNetworkObjectId
+                };
+                playerRes.damage(data);
             }
 
         }

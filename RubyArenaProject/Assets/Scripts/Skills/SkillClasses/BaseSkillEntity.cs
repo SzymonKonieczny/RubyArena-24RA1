@@ -17,8 +17,10 @@ public abstract class BaseSkillEntityBehavior : NetworkBehaviour
     [SerializeField] protected float TimeAlive = 0;
     [SerializeField] protected GameObject entityToSpawn; //Entity to to spawn (for instance after collition for AOE overtime effects)
     [SerializeField] protected Collider collider;
+
     [SerializeField] protected NetworkObject NetworkObj;
     [SerializeField] public SkillDataSO SkillDataSO;
+    public ulong ownerNetworkObjectId;
     protected Collision collisioninfo;
     public virtual void Start()
     {
