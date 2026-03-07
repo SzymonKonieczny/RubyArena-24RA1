@@ -24,6 +24,7 @@ public class LobbyCanvasManager : NetworkBehaviour
         base.OnNetworkSpawn();
          
         startButton.interactable = IsServer;
+
         if (!IsServer) return;
         DisplayJoinCode.text = ServerPlayerStateManager.Instance.lobbyJoinCode;
 
@@ -72,12 +73,16 @@ public class LobbyCanvasManager : NetworkBehaviour
     {
         characterSelect.gameObject.SetActive(!characterSelect.gameObject.activeInHierarchy);
     }
+    public void Disconnect()
+    {
+        NetworkManager.Singleton.Shutdown();
+       // SceneManager.LoadScene("MultiplayerStartScene");
+    }
 
     public void StartGame()
     {
         UpdateStartButton(null);
         if (!IsServer) return;
         NetworkManager.Singleton.SceneManager.LoadScene("AmityArena", LoadSceneMode.Single);
-
     }
 }

@@ -12,8 +12,6 @@ public class RubyFormSkill : SkillBase
 
     public override bool Use() 
     {
-
-
         animationScript.PlayState("jumping");
         combatManagerRef.SetStunTimer(windupTime);
 
