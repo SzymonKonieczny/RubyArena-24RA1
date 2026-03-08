@@ -74,7 +74,8 @@ namespace RubyArena_Launcher
                 {
                     ScrollView.IsEnabled = true;
                     scrollViewContent = await Util.client.GetStringAsync(scrollViewContentURL);
-                    ScrollView.Content = scrollViewContent;
+ 
+                    StaticPatchText.Text = scrollViewContent;
                 }
                 else
                 {
