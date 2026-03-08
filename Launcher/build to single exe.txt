@@ -1,0 +1,2 @@
+run in the directory with csproj
+dotnet publish -c Release --self-contained -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true  -r win-x64 "RubyArena Launcher.csproj"

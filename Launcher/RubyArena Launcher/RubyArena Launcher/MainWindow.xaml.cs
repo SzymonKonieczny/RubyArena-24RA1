@@ -1,6 +1,9 @@
 ﻿using System.Diagnostics;
 using System.IO;
+using System.Security.Policy;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -25,14 +28,18 @@ namespace RubyArena_Launcher
             NeedsUpdate
         }
         State launcherState;
-        readonly string versionURL = "https://raw.githubusercontent.com/SzymonKonieczny/RubyArena-24RA1/releases/download/version-lookup/version.txt";
+        readonly string versionURL = "https://raw.githubusercontent.com/SzymonKonieczny/RubyArena-24RA1/refs/heads/main/version.json";
+        readonly string scrollViewContentURL = "https://raw.githubusercontent.com/SzymonKonieczny/RubyArena-24RA1/refs/heads/main/StaticPatchNotes.txt";
         string buildURL;
-
+        JsonDocument remoteVersionData;
         string versionLocal;
         string versionNewest;
         string currentDir;
         string buildPath;
         string buildDir;
+        string gameExePath;
+        string webViewUrl = null;
+        string scrollViewContent = null;
         string zipPath;
         public MainWindow()
         {
@@ -44,8 +51,16 @@ namespace RubyArena_Launcher
         {
             currentDir = Directory.GetCurrentDirectory();
             buildDir = Path.Combine(currentDir, "Data");
-            buildPath = Path.Combine(buildDir, "Ruby Arena.exe");
             zipPath = Path.Combine(currentDir, "build.zip");
+            gameExePath = Path.Combine(buildDir, "RubyArenaProject.exe");
+
+            string s = "";
+            for (int i = 0; i < 200; i++)
+            {
+                s += $"{i}. TEST Line \n";
+            }
+
+            ScrollView.Content = s;
             versionLocal = "";
             try
             {
@@ -57,7 +72,23 @@ namespace RubyArena_Launcher
             }
             try
             {
-                versionNewest = Util.ReadTextFileFromUrl(versionURL).Result;
+                string data = await Util.client.GetStringAsync(versionURL);
+                remoteVersionData = JsonDocument.Parse(data);
+                versionNewest = Util.GetStringOrDefault(remoteVersionData.RootElement, "version", string.Empty);
+                webViewUrl = Util.GetStringOrDefault(remoteVersionData.RootElement, "webViewUrl", string.Empty);
+                if(string.IsNullOrEmpty(webViewUrl))
+                {
+                    WebViewer.IsEnabled = false;
+                    ScrollView.IsEnabled = true;
+
+                }
+                else
+                {
+                    WebViewer.IsEnabled = true;
+                    ScrollView.IsEnabled = false;
+                    scrollViewContent = await Util.client.GetStringAsync(scrollViewContentURL);
+                    ScrollView.Content = scrollViewContent;
+                }
             }
             catch
             {
@@ -68,7 +99,10 @@ namespace RubyArena_Launcher
             {
                 launcherState = State.NeedsUpdate;
                 PlayButton.Content = "Update";
-                buildURL = $"https://github.com/SzymonKonieczny/RubyArena-24RA1/releases/download/{versionNewest}/Build.zip";
+                if (Util.IsValidHttpUrl(versionNewest))
+                    buildURL = versionNewest;
+                else
+                    buildURL = $"https://github.com/SzymonKonieczny/RubyArena-24RA1/releases/download/{versionNewest}/Build.zip";
             }
             else
                 launcherState = State.UpToDate;
@@ -81,12 +115,16 @@ namespace RubyArena_Launcher
             PlayButton.IsEnabled = false;
             launcherState = State.Updating;
             await Util.DownloadFileAsync(buildURL, zipPath);
+            Util.DeleteAllFiles(buildDir);
+            Util.ExtractZip(zipPath, buildDir);
+            Util.DeleteFile(zipPath);
+
             PlayButton.Content = "Play";
             PlayButton.IsEnabled = true;
         }
         private void RunGame()
         {
-
+            Process.Start(gameExePath);
         }
         private async void PlayButtonClick(object sender, RoutedEventArgs e)
         {
@@ -96,7 +134,7 @@ namespace RubyArena_Launcher
                     RunGame();
                     break;
                 case State.NeedsUpdate:
-                    Update().Start();
+                    Update();
                     break;
             }
         }

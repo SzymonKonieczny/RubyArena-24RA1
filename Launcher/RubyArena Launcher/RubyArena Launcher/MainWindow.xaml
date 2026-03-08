@@ -5,13 +5,16 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RubyArena_Launcher"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
-        <Image HorizontalAlignment="Left" Height="450" Width="800" Source="yang.png" Stretch="Fill"/>
-        <Rectangle Stroke="Black" StrokeThickness="10" Margin="0,363,10,0" Fill="DimGray"/>
+        Title="MainWindow" Height="600" Width="800" Icon="/yang.png" ResizeMode="CanMinimize">
+    <Grid Margin="0,0,0,0">
 
-        <Button Name="PlayButton" Content="Play" HorizontalAlignment="Left" Height="51" Margin="301,373,0,0" VerticalAlignment="Top" Width="168" FontSize="25"
-                FontFamily="Arial Black" Click="PlayButtonClick"/>
+        <Image Margin="0,0,0,0" Source="/yang.png" Stretch="Fill"/>
+        <Rectangle Stroke="Black" StrokeThickness="10" Margin="0,513,10,0" Fill="DimGray"/>
+        <Button Name="PlayButton" Content="Play" HorizontalAlignment="Left" Width="168" FontSize="25"
+                FontFamily="Arial Black" Click="PlayButtonClick" Height="51" VerticalAlignment="Bottom" Margin="300,0,0,10"/>
+        <ScrollViewer x:Name="ScrollView" Margin="0,0,0,71" Content="TEWST VALES" FontFamily="Times New Roman" FontSize="30">
+        </ScrollViewer>
+        <WebBrowser x:Name="WebViewer" Source="https://www.youtube.com" Margin="0,0,0,71"/>
 
 
     </Grid>
