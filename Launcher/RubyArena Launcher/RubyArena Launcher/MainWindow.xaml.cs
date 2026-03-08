@@ -1,18 +1,8 @@
-﻿using System.Diagnostics;
+﻿using Microsoft.Web.WebView2.Wpf;
+using System.Diagnostics;
 using System.IO;
-using System.Security.Policy;
-using System.Text;
 using System.Text.Json;
-using System.Text.Json.Nodes;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Path = System.IO.Path;
 namespace RubyArena_Launcher
 {
@@ -27,7 +17,7 @@ namespace RubyArena_Launcher
             Updating,
             NeedsUpdate
         }
-        private WebBrowser WebViewer;
+        private WebView2 WebViewer;
         State launcherState;
         readonly string versionURL = "https://raw.githubusercontent.com/SzymonKonieczny/RubyArena-24RA1/refs/heads/main/version.json";
         readonly string scrollViewContentURL = "https://raw.githubusercontent.com/SzymonKonieczny/RubyArena-24RA1/refs/heads/main/StaticPatchNotes.txt";
@@ -81,9 +71,10 @@ namespace RubyArena_Launcher
                 {
                     if(WebViewer== null)
                     {
-                        WebViewer = new WebBrowser();
+                        WebViewer = new WebView2();
                         WebViewerHost.Children.Add(WebViewer);
-                        WebViewer.Navigate(webViewUrl);
+                        await WebViewer.EnsureCoreWebView2Async();
+                        WebViewer.Source =new Uri(webViewUrl);
                     }
                     WebViewer.IsEnabled = true;
                     ScrollView.IsEnabled = false;
