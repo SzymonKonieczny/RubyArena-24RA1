@@ -1,4 +1,4 @@
-First downloadable version of Ruby Arena v0.0.1!
+First downloadable version of Ruby Arena v0.0.2!
 
 Patch notes:
 
