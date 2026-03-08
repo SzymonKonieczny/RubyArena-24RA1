@@ -1,1 +1,4 @@
-TEST PATCH NOTES 
+Patch notes:
+
+- Fixed a bug where Yang and Weiss would be unable to dash along certain axis
+- Added a cast-time for Rose Form and Glyph Prison
