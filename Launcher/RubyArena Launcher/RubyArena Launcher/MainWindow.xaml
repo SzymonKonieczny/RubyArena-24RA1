@@ -9,12 +9,12 @@
     <Grid Margin="0,0,0,0">
 
         <Image Margin="0,0,0,0" Source="/yang.png" Stretch="Fill"/>
-        <Rectangle Stroke="Black" StrokeThickness="10" Margin="0,513,10,0" Fill="DimGray"/>
+        <Rectangle Stroke="Black" StrokeThickness="10" Margin="0,513,0,0" Fill="DimGray"/>
         <Button Name="PlayButton" Content="Play" HorizontalAlignment="Left" Width="168" FontSize="25"
                 FontFamily="Arial Black" Click="PlayButtonClick" Height="51" VerticalAlignment="Bottom" Margin="300,0,0,10"/>
         <ScrollViewer x:Name="ScrollView" Margin="0,0,0,71" Content="TEWST VALES" FontFamily="Times New Roman" FontSize="30">
         </ScrollViewer>
-        <WebBrowser x:Name="WebViewer" Source="https://www.youtube.com" Margin="0,0,0,71"/>
+        <Grid x:Name="WebViewerHost" Margin="0,0,0,71"/>
 
 
     </Grid>

@@ -27,6 +27,7 @@ namespace RubyArena_Launcher
             Updating,
             NeedsUpdate
         }
+        private WebBrowser WebViewer;
         State launcherState;
         readonly string versionURL = "https://raw.githubusercontent.com/SzymonKonieczny/RubyArena-24RA1/refs/heads/main/version.json";
         readonly string scrollViewContentURL = "https://raw.githubusercontent.com/SzymonKonieczny/RubyArena-24RA1/refs/heads/main/StaticPatchNotes.txt";
@@ -54,11 +55,7 @@ namespace RubyArena_Launcher
             zipPath = Path.Combine(currentDir, "build.zip");
             gameExePath = Path.Combine(buildDir, "RubyArenaProject.exe");
 
-            string s = "";
-            for (int i = 0; i < 200; i++)
-            {
-                s += $"{i}. TEST Line \n";
-            }
+   
 
             ScrollView.Content = s;
             versionLocal = "";
@@ -78,16 +75,20 @@ namespace RubyArena_Launcher
                 webViewUrl = Util.GetStringOrDefault(remoteVersionData.RootElement, "webViewUrl", string.Empty);
                 if(string.IsNullOrEmpty(webViewUrl))
                 {
-                    WebViewer.IsEnabled = false;
                     ScrollView.IsEnabled = true;
-
+                    scrollViewContent = await Util.client.GetStringAsync(scrollViewContentURL);
+                    ScrollView.Content = scrollViewContent;
                 }
                 else
                 {
+                    if(WebViewer== null)
+                    {
+                        WebViewer = new WebBrowser();
+                        WebViewerHost.Children.Add(WebViewer);
+                        WebViewer.Navigate(webViewUrl);
+                    }
                     WebViewer.IsEnabled = true;
                     ScrollView.IsEnabled = false;
-                    scrollViewContent = await Util.client.GetStringAsync(scrollViewContentURL);
-                    ScrollView.Content = scrollViewContent;
                 }
             }
             catch
