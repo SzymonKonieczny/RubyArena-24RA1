@@ -38,7 +38,7 @@ namespace RubyArena_Launcher
             PlayButton.IsEnabled = false;
             Loaded += InitializeAsync;
         }
-        private async void InitializeAsync(object sender, RoutedEventArgs e)
+        private async void InitializeAsync(object sender = null, RoutedEventArgs e = null)
         {
             currentDir = Directory.GetCurrentDirectory();
             buildDir = Path.Combine(currentDir, "Data");
@@ -63,6 +63,8 @@ namespace RubyArena_Launcher
                 if(string.IsNullOrEmpty(webViewUrl))
                 {
                     ScrollView.IsEnabled = true;
+                    WebViewer = null;
+
                     scrollViewContent = await Util.client.GetStringAsync(scrollViewContentURL);
  
                     StaticPatchText.Text = scrollViewContent;
@@ -130,5 +132,9 @@ namespace RubyArena_Launcher
             }
         }
 
+        private void RefreshButtonClick(object sender, RoutedEventArgs e)
+        {
+            InitializeAsync();
+        }
     }
 }

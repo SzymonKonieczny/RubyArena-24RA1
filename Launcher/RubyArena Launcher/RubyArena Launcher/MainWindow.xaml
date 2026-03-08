@@ -11,14 +11,15 @@
         <Image Margin="0,0,0,0" Source="/background.png" Stretch="Fill" Opacity="0.8"/>
         <Rectangle Stroke="Black" StrokeThickness="10" Fill="DimGray" Margin="0,485,0,0"/>
         <Button Name="PlayButton" Content="Play" FontSize="25"
-                FontFamily="Arial Black" Click="PlayButtonClick" Margin="300,495,332,10"/>
+                FontFamily="Arial Black" Click="PlayButtonClick" Margin="10,495,622,10"/>
         <ScrollViewer x:Name="ScrollView"  Margin="0,0,0,71"  FontFamily="Bahnschrift" FontSize="25" UseLayoutRounding="False">
         
         <TextBlock x:Name="StaticPatchText" TextWrapping="WrapWithOverflow" Text="TextBlock"/>
         
         </ScrollViewer>
         <Grid x:Name="WebViewerHost" Margin="0,0,0,71"/>
-
+        <Button x:Name="RefreshButton" Content="Refresh" FontSize="25"
+            FontFamily="Arial Black" Click="RefreshButtonClick" Margin="622,495,10,10" ToolTip="Check again for updates"/>
 
     </Grid>
 </Window>
