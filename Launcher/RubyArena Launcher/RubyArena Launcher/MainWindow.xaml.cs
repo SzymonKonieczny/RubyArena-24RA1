@@ -55,9 +55,6 @@ namespace RubyArena_Launcher
             zipPath = Path.Combine(currentDir, "build.zip");
             gameExePath = Path.Combine(buildDir, "RubyArenaProject.exe");
 
-   
-
-            ScrollView.Content = s;
             versionLocal = "";
             try
             {
