@@ -104,7 +104,8 @@ public class Movement : NetworkBehaviour
                 direction = ((Model.forward * Input.GetAxis("Vertical")) + (Model.right * Input.GetAxis("Horizontal"))); 
                 break;
             case PlayerOrientationModes.Walking:
-                direction = Model.forward * Mathf.Abs( (Input.GetAxis("Vertical") + Input.GetAxis("Horizontal"))/2);
+                Debug.Log($"Model.forward : {Model.forward} |  Input.GetAxis(\"Vertical\") {Input.GetAxis("Vertical")} | Input.GetAxis(\"Horizontal\"))/2 {Input.GetAxis("Horizontal")}");
+                direction = Model.forward * new Vector2(Input.GetAxis("Vertical"), Input.GetAxis("Horizontal")).magnitude;
                 break;
         }
 

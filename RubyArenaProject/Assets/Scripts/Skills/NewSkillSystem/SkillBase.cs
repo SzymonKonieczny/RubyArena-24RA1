@@ -74,7 +74,7 @@ public abstract class SkillBase : NetworkBehaviour
         if (Physics.Raycast(ray, out RaycastHit raycastHit, rayCastMask))
         {
             SkillDir = (raycastHit.point - this.combatManagerRef.SkillshotSpawnPoint.position).normalized;
-        Debug.DrawLine(ray.origin,
+            Debug.DrawLine(ray.origin,
             raycastHit.point, Color.red, 3f);
 
         }

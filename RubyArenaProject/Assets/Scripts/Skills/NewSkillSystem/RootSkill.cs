@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 
@@ -49,19 +48,18 @@ public class RootSkill : SkillBase
         if (isOnCooldown()) return;
         setCooldown(cooldown);
 
+        StartCoroutine(SpawnEntityDelayed(lookDir));
+       
+    }
+    IEnumerator SpawnEntityDelayed(Vector3 lookDir)
+    {
+        yield return new WaitForSeconds(windupTime);
         GameObject skillEntityGO = Instantiate(projectile);
 
         skillEntityGO.GetComponent<NetworkObject>().Spawn();
         skillEntityGO.transform.SetPositionAndRotation(combatManagerRef.SkillshotSpawnPoint.transform.position + lookDir * 2, Quaternion.LookRotation(lookDir, Vector3.up));
-       // var skillEntity = skillEntityGO.GetComponent<BaseSkillEntityBehavior>();
-       // skillEntity.SkillDataSO = ScriptableObject.CreateInstance<SkillDataSO>();
-       // skillEntity.SkillDataSO.damage = 5;
 
         ServerAnnounceSpellCastClientRPC(0);
-    }
-    async void SpawnEntityDelayed()
-    {
-
     }
     [ClientRpc]
     void ServerAnnounceSpellCastClientRPC(ulong networkObjId)

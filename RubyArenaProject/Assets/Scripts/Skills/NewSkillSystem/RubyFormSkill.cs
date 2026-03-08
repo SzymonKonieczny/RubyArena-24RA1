@@ -12,9 +12,6 @@ public class RubyFormSkill : SkillBase
 
     public override bool Use() 
     {
-        animationScript.PlayState("jumping");
-        combatManagerRef.SetStunTimer(windupTime);
-
         ServerSideUseServerRPC();
         return true;
     }
@@ -31,6 +28,14 @@ public class RubyFormSkill : SkillBase
         ParticleSystem.MainModule main = roseParticles.main;
         main.duration = duration;
     }
+    [ClientRpc]
+    void ClientSideAcknowledgeSpellStartClientRPC()
+    {
+        animationScript.PlayState("Jumping");
+        if(IsOwner)
+            combatManagerRef.SetStunTimer(windupTime);
+    }
+
     [ServerRpc]
     void ServerSideUseServerRPC(ServerRpcParams rpcParams = default)
     {
@@ -38,8 +43,16 @@ public class RubyFormSkill : SkillBase
         if (isOnCooldown()) return;
         setCooldown(cooldown);
 
-        ServerAnnounceSpellCastClientRPC();
+        StartCoroutine(UseWithCastTime());
     }
+    IEnumerator UseWithCastTime()
+    {
+        ClientSideAcknowledgeSpellStartClientRPC();
+        yield return new WaitForSeconds(windupTime);
+        ServerAnnounceSpellCastClientRPC();
+
+    }
+
 
     [ClientRpc]
     void ServerAnnounceSpellCastClientRPC()
