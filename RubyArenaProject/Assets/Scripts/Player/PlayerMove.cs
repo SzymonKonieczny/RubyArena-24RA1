@@ -110,7 +110,6 @@ public class Movement : NetworkBehaviour
         }
 
         StartCoroutine(Dash(direction.normalized, speed , 0.2f));
-        //StartCoroutine(Dash(Rb.velocity.normalized, speed , 0.2f));
     }
 
     void FixedUpdate()
