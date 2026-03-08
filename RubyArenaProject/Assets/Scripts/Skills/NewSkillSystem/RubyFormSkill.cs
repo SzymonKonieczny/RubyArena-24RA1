@@ -32,8 +32,6 @@ public class RubyFormSkill : SkillBase
     void ClientSideAcknowledgeSpellStartClientRPC()
     {
         animationScript.PlayState("Jumping");
-        if(IsOwner)
-            combatManagerRef.SetStunTimer(windupTime);
     }
 
     [ServerRpc]
