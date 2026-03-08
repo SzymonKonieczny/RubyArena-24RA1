@@ -62,7 +62,6 @@ public class MenuScript : MonoBehaviour
     }
     public async void StartClient()
     {
-        LogNetworkConfig();
 
         if (useRelay.isOn)
         {
@@ -73,6 +72,8 @@ public class MenuScript : MonoBehaviour
             NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
         }
         NetworkManager.Singleton.StartClient();
+        LogNetworkConfig();
+
 
     }
 
