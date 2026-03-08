@@ -62,7 +62,7 @@ namespace RubyArena_Launcher
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Unable to read version data.");
+               
             }
             try
             {
@@ -118,6 +118,7 @@ namespace RubyArena_Launcher
             Util.ExtractZip(zipPath, buildDir);
             Util.DeleteFile(zipPath);
 
+            launcherState = State.UpToDate;
             PlayButton.Content = "Play";
             PlayButton.IsEnabled = true;
         }

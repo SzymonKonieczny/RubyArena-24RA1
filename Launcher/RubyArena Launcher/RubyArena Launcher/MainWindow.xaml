@@ -12,7 +12,7 @@
         <Rectangle Stroke="Black" StrokeThickness="10" Fill="DimGray" Margin="0,485,0,0"/>
         <Button Name="PlayButton" Content="Play" FontSize="25"
                 FontFamily="Arial Black" Click="PlayButtonClick" Margin="300,495,332,10"/>
-        <ScrollViewer x:Name="ScrollView"  Margin="0,0,0,71"  FontFamily="Bahnschrift" FontSize="30" UseLayoutRounding="False">
+        <ScrollViewer x:Name="ScrollView"  Margin="0,0,0,71"  FontFamily="Bahnschrift" FontSize="25" UseLayoutRounding="False">
         
         <TextBlock x:Name="StaticPatchText" TextWrapping="WrapWithOverflow" Text="TextBlock"/>
         
