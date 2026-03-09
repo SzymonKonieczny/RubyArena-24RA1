@@ -13,6 +13,7 @@ public class LobbyCanvasManager : NetworkBehaviour
     [SerializeField] Button startButton;
     [SerializeField] TMPro.TMP_Text startButtonText;
     [SerializeField] private TMPro.TMP_Text DisplayJoinCode;
+    [SerializeField] public string sceneName;
 
     public Dictionary<ulong, PlayerInLobbyIcon> playersInLobby = new();
     void PostServerPlayerStateManagerInitialize()
@@ -83,6 +84,6 @@ public class LobbyCanvasManager : NetworkBehaviour
     {
         UpdateStartButton(null);
         if (!IsServer) return;
-        NetworkManager.Singleton.SceneManager.LoadScene("AmityArena", LoadSceneMode.Single);
+        NetworkManager.Singleton.SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
     }
 }
