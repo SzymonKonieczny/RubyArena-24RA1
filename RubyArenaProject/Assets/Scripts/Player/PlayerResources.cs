@@ -6,6 +6,7 @@ using UnityEngine.UI;
 using Unity.Netcode;
 using System;
 using UnityEngine.SceneManagement;
+using Cinemachine;
 
 public class PlayerResources : UnitResource
 {
@@ -14,11 +15,11 @@ public class PlayerResources : UnitResource
 
     [SerializeField] float MaxHP = 100;
     [SerializeField] float MaxMana = 100;
-    [SerializeField] ParticleSystem bleedingEffect;
+    [SerializeField] ParticleSystem bleedingEffect; //inside the player prefab. Assinged via editor
     public Action<ulong,ulong,float, float> onDamageDealt; //DamageDealer,DamageReciever,HpBefore,HpAfter
     public Action<ulong, ulong> onPlayerDeath; //Killer, Killed
     GameObject HealthBarObject;
-
+    CinemachineImpulseSource impulseSource;
     private PlayerScript Player; //optimization to call getComponent less
     public void SetMaxHP(float amount)
     {
@@ -93,6 +94,7 @@ public class PlayerResources : UnitResource
 
         HealthBarObject = GameObject.FindGameObjectWithTag("HealthBar");
         HP_Slider = HealthBarObject?.GetComponent<Slider>();
+        impulseSource = gameObject.GetComponentInChildren<CinemachineImpulseSource>();
 
 
         Mana.OnValueChanged += (float preV, float newV) =>
@@ -103,6 +105,10 @@ public class PlayerResources : UnitResource
         Hp.OnValueChanged += (float preV, float newV) =>
         {
             HP_Slider.value = newV / MaxHP;
+            if (preV > newV)
+            {
+                impulseSource?.GenerateImpulse(0.5f - 0.5f/(preV-Mathf.Abs(newV)));
+            }
         };
 
         Hp.OnValueChanged.Invoke(0, MaxHP);

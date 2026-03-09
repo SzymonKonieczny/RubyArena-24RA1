@@ -1,7 +1,8 @@
 First downloadable version of Ruby Arena v0.0.2b!
 
 [Patch notes]
-Winter Map is here!
+- Winter Map is here!
+- Introduced camera Shake on taking damage
 
 [Fixes]
 - Fixed a bug where Yang and Weiss would be unable to dash along certain axis

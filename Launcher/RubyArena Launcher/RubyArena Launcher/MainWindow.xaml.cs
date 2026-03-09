@@ -121,15 +121,26 @@ namespace RubyArena_Launcher
         }
         private async void PlayButtonClick(object sender, RoutedEventArgs e)
         {
-            switch (launcherState)
+            try
             {
-                case State.UpToDate:
-                    RunGame();
-                    break;
-                case State.NeedsUpdate:
-                    Update();
-                    break;
+
+                switch (launcherState)
+                {
+                    case State.UpToDate:
+                        RunGame();
+                        break;
+                    case State.NeedsUpdate:
+                        await Update();
+                        break;
+                }
             }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+                PlayButton.Content = "Please \n Refresh";
+                PlayButton.IsEnabled = false;
+            }
+
         }
 
         private void RefreshButtonClick(object sender, RoutedEventArgs e)

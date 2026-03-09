@@ -15,7 +15,7 @@ namespace RubyArena_Launcher
     {
         public static readonly HttpClient client = new HttpClient()
         {
-            //Timeout = TimeSpan.FromSeconds(2)
+            Timeout = TimeSpan.FromMinutes(30)
         };
         public static bool IsValidHttpUrl(string url)
         {
