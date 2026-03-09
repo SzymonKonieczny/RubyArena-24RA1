@@ -1,6 +1,7 @@
-First downloadable version of Ruby Arena v0.0.2!
+First downloadable version of Ruby Arena v0.0.2a!
 
 [Patch notes]
 
 - Fixed a bug where Yang and Weiss would be unable to dash along certain axis
 - Added a cast-time for Rose Form and Glyph Prison
+- Fixed frozen Health bar
