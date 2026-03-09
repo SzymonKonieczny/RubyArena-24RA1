@@ -25,9 +25,10 @@ namespace RubyArena_Launcher
         JsonDocument remoteVersionData;
         string versionLocal;
         string versionNewest;
+        string buildDownloadUrlNewest; //url found in the repo
+        string buildDir; // computed build url
         string currentDir;
         string buildPath;
-        string buildDir;
         string gameExePath;
         string webViewUrl = null;
         string scrollViewContent = null;
@@ -60,13 +61,12 @@ namespace RubyArena_Launcher
                 remoteVersionData = JsonDocument.Parse(data);
                 versionNewest = Util.GetStringOrDefault(remoteVersionData.RootElement, "version", string.Empty);
                 webViewUrl = Util.GetStringOrDefault(remoteVersionData.RootElement, "webViewUrl", string.Empty);
-                if(string.IsNullOrEmpty(webViewUrl))
+                buildDownloadUrlNewest = Util.GetStringOrDefault(remoteVersionData.RootElement, "buildUrl", string.Empty);
+                if (string.IsNullOrEmpty(webViewUrl))
                 {
                     ScrollView.IsEnabled = true;
                     WebViewer = null;
-
                     scrollViewContent = await Util.client.GetStringAsync(scrollViewContentURL);
- 
                     StaticPatchText.Text = scrollViewContent;
                 }
                 else
@@ -84,21 +84,21 @@ namespace RubyArena_Launcher
             }
             catch
             {
-                MessageBox.Show("Unable to contact the server.\n Please wait or contact the owner");
+                MessageBox.Show($"Unable to contact the server.\n Please wait or contact the owner. \n The tag {versionNewest}");
             }
 
             if (versionNewest != versionLocal)
             {
                 launcherState = State.NeedsUpdate;
                 PlayButton.Content = "Update";
-                if (Util.IsValidHttpUrl(versionNewest))
-                    buildURL = versionNewest;
-                else
+                if (string.IsNullOrEmpty(buildDownloadUrlNewest))
                     buildURL = $"https://github.com/SzymonKonieczny/RubyArena-24RA1/releases/download/{versionNewest}/Build.zip";
+                else
+                    buildURL = buildDownloadUrlNewest;
             }
             else
                 launcherState = State.UpToDate;
-            
+
             PlayButton.IsEnabled = true;
         }
         private async Task Update()
