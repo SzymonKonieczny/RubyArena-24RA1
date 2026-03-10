@@ -1,4 +1,4 @@
-First downloadable version of Ruby Arena v0.0.2b!
+PreAlpha early release of Ruby Arena v0.0.2c!
 
 [Patch notes]
 - Winter Map is here!
