@@ -7,8 +7,13 @@ public class RubyFormSkill : SkillBase
 {
   //  [SerializeField] MeshRenderer characterModelMesh;
     [SerializeField] ParticleSystem roseParticles;
-    [SerializeField] Renderer[] renderers;
+    [SerializeField] SkinnedMeshRenderer[] skinnedRenderers;
+    [SerializeField] Renderer ballRenderer;
     [SerializeField] float duration;
+    PropertyBlockMaterial propertyBlockMaterial;
+    
+    float currentDissolveProgression = 1; //initializes as dissapeared ^^
+    float targetDissolveProgression = 0;
 
     public override bool Use() 
     {
@@ -23,8 +28,9 @@ public class RubyFormSkill : SkillBase
     override public void Init()
     {
         base.Init();
-
-        renderers = combatManagerRef.GetComponentsInChildren<SkinnedMeshRenderer>(true);
+        ballRenderer.enabled = false;
+        skinnedRenderers = combatManagerRef.GetComponentsInChildren<SkinnedMeshRenderer>(true);
+        propertyBlockMaterial = new PropertyBlockMaterial(skinnedRenderers);
         ParticleSystem.MainModule main = roseParticles.main;
         main.duration = duration;
     }
@@ -32,6 +38,8 @@ public class RubyFormSkill : SkillBase
     void ClientSideAcknowledgeSpellStartClientRPC()
     {
         animationScript.PlayState("Jumping");
+        targetDissolveProgression = 1;
+
     }
 
     [ServerRpc]
@@ -55,7 +63,7 @@ public class RubyFormSkill : SkillBase
     [ClientRpc]
     void ServerAnnounceSpellCastClientRPC()
     {
-        if (animationScript == null || renderers.Length == 0)
+        if (animationScript == null || skinnedRenderers.Length == 0)
         {
           Init(); 
         } 
@@ -71,18 +79,20 @@ public class RubyFormSkill : SkillBase
         combatManagerRef.playerMove.Rb.useGravity = false;
         combatManagerRef.playerMove.speed *= 3;
         combatManagerRef.playerMove.canFly = true;
-        foreach(var r in renderers)
+        /*foreach(var r in renderers)
         {
             r.enabled = false;
-        }
+        }*/
+        ballRenderer.enabled = true;
         roseParticles.Play();
-
         yield return new WaitForSeconds(duration);
+        targetDissolveProgression = 0; // set on animation start
+        ballRenderer.enabled = false;
 
-        foreach (var r in renderers)
-        {
-            r.enabled = true;
-        }
+        /* foreach (var r in renderers)
+         {
+             r.enabled = true;
+         }*/
         combatManagerRef.playerMove.Rb.drag = 0;
         combatManagerRef.playerMove.canFly = false;
         combatManagerRef.playerMove.speed /= 3;
@@ -96,8 +106,24 @@ public class RubyFormSkill : SkillBase
     }
     private void Update()
     {
+        //Fixed update? Doesnt need updating EVRY frame
+        float sign = (targetDissolveProgression - currentDissolveProgression) > 0 ? 1 : -1;
+        currentDissolveProgression += Time.deltaTime * sign * 2;
+        currentDissolveProgression = Mathf.Clamp01(currentDissolveProgression);
+      
+        if (currentDissolveProgression != targetDissolveProgression)
+        {
+            propertyBlockMaterial.SetFloat("_Progress",currentDissolveProgression);
+            Debug.Log($"setting propBLock {currentDissolveProgression}");
+        }
+
+        Debug.Log($"target {targetDissolveProgression} | current {currentDissolveProgression}");
+        
+        
+        
+        
         if (InputCollector == null || combatManagerRef == null || isOnCooldown() || !combatManagerRef.IsOwner)
-            return;
+        return;
 
         if (spellTriggeringFlag.value && combatManagerRef.IsOwner)
         {
