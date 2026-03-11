@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: TrailShaderMat
+  m_Name: FireTrailShaderMat
   m_Shader: {fileID: -6465566751694194690, guid: 6144da156deac0c4e9a1d3af055ee28f, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -47,7 +47,7 @@ Material:
     m_Ints: []
     m_Floats:
     - _AlphaClip: 1
-    - _AlphaCutoff: 0.1
+    - _AlphaCutoff: 0.34
     - _AlphaToMask: 0
     - _Blend: 0
     - _BlendModePreserveSpecular: 1
@@ -64,8 +64,8 @@ Material:
     - _ZWrite: 0
     - _ZWriteControl: 0
     m_Colors:
-    - _Color: {r: 0.3438946, g: 1.6057055, b: 3.471698, a: 1}
-    - _Color_2: {r: 0.07835649, g: 0.17088875, b: 1.8457314, a: 1}
+    - _Color: {r: 5.254026, g: 0.055893894, b: 0, a: 1}
+    - _Color_2: {r: 1.8830179, g: 1.186067, b: 0.06217516, a: 1}
   m_BuildTextureStacks: []
 --- !u!114 &4688184482817217517
 MonoBehaviour:
