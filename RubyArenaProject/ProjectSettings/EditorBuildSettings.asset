@@ -29,4 +29,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/AmityArena.unity
     guid: f655f49d9fccce046a8f2627565603d0
+  - enabled: 1
+    path: Assets/Scenes/_Brawl/BrawlMap.unity
+    guid: 553ba3e391b99824ea332833071d0c96
   m_configObjects: {}

@@ -20,6 +20,7 @@ public class PlayerResources : UnitResource
     public Action<ulong, ulong> onPlayerDeath; //Killer, Killed
     GameObject HealthBarObject;
     CinemachineImpulseSource impulseSource;
+    public IGameMode? gameMode; //This is assigned as part of player registration in the Gamemode
     private PlayerScript Player; //optimization to call getComponent less
     public void SetMaxHP(float amount)
     {
@@ -38,6 +39,10 @@ public class PlayerResources : UnitResource
     public override void damage(SkillInstanceData skillData)
     {
         if (!IsServer) return;
+        if(gameMode !=null && !gameMode.CanDamage(this.NetworkObjectId))
+        {
+            return;
+        }
         float hpBefore = Hp.Value;
         Hp.Value -= skillData.damage;
         onDamageDealt?.Invoke(skillData.ownerNetworkObjectId, this.NetworkObject.NetworkObjectId, hpBefore, Hp.Value);
@@ -95,7 +100,10 @@ public class PlayerResources : UnitResource
         HealthBarObject = GameObject.FindGameObjectWithTag("HealthBar");
         HP_Slider = HealthBarObject?.GetComponent<Slider>();
         impulseSource = gameObject.GetComponentInChildren<CinemachineImpulseSource>();
-
+        if (gameMode == null)
+        {
+            Debug.LogError("Player resources running without a gamemode. This may cause null refernces or unintended behavior");
+        }
 
         Mana.OnValueChanged += (float preV, float newV) =>
         {

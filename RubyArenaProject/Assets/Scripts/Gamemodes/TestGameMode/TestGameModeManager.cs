@@ -31,6 +31,8 @@ public class TestGameModeManager : NetworkBehaviour, IGameMode
             PlayerScript playerScript = playerNO.GetComponent<PlayerScript>();
             playerScript.playerResources.onPlayerDeath+=OnPlayerDeath;
             playerScript.playerResources.onDamageDealt += OnPlayerDamaged;
+           // playerScript.playerResources.gameMode = this;
+
             playerScript.playerMove.RequestTeleportClientRPC(playerRespawn.position);
         }
         Debug.Log($"PLAYER WITH ID {networkId} REGISTERED!");
@@ -182,5 +184,10 @@ public class TestGameModeManager : NetworkBehaviour, IGameMode
     void Update()
     {
         
+    }
+
+    public bool CanDamage(ulong networkId)
+    {
+        return true;
     }
 }

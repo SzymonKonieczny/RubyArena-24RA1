@@ -7,10 +7,10 @@ public class RubyFormSkill : SkillBase
 {
   //  [SerializeField] MeshRenderer characterModelMesh;
     [SerializeField] ParticleSystem roseParticles;
-    [SerializeField] SkinnedMeshRenderer[] skinnedRenderers;
     [SerializeField] Renderer ballRenderer;
     [SerializeField] float duration;
     PropertyBlockMaterial propertyBlockMaterial;
+    [SerializeField] SkinnedMeshRenderer[] skinnedRenderers;
     
     float currentDissolveProgression = 1; //initializes as dissapeared ^^
     float targetDissolveProgression = 0;
@@ -114,10 +114,8 @@ public class RubyFormSkill : SkillBase
         if (currentDissolveProgression != targetDissolveProgression)
         {
             propertyBlockMaterial.SetFloat("_Progress",currentDissolveProgression);
-            Debug.Log($"setting propBLock {currentDissolveProgression}");
         }
 
-        Debug.Log($"target {targetDissolveProgression} | current {currentDissolveProgression}");
         
         
         

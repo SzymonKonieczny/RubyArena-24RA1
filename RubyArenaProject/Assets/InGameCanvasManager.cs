@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
 public class InGameCanvasManager : MonoBehaviour
@@ -18,6 +19,11 @@ public class InGameCanvasManager : MonoBehaviour
         UnityEngine.Cursor.visible = transform;
         UnityEngine.Cursor.lockState = CursorLockMode.None;
     }
+    public void LeaveServer()
+    {
+        NetworkManager.Singleton.Shutdown(); 
+    }
+
     // Update is called once per frame
     void Update()
     {

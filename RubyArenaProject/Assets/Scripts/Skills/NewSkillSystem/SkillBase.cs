@@ -31,6 +31,9 @@ public abstract class SkillBase : NetworkBehaviour
     [SerializeField] protected float windupTime =0.2f;
     [SerializeField] protected int damage =0;
     public NetworkVariable<double> nextAvaliable;
+
+
+
     protected bool isOnCooldown() => nextAvaliable.Value > NetworkManager.NetworkTimeSystem.ServerTime;
     public abstract bool Use();
     private void setTriggerFlagRef(InputCollectorScript inputCollectorScript)

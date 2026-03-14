@@ -1,4 +1,5 @@
 ﻿using Microsoft.Web.WebView2.Wpf;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Text.Json;
@@ -85,6 +86,9 @@ namespace RubyArena_Launcher
             catch
             {
                 MessageBox.Show($"Unable to contact the server.\n Please wait or contact the owner. \n The tag {versionNewest}");
+                launcherState = State.UpToDate; //Let them play if we cant full the update
+                PlayButton.IsEnabled = true;
+                return;
             }
 
             if (versionNewest != versionLocal)
@@ -117,7 +121,18 @@ namespace RubyArena_Launcher
         }
         private void RunGame()
         {
-            Process.Start(gameExePath);
+            try
+            {
+                Process.Start(gameExePath);
+            }
+            catch (FileNotFoundException ex)
+            {
+                MessageBox.Show("The game files do not exist. Please refresh to check if they can be downloaded.");
+            }
+            catch(Win32Exception ex) 
+            {
+                MessageBox.Show("The game files do not exist or are damaged. Please refresh to check if they can be downloaded.");
+            }
         }
         private async void PlayButtonClick(object sender, RoutedEventArgs e)
         {

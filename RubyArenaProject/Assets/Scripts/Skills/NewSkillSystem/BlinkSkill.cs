@@ -7,6 +7,20 @@ public class BlinkSkill : SkillBase
 {
     Vector3 jumpPositionRequest;
     [SerializeField] ParticleSystem effect;
+    [SerializeField] float delayToTeleport = 0.2f;
+
+    PropertyBlockMaterial propertyBlockMaterial;
+    [SerializeField] SkinnedMeshRenderer[] skinnedRenderers;
+
+    float currentDissolveProgression = 1; //initializes as dissapeared ^^
+    NetworkVariable<int> targetDissolveProgression = new(0);
+    public override void Init()
+    {
+        base.Init();
+        skinnedRenderers = combatManagerRef.GetComponentsInChildren<SkinnedMeshRenderer>(true);
+        propertyBlockMaterial = new PropertyBlockMaterial(skinnedRenderers);
+
+    }
     public override bool Use()
     {
         RaycastHit rayHit = getRayHit();
@@ -34,20 +48,30 @@ public class BlinkSkill : SkillBase
     }
     IEnumerator Jump(Vector3 position)
     {
-        yield return new WaitForSeconds(0.2f);
+        yield return new WaitForSeconds(delayToTeleport);
         combatManagerRef.transform.position = position;
+
     }
     [ServerRpc]
     void ServerSideUseServerRPC(ServerRpcParams rpcParams = default)
     {
         if (isOnCooldown()) return;
         setCooldown(cooldown);
+        ServerExecuteSpellCastClientRPC();
+        StartCoroutine(DissapperaAndAppearServer());
+    }
+    IEnumerator DissapperaAndAppearServer()
+    {
+        targetDissolveProgression.Value = 1;
 
-        ServerAnnounceSpellCastClientRPC();
+        yield return new WaitForSeconds(delayToTeleport*2);
+
+        targetDissolveProgression.Value = 0;
+
     }
 
     [ClientRpc]
-    void ServerAnnounceSpellCastClientRPC()
+    void ServerExecuteSpellCastClientRPC()
     {
         if(animationScript == null)
         {
@@ -58,7 +82,8 @@ public class BlinkSkill : SkillBase
         animationScript.Trigger("WindUp");
         animationScript.Trigger("SpellAcknowledge2");
 
-        effect.Play();
+
+       // effect.Play();
         if (IsOwner)
         {
             StartCoroutine(Jump(jumpPositionRequest));
@@ -70,6 +95,20 @@ public class BlinkSkill : SkillBase
     }
     private void Update()
     {
+        //Fixed update? Doesnt need updating EVRY frame
+
+
+        if (currentDissolveProgression != targetDissolveProgression.Value)
+        {
+            propertyBlockMaterial.SetFloat("_Progress", currentDissolveProgression -0.01f);
+        }
+        float sign = (targetDissolveProgression.Value - currentDissolveProgression) > 0 ? 1 : -1;
+        currentDissolveProgression += Time.deltaTime * sign * 5;
+        currentDissolveProgression = Mathf.Clamp01(currentDissolveProgression);
+
+
+
+
         if (InputCollector == null || combatManagerRef == null || isOnCooldown() || !combatManagerRef.IsOwner)
             return;
 

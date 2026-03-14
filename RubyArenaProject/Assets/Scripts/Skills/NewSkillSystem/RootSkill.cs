@@ -56,8 +56,8 @@ public class RootSkill : SkillBase
         yield return new WaitForSeconds(windupTime);
         GameObject skillEntityGO = Instantiate(projectile);
 
-        skillEntityGO.GetComponent<NetworkObject>().Spawn();
         skillEntityGO.transform.SetPositionAndRotation(combatManagerRef.SkillshotSpawnPoint.transform.position + lookDir * 2, Quaternion.LookRotation(lookDir, Vector3.up));
+        skillEntityGO.GetComponent<NetworkObject>().Spawn();
 
         ServerAnnounceSpellCastClientRPC(0);
     }
