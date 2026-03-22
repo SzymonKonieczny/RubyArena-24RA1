@@ -6,5 +6,5 @@ public interface IGameMode
 {
     public bool CanDamage(ulong networkId);
     public void RegisterPlayer(ulong networkId);
-    public void RegisterObject(ulong networkId);
+    public void RegisterNetworkedObject(ulong networkId);
 }

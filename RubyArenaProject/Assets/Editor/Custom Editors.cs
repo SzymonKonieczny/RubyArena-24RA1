@@ -3,6 +3,24 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
+
+
+[CustomEditor(typeof(MinionSpawner))]
+public class MinionSpawnerEditor : Editor
+{
+    public override void OnInspectorGUI()
+    {
+        DrawDefaultInspector();
+        MinionSpawner minionSpawner = (MinionSpawner)target;
+
+        // Add a button to the Inspector
+        if (GUILayout.Button("Kill All Minions "))
+        {
+            // Call the function
+            minionSpawner.KillAllMinions();
+        }
+    }
+}
 [CustomEditor(typeof(Movement))]
 public class MovementEditor : Editor
 {

@@ -16,7 +16,7 @@ public class TestGameModeManager : NetworkBehaviour, IGameMode
 
     NetworkVariable<ulong> winningPlayerNetworkObjectId= new NetworkVariable<ulong>();
     [SerializeField] GameModeCaptureOwnedObjective capturePoint;
-    public void RegisterObject(ulong networkId)
+    public void RegisterNetworkedObject(ulong networkId)
     {
         if (!NetworkManager.Singleton.IsServer) return;
 
