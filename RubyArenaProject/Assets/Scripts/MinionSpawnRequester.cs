@@ -47,6 +47,7 @@ public class MinionSpawnRequester: NetworkBehaviour
             var minion = minionGO.GetComponent<Minion>();
             minion.transform.position = transform.position;
             minion.target = minionTarget;
+            minion.targetTeam = targetTeam;
             spawner.SpawnMinion(minion);
         }
     }

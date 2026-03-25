@@ -8,6 +8,7 @@ using UnityEngine.AI;
 public class Minion : NetworkBehaviour
 {
     public Transform target;
+    public BrawlGameMode.BrawlTeam targetTeam;
    [SerializeField] private NavMeshAgent agent;
 
     void Start()
