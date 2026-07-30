@@ -31,7 +31,7 @@ public class TestGameModeManager : NetworkBehaviour, IGameMode
             PlayerScript playerScript = playerNO.GetComponent<PlayerScript>();
             playerScript.playerResources.onPlayerDeath+=OnPlayerDeath;
             playerScript.playerResources.onDamageDealt += OnPlayerDamaged;
-           // playerScript.playerResources.gameMode = this;
+            playerScript.playerResources.gameMode = this;
 
             playerScript.playerMove.RequestTeleportClientRPC(playerRespawn.position);
         }

@@ -80,13 +80,13 @@ public class AutoAttackSkillCarrier : SkillBase
         
         Vector3 LookDir = getLookDirection();
 
-        ServerSideUseServerRPC(LookDir, combatManagerRef.NetworkObjectId);
+        ServerSideUseServerRPC(LookDir);
 
         return true;
     }
 
     [ServerRpc]
-    void ServerSideUseServerRPC(Vector3 lookDir, ulong senderNetworkObjectId, ServerRpcParams rpcParams = default)
+    public override void ServerSideUseServerRPC(Vector3 lookDir, ServerRpcParams rpcParams = default)
     {
         if (!IsServer) return;
         if (isOnCooldown()) return;
@@ -118,21 +118,21 @@ public class AutoAttackSkillCarrier : SkillBase
         foreach (var player in playerCombatManagers)
         {
             var playerResources = player.GetComponent<UnitResource>();
-            if (!playerResources || player.NetworkObject.NetworkObjectId == senderNetworkObjectId) continue;
+            if (!playerResources || player.NetworkObject.NetworkObjectId == combatManagerRef.NetworkObjectId) continue;
 
             var data = new SkillInstanceData
             {
                 damage = this.damage,
-                ownerNetworkObjectId = senderNetworkObjectId
+                ownerNetworkObjectId = combatManagerRef.NetworkObjectId
             };
             playerResources.damage(data);
         }
 
-        ServerAnnounceSpellCastClientRPC(0);
+        ServerAnnounceSpellCastClientRPC();
     }
 
     [ClientRpc]
-    void ServerAnnounceSpellCastClientRPC(ulong networkObjId)
+    public override void ServerAnnounceSpellCastClientRPC()
     {
         //if (IsServer) return;
         //animationScript.Trigger("SpellCastAccepted");

@@ -11,7 +11,7 @@ public class WeissDashSkill : SkillBase
         animationScript.Trigger("WindUp");
         combatManagerRef.SetStunTimer(windupTime);
 
-        ServerSideUseServerRPC();
+        ServerSideUseServerRPC(new Vector3()); //does not expect input
         return true;
     }
     private void OnTransformParentChanged()
@@ -20,7 +20,7 @@ public class WeissDashSkill : SkillBase
     }
 
     [ServerRpc]
-    void ServerSideUseServerRPC(ServerRpcParams rpcParams = default)
+    public override void ServerSideUseServerRPC(Vector3 lookDir, ServerRpcParams rpcParams = default)
     {
         if (isOnCooldown()) return;
         setCooldown(cooldown);
@@ -29,18 +29,14 @@ public class WeissDashSkill : SkillBase
     }
 
     [ClientRpc]
-    void ServerAnnounceSpellCastClientRPC()
+    public override void ServerAnnounceSpellCastClientRPC()
     {
         if (animationScript == null)
         {
             Init();
         }
-        //if (IsServer) return;
-        //animationScript.PlayState("jumping");
-       // effect.Play();
         if (IsOwner)
         {
-            //combatManagerRef.playerMove.AddNetworkRbForceClientRPC((combatManagerRef.playerMove.Orientation.forward * ForceAdded ) + new Vector3(0, 1f, 0));
             combatManagerRef.playerMove.startDash();
             animationScript.Trigger("SpellAcknowledge1");
         }

@@ -20,13 +20,13 @@ public class TestSkillNewSystem : SkillBase
 
         Vector3 LookDir = getLookDirection();
 
-        ServerSideUseServerRPC(LookDir, combatManagerRef.NetworkObjectId);
+        ServerSideUseServerRPC(LookDir);
 
         return true;
     }
 
     [ServerRpc]
-    void ServerSideUseServerRPC(Vector3 lookDir,ulong senderNetworkObjectId, ServerRpcParams rpcParams = default)
+    public override void ServerSideUseServerRPC(Vector3 lookDir, ServerRpcParams rpcParams = default)
     {
         if (!IsServer) return;
         if (isOnCooldown()) return;
@@ -37,16 +37,13 @@ public class TestSkillNewSystem : SkillBase
         skillEntityGO.GetComponent<NetworkObject>().Spawn();
         skillEntityGO.transform.SetPositionAndRotation(combatManagerRef.SkillshotSpawnPoint.transform.position + lookDir * 2, Quaternion.LookRotation(lookDir, Vector3.up));
         var skillEntity = skillEntityGO.GetComponent<BaseSkillEntityBehavior>();
-        skillEntity.ownerNetworkObjectId = senderNetworkObjectId;
+        skillEntity.ownerNetworkObjectId = combatManagerRef.NetworkObjectId;
         skillEntity.SkillDataSO = SkillDataSO;
-        ServerAnnounceSpellCastClientRPC(0);
+        ServerAnnounceSpellCastClientRPC();
     }
-    async void SpawnEntityDelayed()
-    {
-         
-    }
+
     [ClientRpc]
-    void ServerAnnounceSpellCastClientRPC(ulong networkObjId)
+    public override void ServerAnnounceSpellCastClientRPC()
     {
         if (IsOwner)
         {

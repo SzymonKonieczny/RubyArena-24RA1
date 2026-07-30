@@ -28,40 +28,39 @@ public class SniperShotSkillCarrier : SkillBase
 
         Vector3 LookDir = getLookDirection();
 
-        ServerSideUseServerRPC(LookDir, combatManagerRef.NetworkObjectId);
+        ServerSideUseServerRPC(LookDir);
 
         return true;
     }
 
     [ServerRpc]
-    void ServerSideUseServerRPC(Vector3 lookDir, ulong ownerNetworkObjectId, ServerRpcParams rpcParams = default)
+    public override void ServerSideUseServerRPC(Vector3 lookDir, ServerRpcParams rpcParams = default)
     {
-        if (!IsServer) return;
         if (isOnCooldown()) return;
         setCooldown(cooldown);
-
+        if (!IsServer) return;
 
         var collider = Physics.Raycast(new Ray(combatManagerRef.SkillshotSpawnPoint.position, lookDir),out RaycastHit hit, 500);
         Debug.DrawLine(combatManagerRef.SkillshotSpawnPoint.position, combatManagerRef.SkillshotSpawnPoint.position + (lookDir * 100), Color.green,3f);
         if(hit.collider.CompareTag("Player"))
         {
             var playerResources = hit.collider.transform.GetComponent<UnitResource>();
-            if (!playerResources || playerResources.NetworkObject.NetworkObjectId == ownerNetworkObjectId) return;
+            if (!playerResources || playerResources.NetworkObject.NetworkObjectId == combatManagerRef.NetworkObjectId) return;
 
             var data = new SkillInstanceData
             {
                 damage = this.damage,
-                ownerNetworkObjectId = ownerNetworkObjectId
+                ownerNetworkObjectId = combatManagerRef.NetworkObjectId
             };
             playerResources.damage(data);
         }
 
 
-        ServerAnnounceSpellCastClientRPC(0);
+        ServerAnnounceSpellCastClientRPC();
     }
 
     [ClientRpc]
-    void ServerAnnounceSpellCastClientRPC(ulong networkObjId)
+    public override void ServerAnnounceSpellCastClientRPC()
     {
         if (IsOwner)
         {

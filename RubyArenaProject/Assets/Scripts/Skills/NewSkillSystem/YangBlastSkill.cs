@@ -57,18 +57,19 @@ public class YangBlastSkill : SkillBase
 
         Vector3 LookDir = getLookDirection();
         combatManagerRef.playerMove.AddNetworkRbVelocityClientRPC(-LookDir * 5);
-        ServerSideUseServerRPC(LookDir, combatManagerRef.SkillshotSpawnPoint.position, combatManagerRef.NetworkObjectId);
+        ServerSideUseServerRPC(LookDir);
 
         return true;
     }
 
     [ServerRpc]
-     void ServerSideUseServerRPC(Vector3 lookDir, Vector3 skillOrigin,ulong senderNetworkObjectId, ServerRpcParams rpcParams = default)
+    public override void ServerSideUseServerRPC(Vector3 lookDir, ServerRpcParams rpcParams = default)
     {
         if (!IsServer) return;
         if (isOnCooldown()) return;
-       
 
+        Vector3 skillOrigin = combatManagerRef.SkillshotSpawnPoint.position;
+        ulong senderNetworkObjectId = combatManagerRef.NetworkObjectId;
         setCooldown(cooldown);
 
         GameObject skillEntityGO = Instantiate(blastEffect);
@@ -124,11 +125,11 @@ public class YangBlastSkill : SkillBase
         }
         storedDamage = 0;
 
-        ServerAnnounceSpellCastClientRPC(0);
+        ServerAnnounceSpellCastClientRPC();
     }
 
     [ClientRpc]
-    void ServerAnnounceSpellCastClientRPC(ulong networkObjId)
+    public override void ServerAnnounceSpellCastClientRPC()
     {
         //if (IsServer) return;
         if(IsOwner)

@@ -42,7 +42,7 @@ public class RootSkill : SkillBase
     }
 
     [ServerRpc]
-    void ServerSideUseServerRPC(Vector3 lookDir, ServerRpcParams rpcParams = default)
+    public override void ServerSideUseServerRPC(Vector3 lookDir, ServerRpcParams rpcParams = default)
     {
         if (!IsServer) return;
         if (isOnCooldown()) return;
@@ -59,10 +59,10 @@ public class RootSkill : SkillBase
         skillEntityGO.transform.SetPositionAndRotation(combatManagerRef.SkillshotSpawnPoint.transform.position + lookDir * 2, Quaternion.LookRotation(lookDir, Vector3.up));
         skillEntityGO.GetComponent<NetworkObject>().Spawn();
 
-        ServerAnnounceSpellCastClientRPC(0);
+        ServerAnnounceSpellCastClientRPC();
     }
     [ClientRpc]
-    void ServerAnnounceSpellCastClientRPC(ulong networkObjId)
+    public override void ServerAnnounceSpellCastClientRPC()
     {
         if (IsOwner)
         {

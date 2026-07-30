@@ -32,10 +32,24 @@ public abstract class SkillBase : NetworkBehaviour
     [SerializeField] protected int damage =0;
     public NetworkVariable<double> nextAvaliable;
 
-
+    Guid SpellInstanceId = new Guid(); //Not networked, only server cares
 
     protected bool isOnCooldown() => nextAvaliable.Value > NetworkManager.NetworkTimeSystem.ServerTime;
+
+
     public abstract bool Use();
+
+    [ServerRpc]
+    public virtual void ServerSideUseServerRPC(Vector3 lookDir, ServerRpcParams rpcParams = default)
+    {
+
+    }
+
+    [ClientRpc]
+    public virtual void ServerAnnounceSpellCastClientRPC()
+    {
+
+    }
     private void setTriggerFlagRef(InputCollectorScript inputCollectorScript)
     {
         if (inputCollectorScript == null)
@@ -79,7 +93,6 @@ public abstract class SkillBase : NetworkBehaviour
             SkillDir = (raycastHit.point - this.combatManagerRef.SkillshotSpawnPoint.position).normalized;
             Debug.DrawLine(ray.origin,
             raycastHit.point, Color.red, 3f);
-
         }
         else
         {

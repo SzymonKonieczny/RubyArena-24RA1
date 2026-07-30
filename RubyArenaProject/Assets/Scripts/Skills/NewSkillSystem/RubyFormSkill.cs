@@ -13,11 +13,14 @@ public class RubyFormSkill : SkillBase
     [SerializeField] SkinnedMeshRenderer[] skinnedRenderers;
     
     float currentDissolveProgression = 1; //initializes as dissapeared ^^
-    float targetDissolveProgression = 0;
+    NetworkVariable<int> targetDissolveProgression = new(0);
+
 
     public override bool Use() 
     {
-        ServerSideUseServerRPC();
+        ServerSideUseServerRPC(new Vector3()); //doesnt expect input
+        animationScript.PlayState("Jumping");
+
         return true;
     }
     private void OnTransformParentChanged()
@@ -34,44 +37,33 @@ public class RubyFormSkill : SkillBase
         ParticleSystem.MainModule main = roseParticles.main;
         main.duration = duration;
     }
-    [ClientRpc]
-    void ClientSideAcknowledgeSpellStartClientRPC()
-    {
-        animationScript.PlayState("Jumping");
-        targetDissolveProgression = 1;
 
-    }
-
+ 
     [ServerRpc]
-    void ServerSideUseServerRPC(ServerRpcParams rpcParams = default)
+    public override void ServerSideUseServerRPC(Vector3 lookDir, ServerRpcParams rpcParams = default)
     {
         if (!IsServer) return;
         if (isOnCooldown()) return;
         setCooldown(cooldown);
 
+        targetDissolveProgression.Value = 1;
+
         StartCoroutine(UseWithCastTime());
     }
-    IEnumerator UseWithCastTime()
-    {
-        ClientSideAcknowledgeSpellStartClientRPC();
-        yield return new WaitForSeconds(windupTime);
-        ServerAnnounceSpellCastClientRPC();
-
-    }
-
 
     [ClientRpc]
-    void ServerAnnounceSpellCastClientRPC()
+    public override void ServerAnnounceSpellCastClientRPC()
     {
         if (animationScript == null || skinnedRenderers.Length == 0)
         {
-          Init(); 
-        } 
-        //if (IsServer) return;
-        //animationScript.PlayState("jumping");
-        // effect.Play();
-            //combatManagerRef.playerMove.AddNetworkRbForceClientRPC((combatManagerRef.playerMove.Orientation.forward * ForceAdded ) + new Vector3(0, 1f, 0));
-         StartCoroutine(this.FormSwap(duration));
+            Init();
+        }
+        StartCoroutine(this.FormSwap(duration));
+    }
+    IEnumerator UseWithCastTime()
+    {
+        yield return new WaitForSeconds(windupTime);
+        ServerAnnounceSpellCastClientRPC();
     }
     IEnumerator FormSwap (float duration)
     {
@@ -86,7 +78,7 @@ public class RubyFormSkill : SkillBase
         ballRenderer.enabled = true;
         roseParticles.Play();
         yield return new WaitForSeconds(duration);
-        targetDissolveProgression = 0; // set on animation start
+        targetDissolveProgression.Value = 0; // set on animation start
         ballRenderer.enabled = false;
 
         /* foreach (var r in renderers)
@@ -97,7 +89,6 @@ public class RubyFormSkill : SkillBase
         combatManagerRef.playerMove.canFly = false;
         combatManagerRef.playerMove.speed /= 3;
         combatManagerRef.playerMove.Rb.useGravity = true;
-
     }
 
     private void Start()
@@ -107,18 +98,14 @@ public class RubyFormSkill : SkillBase
     private void Update()
     {
         //Fixed update? Doesnt need updating EVRY frame
-        float sign = (targetDissolveProgression - currentDissolveProgression) > 0 ? 1 : -1;
+        float sign = (targetDissolveProgression.Value - currentDissolveProgression) > 0 ? 1 : -1;
         currentDissolveProgression += Time.deltaTime * sign * 2;
         currentDissolveProgression = Mathf.Clamp01(currentDissolveProgression);
       
-        if (currentDissolveProgression != targetDissolveProgression)
+        if (currentDissolveProgression != targetDissolveProgression.Value)
         {
             propertyBlockMaterial.SetFloat("_Progress",currentDissolveProgression);
         }
-
-        
-        
-        
         
         if (InputCollector == null || combatManagerRef == null || isOnCooldown() || !combatManagerRef.IsOwner)
         return;
@@ -128,4 +115,5 @@ public class RubyFormSkill : SkillBase
             Use();
         }
     }
+
 }

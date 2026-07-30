@@ -39,7 +39,7 @@ public class BlinkSkill : SkillBase
         animationScript.PlayState("jumping");
         combatManagerRef.SetStunTimer(windupTime);
 
-        ServerSideUseServerRPC(); 
+        ServerSideUseServerRPC(new Vector3()); 
         return true;
     }
     private void OnTransformParentChanged()
@@ -53,13 +53,14 @@ public class BlinkSkill : SkillBase
 
     }
     [ServerRpc]
-    void ServerSideUseServerRPC(ServerRpcParams rpcParams = default)
+    public override void ServerSideUseServerRPC(Vector3 lookDir, ServerRpcParams rpcParams = default)
     {
         if (isOnCooldown()) return;
         setCooldown(cooldown);
-        ServerExecuteSpellCastClientRPC();
+        ServerAnnounceSpellCastClientRPC();
         StartCoroutine(DissapperaAndAppearServer());
     }
+
     IEnumerator DissapperaAndAppearServer()
     {
         targetDissolveProgression.Value = 1;
@@ -71,7 +72,7 @@ public class BlinkSkill : SkillBase
     }
 
     [ClientRpc]
-    void ServerExecuteSpellCastClientRPC()
+    public override void ServerAnnounceSpellCastClientRPC()
     {
         if(animationScript == null)
         {
@@ -81,7 +82,6 @@ public class BlinkSkill : SkillBase
         //if (IsServer) return;
         animationScript.Trigger("WindUp");
         animationScript.Trigger("SpellAcknowledge2");
-
 
        // effect.Play();
         if (IsOwner)
@@ -96,8 +96,6 @@ public class BlinkSkill : SkillBase
     private void Update()
     {
         //Fixed update? Doesnt need updating EVRY frame
-
-
         if (currentDissolveProgression != targetDissolveProgression.Value)
         {
             propertyBlockMaterial.SetFloat("_Progress", currentDissolveProgression -0.01f);
@@ -105,9 +103,6 @@ public class BlinkSkill : SkillBase
         float sign = (targetDissolveProgression.Value - currentDissolveProgression) > 0 ? 1 : -1;
         currentDissolveProgression += Time.deltaTime * sign * 5;
         currentDissolveProgression = Mathf.Clamp01(currentDissolveProgression);
-
-
-
 
         if (InputCollector == null || combatManagerRef == null || isOnCooldown() || !combatManagerRef.IsOwner)
             return;
