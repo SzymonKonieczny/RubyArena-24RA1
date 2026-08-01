@@ -3,38 +3,53 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using System;
+using VContainer;
+using Assets.Scripts.Events;
+using Unity.VisualScripting;
 
 public class YangBlastSkill : SkillBase
 {
-    [SerializeField] PlayerResources resources;
     public GameObject blastEffect;
-    [SerializeField]  float storedDamage = 0;
+    [SerializeField]  NetworkVariable<float> storedDamage = new(0);
     [SerializeField] ISkillEffect FlamingGloves;
-    // Start is called before the first frame update
+
+    [Inject]
+    EventBus<DamageTakenEvent> damageTakenEvent;
+
+    EventBinding<DamageTakenEvent> damageEventBinding;
+    private void OnDestroy()
+    {
+        damageTakenEvent.Unrgister(damageEventBinding);
+    }
+
     void Start()
     {
         FlamingGloves = combatManagerRef.GetComponentInChildren<ISkillEffect>();
+        storedDamage.OnValueChanged += updateVFX;
+        damageEventBinding = new EventBinding<DamageTakenEvent>((DamageTakenEvent data) => onDamageTaken(data.damageAmountPostMitigation));
+        damageTakenEvent.Register(damageEventBinding);
+
     }
     private void OnTransformParentChanged()
     {
         Init();
+    }
 
-        resources = combatManagerRef.GetComponent<PlayerResources>();
-
-       // if (IsServer)
+    void updateVFX(float oldStoredDamage, float newStoredDamage)
+    {
+        if (newStoredDamage > 30)
         {
-            if(resources)
-            {
-                resources.Hp.OnValueChanged += (float oldV, float newV) => {
-                    if (newV > oldV) return; //no damage taken, heals
-                    storedDamage += oldV-newV; 
-                    if(storedDamage > 30)
-                    {
-                        FlamingGloves.PlayEffect(0);
-                    }
-                };
-            }
+            FlamingGloves.PlayEffect(0);
         }
+        else
+        {
+            FlamingGloves.PlayEffect(1);
+        }
+    }
+
+    void onDamageTaken(float damageAmount)
+    {
+        storedDamage.Value += damageAmount;
     }
     // Update is called once per frame
     void Update()
@@ -118,12 +133,12 @@ public class YangBlastSkill : SkillBase
 
             var data = new SkillInstanceData
             {
-                damage = this.damage + (int)storedDamage,
+                damage = this.damage + (int)storedDamage.Value,
                 ownerNetworkObjectId = senderNetworkObjectId
             };
             playerResources.damage(data);
         }
-        storedDamage = 0;
+        storedDamage.Value = 0;
 
         ServerAnnounceSpellCastClientRPC();
     }
@@ -141,6 +156,5 @@ public class YangBlastSkill : SkillBase
             animationScript.Trigger("WindUp");
             animationScript.Trigger("SpellAcknowledge2");
         }
-        FlamingGloves.PlayEffect(1);
     }
 }

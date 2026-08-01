@@ -8,6 +8,7 @@ public struct SkillInstanceData
     public SkillType Type;
     public int damage;
     public ulong ownerNetworkObjectId;
+    public ulong spellCarrierNetworkObjectId;
 }
 public abstract class UnitResource : NetworkBehaviour
 {

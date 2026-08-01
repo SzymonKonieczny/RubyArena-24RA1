@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using UnityEngine.SceneManagement;
+using VContainer;
+using Assets.Scripts.Events;
 
 public class TestGameModeManager : NetworkBehaviour, IGameMode
 {
@@ -16,10 +18,20 @@ public class TestGameModeManager : NetworkBehaviour, IGameMode
 
     NetworkVariable<ulong> winningPlayerNetworkObjectId= new NetworkVariable<ulong>();
     [SerializeField] GameModeCaptureOwnedObjective capturePoint;
+
+    [Inject]
+    EventBus<PlayerDeathEvent> playerDeathEvent;
+
+    [Inject]
+    EventBus<DamageTakenEvent> damageTakenEvent;
+
+
+    EventBinding<PlayerDeathEvent> deathEventBinding;
+    EventBinding<DamageTakenEvent> damageEventBinding;
+
     public void RegisterNetworkedObject(ulong networkId)
     {
         if (!NetworkManager.Singleton.IsServer) return;
-
     }
 
     public void RegisterPlayer(ulong networkId)
@@ -29,9 +41,6 @@ public class TestGameModeManager : NetworkBehaviour, IGameMode
         {
 
             PlayerScript playerScript = playerNO.GetComponent<PlayerScript>();
-            playerScript.playerResources.onPlayerDeath+=OnPlayerDeath;
-            playerScript.playerResources.onDamageDealt += OnPlayerDamaged;
-            playerScript.playerResources.gameMode = this;
 
             playerScript.playerMove.RequestTeleportClientRPC(playerRespawn.position);
         }
@@ -39,7 +48,7 @@ public class TestGameModeManager : NetworkBehaviour, IGameMode
 
     }
   
-    void OnPlayerDamaged(ulong dealerNoId,ulong recieveNoId,float hpBefore, float hpAfter)
+    void OnPlayerDamaged(DamageTakenEvent eventData)
     {
 
     }
@@ -68,7 +77,7 @@ public class TestGameModeManager : NetworkBehaviour, IGameMode
         capturePoint.active.Value = true;
         MoveCapture();
     }
-    // Start is called before the first frame update
+
     void Start()
     {
         winningPlayerNetworkObjectId.OnValueChanged += AnnounceWinner;
@@ -87,7 +96,16 @@ public class TestGameModeManager : NetworkBehaviour, IGameMode
                 capturePoint.transform.position = capturePointSpawnPositions[randomIndex].position;
             }    
         }
+        deathEventBinding = new EventBinding<PlayerDeathEvent>((eventData) =>
+            OnPlayerDeath(eventData.playerKillingNetworkId, eventData.playerKilledNetworkId)
+        );
+        damageEventBinding = new EventBinding<DamageTakenEvent>(OnPlayerDamaged);
+
+        playerDeathEvent.Register(deathEventBinding);
+        damageTakenEvent.Register(damageEventBinding);
+
     }
+
     [ClientRpc]
     void setScoreboardPointClientRPC(ulong clientNOId, int score)
     {

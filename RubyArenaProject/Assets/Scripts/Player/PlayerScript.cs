@@ -5,6 +5,8 @@ using Unity.Netcode;
 using Cinemachine;
 using UnityEngine.Rendering.HighDefinition.Attributes;
 using UnityEngine.SceneManagement;
+using VContainer;
+using VContainer.Unity;
 
 public class PlayerScript : NetworkBehaviour
 {
@@ -19,6 +21,9 @@ public class PlayerScript : NetworkBehaviour
     private PlayerSkillHolder skillHolder;
     public NetworkVariable<int> characterID = new(0);
     public List<NetworkObject> spawnedObjects = new();
+
+    [Inject]
+    private IObjectResolver container;
 
     private void Start()
     {
@@ -114,6 +119,9 @@ public class PlayerScript : NetworkBehaviour
         var skillHolder = GetComponent<PlayerSkillHolder>().transform;
 
         GameObject skillpref = Instantiate(skillPrefab);
+
+        container.InjectGameObject(skillpref);// resolve [inject] requests for DI
+
         var skillprefNetworkObj = skillpref.GetComponent<NetworkObject>();
         spawnedObjects.Add(skillprefNetworkObj);
         skillprefNetworkObj.SpawnWithOwnership(clientID);

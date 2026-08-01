@@ -2,11 +2,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
+using VContainer;
+using VContainer.Unity;
 
 public class PlayerObjectSpawner : NetworkBehaviour
 {
     public GameObject playerPrefab;
     public List<NetworkObject> spawnedObjects = new();
+
+    [Inject] 
+    private IObjectResolver container;
 
     public override void OnNetworkSpawn()
     {
@@ -42,6 +47,9 @@ public class PlayerObjectSpawner : NetworkBehaviour
         int chosenChampId = ServerPlayerStateManager.Instance.playerStates[clientId].chosenCharacter.Value;
 
         var obj = Instantiate(playerPrefab);
+
+        container.InjectGameObject(obj);// resolve [inject] requests for DI
+
         var objNO = obj.GetComponent<NetworkObject>();
         spawnedObjects.Add(objNO);
         var playerScript = obj.GetComponent<PlayerScript>();

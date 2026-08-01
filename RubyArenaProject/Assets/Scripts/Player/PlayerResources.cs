@@ -7,21 +7,29 @@ using Unity.Netcode;
 using System;
 using UnityEngine.SceneManagement;
 using Cinemachine;
+using VContainer;
+using Assets.Scripts.Events;
 
 public class PlayerResources : UnitResource
 {
     [SerializeField] Slider HP_Slider;
     [SerializeField] Slider Mana_Slider;
-
     [SerializeField] float MaxHP = 100;
+
     [SerializeField] float MaxMana = 100;
     [SerializeField] ParticleSystem bleedingEffect; //inside the player prefab. Assinged via editor
-    public Action<ulong,ulong,float, float> onDamageDealt; //DamageDealer,DamageReciever,HpBefore,HpAfter
-    public Action<ulong, ulong> onPlayerDeath; //Killer, Killed
     GameObject HealthBarObject;
     CinemachineImpulseSource impulseSource;
-    public IGameMode? gameMode; //This is assigned as part of player registration in the Gamemode
-    private PlayerScript Player; //optimization to call getComponent less
+    
+    [Inject]
+    public IGameMode? gameMode;
+
+    [Inject]
+    EventBus<DamageTakenEvent> damageEventBus;
+
+    [Inject]
+    EventBus<PlayerDeathEvent> playerDeathEvent;
+
     public void SetMaxHP(float amount)
     {
         MaxHP = amount;
@@ -44,10 +52,24 @@ public class PlayerResources : UnitResource
         }
         float hpBefore = Hp.Value;
         Hp.Value -= skillData.damage;
-        onDamageDealt?.Invoke(skillData.ownerNetworkObjectId, this.NetworkObject.NetworkObjectId, hpBefore, Hp.Value);
+
+
+        damageEventBus.Raise( new DamageTakenEvent {
+            damagerNetworkObjectId = skillData.ownerNetworkObjectId,
+            recieverNetworkObjectId = this.NetworkObjectId,
+             healthBefore = hpBefore,
+             healthAfter = Hp.Value,
+             spellCarrierNetworkObjectId = skillData.spellCarrierNetworkObjectId,
+             damageAmountPreMitigation = skillData.damage,
+             damageAmountPostMitigation = skillData.damage,
+        });
+            
+
         if(Hp.Value <=0)
         {
-            onPlayerDeath?.Invoke(skillData.ownerNetworkObjectId, this.NetworkObject.NetworkObjectId);
+            playerDeathEvent.Raise(new PlayerDeathEvent { 
+                playerKillingNetworkId = skillData.ownerNetworkObjectId,
+                playerKilledNetworkId =  this.NetworkObject.NetworkObjectId });
         }
     }
 
