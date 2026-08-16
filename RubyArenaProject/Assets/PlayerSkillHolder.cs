@@ -8,4 +8,5 @@ public class PlayerSkillHolder : MonoBehaviour
     public InputCollectorScript inputCollectorScript;
     public PlayerAnimationScript animationScript;
     public StatModifierHolder statModifierHolder;
+    public EntityStats Stats;
 }

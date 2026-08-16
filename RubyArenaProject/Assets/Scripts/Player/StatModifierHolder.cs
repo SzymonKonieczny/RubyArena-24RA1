@@ -2,10 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
+using Unity.Networking.Transport;
 
-public class EntityStatistics //add more as needed
+public class EntityStatisticsModifier //add more as needed
 {
-    public float speedModifier = 1;
+    public float speedMultiplier = 1;
+    public int AttackDamageBoost = 0;
+    public int AttackSpeedMultiplier = 1;
 
     public double serverTimeEffectEnd;
 
@@ -20,6 +23,11 @@ class GameplayEffectExample : IGameplayEffect <--------- Pipeline Takich!
     { 
         playerRef.StatsAfterEffects.Speed *= speedBuff; 
     }
+    public void OnStart()
+    public void OnFinish()
+    public void OnFixedUpdate() //apply overtime dmg np
+
+
 
 }
 public class EntityEffectHolder : MonoBehaviour
@@ -49,10 +57,38 @@ public class EntityEffectHolder : MonoBehaviour
  */
 public class StatModifierHolder : MonoBehaviour
 {
-    public List<EntityStatistics> modifiers = new();
+    public EntityStats entityStats;
+    public void AddModifier(EntityStatisticsModifier modifier)
+    {
+        modifiers.Add(modifier);
+        RecalculateStats();
+    }
 
+    [SerializeField]
+    List<EntityStatisticsModifier> modifiers = new();
 
-    List<EntityStatistics> toRemove = new();
+    List<EntityStatisticsModifier> toRemove = new();
+
+    void RecalculateStats()
+    {
+        Stats stats = new()
+        {
+            AttackDamage = entityStats.basicStats.Value.AttackDamage,
+            AttackRange = entityStats.basicStats.Value.AttackRange,
+            AttackSpeed = entityStats.basicStats.Value.AttackSpeed,
+            canFly = entityStats.basicStats.Value.canFly,
+            speed = entityStats.basicStats.Value.speed,
+        };
+
+        foreach (EntityStatisticsModifier modifier in modifiers) 
+        {
+            stats.AttackSpeed *= modifier.AttackSpeedMultiplier;
+            stats.AttackDamage += modifier.AttackDamageBoost;
+            stats.speed *= modifier.speedMultiplier;
+        }
+        entityStats.WriteModifiedStats(stats);
+    }
+
     private void FixedUpdate()
     {
 
@@ -67,6 +103,13 @@ public class StatModifierHolder : MonoBehaviour
         {
             modifiers.Remove(r);
         }
+        if (toRemove.Count > 0)
+        {
+            //TODO: 
+            // Call recalculation of EntityStats
+            RecalculateStats();
+        }
+
         toRemove.Clear();
     }
 }

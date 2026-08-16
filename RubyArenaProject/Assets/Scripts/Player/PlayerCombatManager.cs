@@ -10,14 +10,8 @@ using Unity.VisualScripting;
 
 public class PlayerCombatManager : NetworkBehaviour
 {
-    public BaseSkill Skill1;
-    public BaseSkill Skill2;
-    public SkillDataSO Skill1SO;
-    public SkillDataSO Skill2SO;
-
     public NetworkVariable<bool> canCombat = new(true);
 
-    [SerializeField] float SkillCooldown = 0;
     InputCollectorScript InputCollector;
     PlayerScript playerScript;
     public Transform SkillshotSpawnPoint;
@@ -59,18 +53,9 @@ public class PlayerCombatManager : NetworkBehaviour
        
 
     }
-    // Update is called once per frame
-    void Update()
+
+    void FixedUpdate()
     {
-        if (!IsOwner || !isInitialized) return;
-       
-        SkillCooldown -= Time.deltaTime;
-
-        if ( !canCombat.Value) return;
-        // canCombat is also checked when accepting/rejecting a spell
-
-        return;
-
 
     }
 

@@ -7,6 +7,7 @@ using UnityEngine.Rendering.HighDefinition.Attributes;
 using UnityEngine.SceneManagement;
 using VContainer;
 using VContainer.Unity;
+using UnityEngine.TextCore.Text;
 
 public class PlayerScript : NetworkBehaviour
 {
@@ -67,6 +68,12 @@ public class PlayerScript : NetworkBehaviour
         IGameMode GameMode = GM.GetComponent<IGameMode>();
         GameMode.RegisterPlayer(NetworkObject.NetworkObjectId);
         NetworkManager.Singleton.SceneManager.OnLoadEventCompleted -= onLoadComplete;
+    }
+    protected override void OnNetworkPostSpawn()
+    {
+        base.OnNetworkPostSpawn();
+        skillHolder = GetComponent<PlayerSkillHolder>();
+        skillHolder.Stats.basicStats.Value = CharacterList.Instance.Characters[this.characterID.Value].characterModel.BaseStats;
     }
     void InitializeCharacter()
     {

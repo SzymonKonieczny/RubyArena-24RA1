@@ -18,7 +18,7 @@ public class Movement : NetworkBehaviour
     }
     [SerializeField] Transform AimingCameraPos;
     [SerializeField] Transform NormalCameraPos;
-
+    [SerializeField] PlayerSkillHolder playerSkillHolder;
      Transform cameraPos;
     [SerializeField] Transform Model;
     public Transform Orientation;
@@ -32,8 +32,6 @@ public class Movement : NetworkBehaviour
     private InputCollectorScript InputCollector;
     public Rigidbody Rb;
     private PlayerScript playerScript;
-    public float speed = 30;
-    public bool canFly = false;
     public float dashModifier = 25;
 
     public float jumpForce;
@@ -44,6 +42,7 @@ public class Movement : NetworkBehaviour
         InputCollector = GetComponent<InputCollectorScript>();
         playerScript = GetComponent<PlayerScript>();
         playerResources = GetComponent<PlayerResources>();
+        playerSkillHolder = GetComponent<PlayerSkillHolder>();
 
         if (IsOwner)
         {
@@ -109,7 +108,7 @@ public class Movement : NetworkBehaviour
                 break;
         }
 
-        StartCoroutine(Dash(direction.normalized, speed , 0.2f));
+        StartCoroutine(Dash(direction.normalized, playerSkillHolder.Stats.modifiedStats.speed , 0.2f));
     }
 
     void FixedUpdate()
@@ -168,16 +167,16 @@ public class Movement : NetworkBehaviour
         {
             case PlayerOrientationModes.Walking:
                 velocity = ((Orientation.forward * Input.GetAxis("Vertical")) + (Orientation.right * Input.GetAxis("Horizontal")))
-              * speed * Time.fixedDeltaTime;
+              * playerSkillHolder.Stats.modifiedStats.speed * Time.fixedDeltaTime;
 
                 break;
             case PlayerOrientationModes.Aiming:
                 velocity = ((Model.forward * Input.GetAxis("Vertical")) + (Model.right * Input.GetAxis("Horizontal")))
-             * speed * Time.fixedDeltaTime;
+             * playerSkillHolder.Stats.modifiedStats.speed * Time.fixedDeltaTime;
                 break;
         }
 
-        if (canFly)
+        if (playerSkillHolder.Stats.modifiedStats.canFly)
         {
             if (Input.GetKey(KeyCode.Space))
             {

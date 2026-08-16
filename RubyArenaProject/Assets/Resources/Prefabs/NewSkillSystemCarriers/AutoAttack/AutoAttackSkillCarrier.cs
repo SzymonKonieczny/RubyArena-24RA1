@@ -45,7 +45,7 @@ public class AutoAttackSkillCarrier : SkillBase
 
     private void Start()
     {
-        autoAttackParams.OnValueChanged += (AutoAttackParams outdated, AutoAttackParams updated) =>autoAttackDataUpdate();
+        autoAttackParams.OnValueChanged += (_, _) =>autoAttackDataUpdate();
         autoAttackDataUpdate();
         if (IsOwner)
         {
@@ -64,6 +64,16 @@ public class AutoAttackSkillCarrier : SkillBase
     public override void Init()
     {
         base.Init();
+        if (IsServer)
+        {
+            autoAttackParams.Value = new AutoAttackParams
+            {
+                AttackSpeed = skillHolderRef.Stats.modifiedStats.AttackSpeed,
+                Damage = skillHolderRef.Stats.modifiedStats.AttackDamage,
+                Range = skillHolderRef.Stats.modifiedStats.AttackRange,
+            };
+        }
+
         autoAttackDataUpdate();
         if (IsOwner)
         {
@@ -93,7 +103,7 @@ public class AutoAttackSkillCarrier : SkillBase
 
         setCooldown(cooldown);
 
-        Vector3 skillshotSpawnPos = combatManagerRef.SkillshotSpawnPoint.transform.position;
+        Vector3 skillshotSpawnPos = skillHolderRef.playerCombatManager.SkillshotSpawnPoint.transform.position;
 
         var ovelappingColliders = Physics.OverlapBox(skillshotSpawnPos + (lookDir * autoAttackParams.Value.Range / 2),
             new Vector3(2, 1, autoAttackParams.Value.Range / 2), Quaternion.LookRotation(lookDir),rayCastMask);

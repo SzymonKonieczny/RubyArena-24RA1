@@ -17,14 +17,17 @@ public class BoolRefType
 }
 public abstract class SkillBase : NetworkBehaviour
 {
-    public BoolRefType spellTriggeringFlag;//for instance a key stroke
+    public PlayerSkillHolder skillHolderRef;
+    
+    //TODO: Remove those 3, replace all usages with skillHolderRef.X
     public PlayerCombatManager combatManagerRef;
-    public LayerMask rayCastMask;
     public PlayerAnimationScript animationScript;
-
-
-
     public InputCollectorScript InputCollector;
+    
+    
+    
+    public BoolRefType spellTriggeringFlag;//for instance a key stroke
+    public LayerMask rayCastMask;
     public SkillCastType castType;
     [SerializeField] public SkillDataSO SkillDataSO;
     [SerializeField] public float cooldown =0;
@@ -110,6 +113,8 @@ public abstract class SkillBase : NetworkBehaviour
             Debug.Log("Unable to find the player skillholder. Probably due to despawnings");
             return;
         }
+        skillHolderRef = skillholder;
+
         this.combatManagerRef = skillholder.playerCombatManager;
         animationScript = skillholder.animationScript;
         InputCollector = skillholder.inputCollectorScript;

@@ -58,6 +58,13 @@ public class RubyFormSkill : SkillBase
         {
             Init();
         }
+
+        skillHolderRef.statModifierHolder.AddModifier(new EntityStatisticsModifier()
+        {
+            speedMultiplier = 3,
+            serverTimeEffectEnd = NetworkManager.Singleton.ServerTime.Time + 3f
+        });
+
         StartCoroutine(this.FormSwap(duration));
     }
     IEnumerator UseWithCastTime()
@@ -67,28 +74,26 @@ public class RubyFormSkill : SkillBase
     }
     IEnumerator FormSwap (float duration)
     {
-        combatManagerRef.playerMove.Rb.drag = 3;
-        combatManagerRef.playerMove.Rb.useGravity = false;
-        combatManagerRef.playerMove.speed *= 3;
-        combatManagerRef.playerMove.canFly = true;
-        /*foreach(var r in renderers)
-        {
-            r.enabled = false;
-        }*/
+        //TODO:
+        // MOVE THIS TO AN IMPLEMENTATION AS AN "EFFECT"
+
+       // combatManagerRef.playerMove.Rb.drag = 3;
+       // combatManagerRef.playerMove.Rb.useGravity = false;
+       // combatManagerRef.playerMove.speed *= 3;
+       // combatManagerRef.playerMove.canFly = true;
+       
+
         ballRenderer.enabled = true;
         roseParticles.Play();
         yield return new WaitForSeconds(duration);
         targetDissolveProgression.Value = 0; // set on animation start
         ballRenderer.enabled = false;
 
-        /* foreach (var r in renderers)
-         {
-             r.enabled = true;
-         }*/
-        combatManagerRef.playerMove.Rb.drag = 0;
-        combatManagerRef.playerMove.canFly = false;
-        combatManagerRef.playerMove.speed /= 3;
-        combatManagerRef.playerMove.Rb.useGravity = true;
+
+       // combatManagerRef.playerMove.Rb.drag = 0;
+       // combatManagerRef.playerMove.canFly = false;
+       // combatManagerRef.playerMove.speed /= 3;
+       // combatManagerRef.playerMove.Rb.useGravity = true;
     }
 
     private void Start()
