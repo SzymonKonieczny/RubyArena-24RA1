@@ -1,7 +1,9 @@
+using Assets.Scripts.Events;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
+using VContainer;
 
 [System.Serializable]
 public struct Stats : INetworkSerializable, System.IEquatable<Stats>
@@ -30,22 +32,33 @@ public struct Stats : INetworkSerializable, System.IEquatable<Stats>
                AttackRange == other.AttackRange;
     }
 }
+
 public class EntityStats : NetworkBehaviour
 {
     [SerializeField] public NetworkVariable<Stats> basicStats;
-    [SerializeField] public Stats modifiedStats { get; private set; }
+    [SerializeField] public NetworkVariable<Stats> modifiedStats { get; private set; } = new();
+
+
+    [Inject]
+    EventBus<GlobalStatsChangeEvent> GlobalStatsChangeEvent;
+
+
 
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
         basicStats.OnValueChanged += (Stats old, Stats newStats) =>
         {
-            modifiedStats = newStats;
+            modifiedStats.Value = newStats;
         };
+        GlobalStatsChangeEvent.Raise(new GlobalStatsChangeEvent { recieverNetworkObjectId = NetworkObjectId });
+
     }
+
     public void WriteModifiedStats(Stats _modifiedStats) 
     {
-        modifiedStats = _modifiedStats;
+        modifiedStats.Value = _modifiedStats;
+        GlobalStatsChangeEvent.Raise(new GlobalStatsChangeEvent { recieverNetworkObjectId = NetworkObjectId });
 
         //TODO:
         // Sync after every write

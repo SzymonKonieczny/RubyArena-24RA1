@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using UnityEngine.UIElements;
+using Assets.Scripts.Events;
+using VContainer;
 
 
 
@@ -34,9 +36,12 @@ public class Movement : NetworkBehaviour
     private PlayerScript playerScript;
     public float dashModifier = 25;
 
+
     public float jumpForce;
 
     private bool isGrounded;
+
+
     void Start()
     {
         InputCollector = GetComponent<InputCollectorScript>();
@@ -92,8 +97,8 @@ public class Movement : NetworkBehaviour
             yield return new WaitForFixedUpdate();
             it += 1;
         }
-
     }
+
     public void startDash()
     {
         Vector3 direction = new();
@@ -108,7 +113,7 @@ public class Movement : NetworkBehaviour
                 break;
         }
 
-        StartCoroutine(Dash(direction.normalized, playerSkillHolder.Stats.modifiedStats.speed , 0.2f));
+        StartCoroutine(Dash(direction.normalized, playerSkillHolder.Stats.modifiedStats.Value.speed , 0.2f));
     }
 
     void FixedUpdate()
@@ -167,16 +172,16 @@ public class Movement : NetworkBehaviour
         {
             case PlayerOrientationModes.Walking:
                 velocity = ((Orientation.forward * Input.GetAxis("Vertical")) + (Orientation.right * Input.GetAxis("Horizontal")))
-              * playerSkillHolder.Stats.modifiedStats.speed * Time.fixedDeltaTime;
+              * playerSkillHolder.Stats.modifiedStats.Value.speed * Time.fixedDeltaTime;
 
                 break;
             case PlayerOrientationModes.Aiming:
                 velocity = ((Model.forward * Input.GetAxis("Vertical")) + (Model.right * Input.GetAxis("Horizontal")))
-             * playerSkillHolder.Stats.modifiedStats.speed * Time.fixedDeltaTime;
+             * playerSkillHolder.Stats.modifiedStats.Value.speed * Time.fixedDeltaTime;
                 break;
         }
 
-        if (playerSkillHolder.Stats.modifiedStats.canFly)
+        if (playerSkillHolder.Stats.modifiedStats.Value.canFly)
         {
             if (Input.GetKey(KeyCode.Space))
             {

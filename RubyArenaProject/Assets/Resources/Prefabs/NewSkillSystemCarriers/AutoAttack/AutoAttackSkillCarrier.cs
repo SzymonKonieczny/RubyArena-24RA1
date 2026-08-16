@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
+using Assets.Scripts.Events;
+using VContainer;
 
 [System.Serializable]
 public struct AutoAttackParams : INetworkSerializable, System.IEquatable<AutoAttackParams>
@@ -36,7 +38,13 @@ public struct AutoAttackParams : INetworkSerializable, System.IEquatable<AutoAtt
 public class AutoAttackSkillCarrier : SkillBase
 {
     public NetworkVariable< AutoAttackParams> autoAttackParams = new();
+    float Range;
     
+    [Inject]
+    EventBus<GlobalStatsChangeEvent> GlobalStatsChangeEvent;
+
+    EventBinding<GlobalStatsChangeEvent> GlobalStatsChangeEventBinding; //Someone changed stats, gotta check if it was us!
+
     [ServerRpc]
     private void ParamsSyncRequestServerRpc() //Could be set before networkSpawn, but that would cause dumb if-ology in the spawning logic
     {
@@ -51,11 +59,24 @@ public class AutoAttackSkillCarrier : SkillBase
         {
           ParamsSyncRequestServerRpc();
         }
+        GlobalStatsChangeEventBinding = new(OnStatsChanged);
+    }
+
+    void OnStatsChanged(GlobalStatsChangeEvent args)
+    {
+        Debug.Log("GlobalStatsChangeEvent Recieved");
+
+        if (args == null) return;
+        if (args.recieverNetworkObjectId != skillHolderRef.playerCombatManager.NetworkObjectId) return;
+
+        Debug.Log("GlobalStatsChangeEvent Was us!");
+        autoAttackDataUpdate();
     }
     private void autoAttackDataUpdate()
     {
-        damage = autoAttackParams.Value.Damage;
-        cooldown = 1.0f / autoAttackParams.Value.AttackSpeed;
+        damage = skillHolderRef.Stats.modifiedStats.Value.AttackDamage;
+        cooldown = 1.0f / skillHolderRef.Stats.modifiedStats.Value.AttackSpeed;
+        Range = skillHolderRef.Stats.modifiedStats.Value.AttackRange;
     }
     private void OnTransformParentChanged()
     {
@@ -64,7 +85,7 @@ public class AutoAttackSkillCarrier : SkillBase
     public override void Init()
     {
         base.Init();
-        if (IsServer)
+       /* if (IsServer)
         {
             autoAttackParams.Value = new AutoAttackParams
             {
@@ -72,7 +93,7 @@ public class AutoAttackSkillCarrier : SkillBase
                 Damage = skillHolderRef.Stats.modifiedStats.AttackDamage,
                 Range = skillHolderRef.Stats.modifiedStats.AttackRange,
             };
-        }
+        }*/
 
         autoAttackDataUpdate();
         if (IsOwner)
@@ -84,14 +105,10 @@ public class AutoAttackSkillCarrier : SkillBase
     public override bool Use()
     {
         animationScript = combatManagerRef.animationScript;
-       
         animationScript.Trigger("WindUp");
         combatManagerRef.SetStunTimer(windupTime);
-        
         Vector3 LookDir = getLookDirection();
-
         ServerSideUseServerRPC(LookDir);
-
         return true;
     }
 
@@ -158,6 +175,11 @@ public class AutoAttackSkillCarrier : SkillBase
             animationScript.Trigger("WindUp");
             animationScript.Trigger("AutoAttackAcknowledge");
         }
+    }
+
+    private void OnDestroy()
+    {
+        GlobalStatsChangeEvent.Unrgister(GlobalStatsChangeEventBinding);
     }
 
     // Update is called once per frame
