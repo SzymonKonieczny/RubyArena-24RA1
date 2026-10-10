@@ -1,60 +1,52 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
-using System;
 using VContainer;
 using Assets.Scripts.Events;
-using Unity.VisualScripting;
 
+/// <summary>
+/// Yang's charged blast skill. Stores damage taken, then fires a cone AOE that
+/// deals stored + base damage and knocks hit targets away.
+/// </summary>
 public class YangBlastSkill : SkillBase
 {
+    [Header("Prefabs & References")]
     public GameObject blastEffect;
-    [SerializeField]  NetworkVariable<float> storedDamage = new(0);
-    [SerializeField] ISkillEffect FlamingGloves;
+
+    NetworkVariable<float> storedDamage = new(0);
+    ISkillEffect flamingGloves;
 
     [Inject]
     EventBus<DamageTakenEvent> damageTakenEvent;
-
     EventBinding<DamageTakenEvent> damageEventBinding;
-    private void OnDestroy()
-    {
-        damageTakenEvent.Unrgister(damageEventBinding);
-    }
+
+    // --- Lifetime ---
 
     void Start()
     {
-        FlamingGloves = combatManagerRef.GetComponentInChildren<ISkillEffect>();
-        storedDamage.OnValueChanged += updateVFX;
-        damageEventBinding = new EventBinding<DamageTakenEvent>((DamageTakenEvent data) => onDamageTaken(data.damageAmountPostMitigation));
-        damageTakenEvent.Register(damageEventBinding);
+        flamingGloves = combatManagerRef.GetComponentInChildren<ISkillEffect>();
+        storedDamage.OnValueChanged += UpdateVFX;
 
+        damageEventBinding = new EventBinding<DamageTakenEvent>(
+            data => OnDamageTaken(data.damageAmountPostMitigation)
+        );
+        damageTakenEvent.Register(damageEventBinding);
     }
+
+    void OnDestroy()
+    {
+        damageTakenEvent.Unregister(damageEventBinding);
+    }
+
     private void OnTransformParentChanged()
     {
         Init();
     }
 
-    void updateVFX(float oldStoredDamage, float newStoredDamage)
-    {
-        if (newStoredDamage > 30)
-        {
-            FlamingGloves.PlayEffect(0);
-        }
-        else
-        {
-            FlamingGloves.PlayEffect(1);
-        }
-    }
+    // --- Input ---
 
-    void onDamageTaken(float damageAmount)
-    {
-        storedDamage.Value += damageAmount;
-    }
-    // Update is called once per frame
     void Update()
     {
-        if (InputCollector == null || combatManagerRef == null || isOnCooldown()  || !combatManagerRef.IsOwner)
+        if (InputCollector == null || combatManagerRef == null || isOnCooldown() || !combatManagerRef.IsOwner)
             return;
 
         if (spellTriggeringFlag.value)
@@ -63,16 +55,17 @@ public class YangBlastSkill : SkillBase
         }
     }
 
-    public override bool Use()
-    {   
-        animationScript = combatManagerRef.animationScript;
+    // --- Skill Execution ---
 
+    public override bool Use()
+    {
+        animationScript = combatManagerRef.animationScript;
         animationScript.Trigger("WindUp");
         combatManagerRef.SetStunTimer(windupTime);
 
-        Vector3 LookDir = getLookDirection();
-        combatManagerRef.playerMove.AddNetworkRbVelocityClientRPC(-LookDir * 5);
-        ServerSideUseServerRPC(LookDir);
+        Vector3 lookDir = getLookDirection();
+        combatManagerRef.playerMove.AddNetworkRbVelocityClientRPC(-lookDir * 5);
+        ServerSideUseServerRPC(lookDir);
 
         return true;
     }
@@ -82,79 +75,117 @@ public class YangBlastSkill : SkillBase
     {
         if (!IsServer) return;
         if (isOnCooldown()) return;
-
-        Vector3 skillOrigin = combatManagerRef.SkillshotSpawnPoint.position;
-        ulong senderNetworkObjectId = combatManagerRef.NetworkObjectId;
         setCooldown(cooldown);
 
-        GameObject skillEntityGO = Instantiate(blastEffect);
+        SpawnBlastEffect(lookDir);
 
-        skillEntityGO.GetComponent<NetworkObject>().Spawn();
-        skillEntityGO.transform.SetPositionAndRotation(combatManagerRef.SkillshotSpawnPoint.transform.position + lookDir * 2, Quaternion.LookRotation(lookDir, Vector3.up));
+        ulong senderId = combatManagerRef.NetworkObjectId;
+        Vector3 skillOrigin = combatManagerRef.SkillshotSpawnPoint.position;
 
-
-        Collider[] overlaps = Physics.OverlapSphere(skillOrigin, 5);
-        List<PlayerCombatManager> playerCombatManagers = new();
-        foreach(var o in overlaps)
+        foreach (PlayerCombatManager target in GetPlayersInCone(skillOrigin, lookDir))
         {
-            if(o.CompareTag("Player"))
-            {
-                var combatManager = o.transform.GetComponent<PlayerCombatManager>();
-                if (combatManager && combatManagerRef != combatManager) playerCombatManagers.Add(combatManager);
-            }
-        }
-        List<PlayerCombatManager> playersInRange = new();
+            if (target.NetworkObject.NetworkObjectId == senderId) continue;
 
-        Debug.DrawLine(skillOrigin, skillOrigin + (lookDir.normalized * 5), Color.blue, 2f);
-        foreach (var player in playerCombatManagers)
-        {
-            Vector3 toTarget = ( player.transform.position - skillOrigin);
-            float angle = Mathf.Acos(Vector3.Dot(lookDir.normalized, toTarget.normalized));
+            PlayerResources resources = target.GetComponent<PlayerResources>();
+            if (resources == null) continue;
 
-            Debug.DrawLine(skillOrigin, skillOrigin + toTarget, Color.gray, 2f);
+            // Knockback away from Yang
+            Vector3 knockbackDir = (target.transform.position - skillOrigin).normalized;
+            target.playerMove.AddNetworkRbVelocityClientRPC(knockbackDir * 10);
 
-            Debug.Log($"angle : {angle}");
-            if(Mathf.Abs(angle) < Mathf.Deg2Rad * 40)
-            {
-                playersInRange.Add(player);
-                Debug.DrawLine(skillOrigin, skillOrigin + toTarget, Color.red,2f);
-            }
-
-        }
-
-        foreach (var player in playersInRange)
-        {
-            var playerResources = player.GetComponent<PlayerResources>();
-            if (!playerResources || player.NetworkObject.NetworkObjectId == senderNetworkObjectId) continue;
-
-            Vector3 toTarget = (player.transform.position - skillOrigin);
-            player.playerMove.AddNetworkRbVelocityClientRPC(toTarget.normalized * 10);
-
-
-            var data = new SkillInstanceData
+            resources.damage(new SkillInstanceData
             {
                 damage = this.damage + (int)storedDamage.Value,
-                ownerNetworkObjectId = senderNetworkObjectId
-            };
-            playerResources.damage(data);
+                ownerNetworkObjectId = senderId
+            });
         }
-        storedDamage.Value = 0;
 
+        storedDamage.Value = 0;
         ServerAnnounceSpellCastClientRPC();
     }
 
     [ClientRpc]
     public override void ServerAnnounceSpellCastClientRPC()
     {
-        //if (IsServer) return;
-        if(IsOwner)
+        if (IsOwner)
         {
-           animationScript.Trigger("SpellAcknowledge2");
+            animationScript.Trigger("SpellAcknowledge2");
         }
         else
         {
             animationScript.Trigger("WindUp");
             animationScript.Trigger("SpellAcknowledge2");
         }
+    }
+
+    // --- Damage Accumulation ---
+
+    void OnDamageTaken(float damageAmount)
+    {
+        storedDamage.Value += damageAmount;
+    }
+
+    void UpdateVFX(float oldStoredDamage, float newStoredDamage)
+    {
+        int effectId = newStoredDamage > 30 ? 0 : 1;
+        flamingGloves.PlayEffect(effectId);
+    }
+
+    // --- Helpers ---
+
+    /// <summary>
+    /// Spawns the blast visual at the skill origin, facing the look direction.
+    /// </summary>
+    void SpawnBlastEffect(Vector3 lookDir)
+    {
+        Transform spawnPoint = combatManagerRef.SkillshotSpawnPoint;
+        Vector3 position = spawnPoint.position + lookDir * 2;
+        Quaternion rotation = Quaternion.LookRotation(lookDir, Vector3.up);
+
+        GameObject effect = Instantiate(blastEffect);
+        effect.GetComponent<NetworkObject>().Spawn();
+        effect.transform.SetPositionAndRotation(position, rotation);
+    }
+
+    /// <summary>
+    /// Returns all players within a 5-unit 40° cone in front of the skill origin.
+    /// </summary>
+    PlayerCombatManager[] GetPlayersInCone(Vector3 origin, Vector3 direction)
+    {
+        Collider[] overlaps = Physics.OverlapSphere(origin, 5);
+        int coneCount = 0;
+
+        // Two-pass: count then fill — avoids allocating a list per cast.
+        for (int i = 0; i < overlaps.Length; i++)
+        {
+            if (IsInCone(overlaps[i], origin, direction))
+                coneCount++;
+        }
+
+        PlayerCombatManager[] result = new PlayerCombatManager[coneCount];
+        int index = 0;
+
+        for (int i = 0; i < overlaps.Length; i++)
+        {
+            if (IsInCone(overlaps[i], origin, direction))
+                result[index++] = overlaps[i].GetComponent<PlayerCombatManager>();
+        }
+
+        return result;
+    }
+
+    bool IsInCone(Collider collider, Vector3 origin, Vector3 direction)
+    {
+        if (!collider.CompareTag("Player"))
+            return false;
+
+        PlayerCombatManager combatManager = collider.GetComponent<PlayerCombatManager>();
+        if (combatManager == null || combatManager == combatManagerRef)
+            return false;
+
+        Vector3 toTarget = (combatManager.transform.position - origin);
+        float angle = Mathf.Acos(Vector3.Dot(direction.normalized, toTarget.normalized));
+
+        return Mathf.Abs(angle) < Mathf.Deg2Rad * 40;
     }
 }

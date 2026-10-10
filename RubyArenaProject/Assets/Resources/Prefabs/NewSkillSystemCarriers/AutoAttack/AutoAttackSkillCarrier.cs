@@ -179,7 +179,7 @@ public class AutoAttackSkillCarrier : SkillBase
 
     private void OnDestroy()
     {
-        GlobalStatsChangeEvent.Unrgister(GlobalStatsChangeEventBinding);
+        GlobalStatsChangeEvent.Unregister(GlobalStatsChangeEventBinding);
     }
 
     // Update is called once per frame
