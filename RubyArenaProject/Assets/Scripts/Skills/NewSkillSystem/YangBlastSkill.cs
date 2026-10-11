@@ -86,12 +86,12 @@ public class YangBlastSkill : SkillBase
         {
             if (target.NetworkObject.NetworkObjectId == senderId) continue;
 
-            PlayerResources resources = target.GetComponent<PlayerResources>();
+            UnitResource resources = target.GetComponent<UnitResource>();
             if (resources == null) continue;
 
             // Knockback away from Yang
             Vector3 knockbackDir = (target.transform.position - skillOrigin).normalized;
-            target.playerMove.AddNetworkRbVelocityClientRPC(knockbackDir * 10);
+            target.playerMove?.AddNetworkRbVelocityClientRPC(knockbackDir * 10);
 
             resources.damage(new SkillInstanceData
             {

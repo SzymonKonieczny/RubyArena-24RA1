@@ -22,7 +22,7 @@ public class Movement : NetworkBehaviour
     [SerializeField] Transform NormalCameraPos;
     [SerializeField] PlayerSkillHolder playerSkillHolder;
      Transform cameraPos;
-    [SerializeField] Transform Model;
+    public Transform Model;
     public Transform Orientation;
     [SerializeField] Transform UpwardTorsoBone;
     [SerializeField] PlayerOrientationModes OrientationMode = PlayerOrientationModes.Walking;

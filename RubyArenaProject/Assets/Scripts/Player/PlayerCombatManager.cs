@@ -30,6 +30,8 @@ public class PlayerCombatManager : NetworkBehaviour
 
     public void SetStunTimer(float time)
     {
+        if (InputCollector == null) return;
+
         if (InputCollector.StunTime < 0)
             InputCollector.StunTime = 0;
 

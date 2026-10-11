@@ -63,7 +63,7 @@ public class TestQSkill : BaseSkillEntityBehaviorSkillShot //make it into a base
                Vector3 force =  (networkObject.transform.position - transform.position).ScaleVec(new Vector3(1, 0,1).normalized)
                     * 5;
                 Debug.LogWarning($"hit + {networkObject.name}");
-                networkObject.GetComponent<Movement>().AddNetworkRbForceClientRPC(force);
+                networkObject.GetComponent<Movement>()?.AddNetworkRbForceClientRPC(force);
                 // networkObject.transform.position = new Vector3(0, 5, 0);
 
             }
@@ -87,10 +87,10 @@ public class TestQSkill : BaseSkillEntityBehaviorSkillShot //make it into a base
     {
      // var Colliders = Physics.OverlapSphere(this.transform.position, 0.4f);
 
-      var playerScript = collisioninfo.transform.GetComponent<PlayerScript>(); //Colliders[0]?.transform?.GetComponent<PlayerScript>();
-      if (playerScript != null)
+      var unitResource = collisioninfo.transform.GetComponent<UnitResource>(); //Colliders[0]?.transform?.GetComponent<PlayerScript>();
+      if (unitResource != null)
       {
-        var NetworkObjHit = playerScript.transform.GetComponent<NetworkObject>();
+        var NetworkObjHit = unitResource.transform.GetComponent<NetworkObject>();
             return NetworkObjHit;
       }
       return null;
@@ -104,14 +104,14 @@ public class TestQSkill : BaseSkillEntityBehaviorSkillShot //make it into a base
             if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(Object.NetworkObjectId, out NetworkObject networkObject))
             {
                 MovePlayerAroundClientRPC(networkObject.NetworkObjectId);
-                var playerRes =  networkObject.GetComponent<PlayerResources>();
+                var unitRes =  networkObject.GetComponent<UnitResource>();
 
                 SkillInstanceData data = new SkillInstanceData
                 {
                     damage = SkillDataSO.damage,
                     ownerNetworkObjectId = ownerNetworkObjectId
                 };
-                playerRes.damage(data);
+                unitRes.damage(data);
             }
 
         }

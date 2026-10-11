@@ -24,8 +24,8 @@ public abstract class SkillBase : NetworkBehaviour
     public PlayerAnimationScript animationScript;
     public InputCollectorScript InputCollector;
     
-    
-    
+        
+
     public BoolRefType spellTriggeringFlag;//for instance a key stroke
     public LayerMask rayCastMask;
     public SkillCastType castType;

@@ -30,6 +30,7 @@ public class MenuScript : MonoBehaviour
             await AuthenticationService.Instance.SignInAnonymouslyAsync();
         }
         serviesInitialized = true;
+        NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnected;
     }
 
     public async void StartHost()
@@ -93,6 +94,25 @@ public class MenuScript : MonoBehaviour
                 listStr += prefab.Prefab.name + "\n";
             }
             Debug.LogError($"Registered : {listStr}");
+        }
+    }
+
+    private void OnClientDisconnected(ulong clientId)
+    {
+        // Check if the local client was the one that failed/disconnected
+        if (clientId == NetworkManager.Singleton.LocalClientId)
+        {
+            // NGO 1.2.0+ provides the server's rejection/disconnect reason
+            string reason = NetworkManager.Singleton.DisconnectReason;
+
+            if (string.IsNullOrEmpty(reason))
+            {
+                Debug.LogWarning("Connection failed or timed out before reaching the host.");
+            }
+            else
+            {
+                Debug.LogError($"Connection failed. Server Reason: {reason}");
+            }
         }
     }
 }

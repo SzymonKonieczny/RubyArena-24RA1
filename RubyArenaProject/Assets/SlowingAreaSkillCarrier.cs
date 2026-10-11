@@ -57,8 +57,8 @@ public class SlowingAreaSkillCarrier : SkillBase
         ulong senderNetworkObjectId = combatManagerRef.NetworkObjectId;
         setCooldown(cooldown);
 
-       
 
+       
         ServerAnnounceSpellCastClientRPC();
     }
 

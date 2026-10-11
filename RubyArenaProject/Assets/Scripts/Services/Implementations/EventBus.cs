@@ -20,7 +20,12 @@ public class EventBus<T> where T : class
 
     public void Raise(T arg)
     {
-        foreach (var binding in eventBindings)
+        // Snapshot: copy to a temporary array so modifications during iteration
+        // (Register/Unregister/callback-triggered re-entrant Raise) are safe.
+        EventBinding<T>[] snapshot = new EventBinding<T>[eventBindings.Count];
+        eventBindings.CopyTo(snapshot);
+
+        foreach (var binding in snapshot)
         {
             binding.Action(arg);
         }
