@@ -21,7 +21,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Neo Disolve
-  m_Shader: {fileID: -6465566751694194690, guid: 5611a6bb15e5d30439e6479b181ab4da, type: 3}
+  m_Shader: {fileID: -6465566751694194690, guid: 99b94fb9ce19bff46923050d67b81146, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
@@ -123,7 +123,7 @@ Material:
     - _NoiseScale: 40
     - _OcclusionStrength: 1
     - _Parallax: 0.005
-    - _Progress: 0
+    - _Progress: 0.24
     - _QueueControl: 0
     - _QueueOffset: 0
     - _ReceiveShadows: 1
@@ -137,7 +137,8 @@ Material:
     - _ZTest: 4
     - _ZWrite: 1
     - _ZWriteControl: 0
-    - _alphaThresholdAdjustment: 0
+    - _alphaThresholdAdjustment: 0.27
+    - _edge: 0.48
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}

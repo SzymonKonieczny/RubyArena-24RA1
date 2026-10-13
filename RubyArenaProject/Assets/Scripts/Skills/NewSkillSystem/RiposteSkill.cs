@@ -23,6 +23,8 @@ public class RiposteSkill : SkillBase
     [SerializeField] GameObject counterReadyVFX;    // subtle aura during window
     [SerializeField] GameObject teleportVFX;        // glass-shatter blink
     [SerializeField] GameObject strikeVFX;          // parasol swing trail
+    [SerializeField] float shieldEdgeSize = 0.3f;
+
 
     bool isRiposting = false;
     bool counterTriggered = false;
@@ -33,8 +35,8 @@ public class RiposteSkill : SkillBase
 
     PropertyBlockMaterial propertyBlockMaterial;
     [SerializeField] SkinnedMeshRenderer[] skinnedRenderers;
-    float currentDissolveProgression = 0;
-    NetworkVariable<int> targetDissolveProgression = new(0);
+    [SerializeField]  float currentDissolveProgression = 0;
+    [SerializeField]  NetworkVariable<float> targetDissolveProgression = new(-0.3f);
 
     // --- Lifetime ---
 
@@ -42,7 +44,7 @@ public class RiposteSkill : SkillBase
     {
         Init();
         damageBinding = new EventBinding<DamageTakenEvent>(OnDamageTaken);
-        damageEventBus.Register(damageBinding);
+        damageEventBus?.Register(damageBinding);
     }
 
     public override void Init()
@@ -50,11 +52,17 @@ public class RiposteSkill : SkillBase
         base.Init();
         skinnedRenderers = combatManagerRef.GetComponentsInChildren<SkinnedMeshRenderer>(true);
         propertyBlockMaterial = new PropertyBlockMaterial(skinnedRenderers);
+        propertyBlockMaterial.SetFloat("_Progress", currentDissolveProgression);
+        propertyBlockMaterial.SetFloat("_edge", shieldEdgeSize);
+        propertyBlockMaterial.SetFloat("_alphaThresholdAdjustment", 0.3f);
+        
+        if(IsServer)
+            targetDissolveProgression.Value = -shieldEdgeSize;
     }
 
     void OnDestroy()
     {
-        damageEventBus.Unregister(damageBinding);
+        damageEventBus?.Unregister(damageBinding);
     }
 
     private void OnTransformParentChanged()
@@ -66,13 +74,6 @@ public class RiposteSkill : SkillBase
 
     void Update()
     {
-        if (InputCollector == null || combatManagerRef == null || !combatManagerRef.IsOwner)
-            return;
-
-        if (spellTriggeringFlag.value && !isOnCooldown())
-        {
-            Use();
-        }
 
         // Dissolve update (all clients)
         if (currentDissolveProgression != targetDissolveProgression.Value)
@@ -81,7 +82,23 @@ public class RiposteSkill : SkillBase
         }
         float sign = (targetDissolveProgression.Value - currentDissolveProgression) > 0 ? 1 : -1;
         currentDissolveProgression += Time.deltaTime * sign * 5;
-        currentDissolveProgression = Mathf.Clamp01(currentDissolveProgression);
+
+        if (currentDissolveProgression < -shieldEdgeSize) //clamp between -shieldEdgeSize and 1
+            currentDissolveProgression = -shieldEdgeSize; 
+        else if (currentDissolveProgression > 1)
+                currentDissolveProgression = 1;
+
+
+
+
+        if (InputCollector == null || combatManagerRef == null || !combatManagerRef.IsOwner)
+            return;
+
+        if (spellTriggeringFlag.value && !isOnCooldown())
+        {
+            Use();
+        }
+
     }
 
     // --- Skill Execution ---
@@ -89,7 +106,7 @@ public class RiposteSkill : SkillBase
     public override bool Use()
     {
         animationScript.Trigger("WindUp");
-        combatManagerRef.SetStunTimer(counterWindow * 0.5f);
+        combatManagerRef.SetStunTimer(counterWindow);
 
         ServerSideUseServerRPC(new Vector3());
         return true;
@@ -108,6 +125,7 @@ public class RiposteSkill : SkillBase
     {
         isRiposting = true;
         counterTriggered = false;
+        targetDissolveProgression.Value =0;
 
         ServerAnnounceSpellCastClientRPC();
         ShowCounterReadyClientRPC();
@@ -115,6 +133,7 @@ public class RiposteSkill : SkillBase
         yield return new WaitForSeconds(counterWindow);
 
         isRiposting = false;
+        targetDissolveProgression.Value = -shieldEdgeSize;
 
         float cd = counterTriggered ? fullCooldown : reducedCooldown;
         nextAvaliable.Value = NetworkManager.NetworkTimeSystem.ServerTime + cd;
@@ -132,7 +151,7 @@ public class RiposteSkill : SkillBase
         if (counterTriggered) return;
 
         counterTriggered = true;
-
+        targetDissolveProgression.Value = 1f;
         // Find the attacker by their network object ID
         
         if (!NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(e.damagerNetworkObjectId, out var attackerObj))
@@ -248,6 +267,6 @@ public class RiposteSkill : SkillBase
 
         if (combatManagerRef == null) yield break;
 
-        targetDissolveProgression.Value = 0;
+        targetDissolveProgression.Value = -shieldEdgeSize;
     }
 }
