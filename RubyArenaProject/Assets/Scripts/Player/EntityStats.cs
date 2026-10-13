@@ -57,6 +57,7 @@ public class EntityStats : NetworkBehaviour
 
     public void WriteModifiedStats(Stats _modifiedStats) 
     {
+        if (!IsServer) return;
         modifiedStats.Value = _modifiedStats;
         GlobalStatsChangeEvent.Raise(new GlobalStatsChangeEvent { recieverNetworkObjectId = NetworkObjectId });
 

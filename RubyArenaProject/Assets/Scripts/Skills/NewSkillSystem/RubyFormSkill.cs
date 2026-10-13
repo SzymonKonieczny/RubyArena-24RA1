@@ -86,8 +86,9 @@ public class RubyFormSkill : SkillBase
         ballRenderer.enabled = true;
         roseParticles.Play();
         yield return new WaitForSeconds(duration);
-        targetDissolveProgression.Value = 0; // set on animation start
         ballRenderer.enabled = false;
+        if(IsServer)
+            targetDissolveProgression.Value = 0; // set on animation start
 
 
        // combatManagerRef.playerMove.Rb.drag = 0;
