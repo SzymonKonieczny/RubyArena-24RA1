@@ -78,15 +78,18 @@ public class RiposteSkill : SkillBase
         // Dissolve update (all clients)
         if (currentDissolveProgression != targetDissolveProgression.Value)
         {
-            propertyBlockMaterial.SetFloat("_Progress", currentDissolveProgression);
-        }
-        float sign = (targetDissolveProgression.Value - currentDissolveProgression) > 0 ? 1 : -1;
-        currentDissolveProgression += Time.deltaTime * sign * 5;
+            float sign = (targetDissolveProgression.Value - currentDissolveProgression) > 0 ? 1 : -1;
+            currentDissolveProgression += Time.deltaTime * sign * 5;
 
-        if (currentDissolveProgression < -shieldEdgeSize) //clamp between -shieldEdgeSize and 1
-            currentDissolveProgression = -shieldEdgeSize; 
-        else if (currentDissolveProgression > 1)
-                currentDissolveProgression = 1;
+            if (currentDissolveProgression < -shieldEdgeSize) //clamp between -shieldEdgeSize and 1
+                currentDissolveProgression = -shieldEdgeSize; 
+            else if (currentDissolveProgression > 1)
+                    currentDissolveProgression = 1;
+
+            propertyBlockMaterial.SetFloat("_Progress", currentDissolveProgression);
+
+        }
+
 
 
 

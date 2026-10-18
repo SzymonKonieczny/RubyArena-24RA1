@@ -122,7 +122,8 @@ public class YangBlastSkill : SkillBase
 
     void OnDamageTaken(float damageAmount)
     {
-        storedDamage.Value += damageAmount;
+        if(IsServer)
+            storedDamage.Value += damageAmount;
     }
 
     void UpdateVFX(float oldStoredDamage, float newStoredDamage)

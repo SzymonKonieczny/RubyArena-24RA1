@@ -49,7 +49,8 @@ public class EntityStats : NetworkBehaviour
         base.OnNetworkSpawn();
         basicStats.OnValueChanged += (Stats old, Stats newStats) =>
         {
-            modifiedStats.Value = newStats;
+            if(IsServer)
+                modifiedStats.Value = newStats;
         };
         GlobalStatsChangeEvent.Raise(new GlobalStatsChangeEvent { recieverNetworkObjectId = NetworkObjectId });
 
