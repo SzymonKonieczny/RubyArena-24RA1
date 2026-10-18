@@ -11,6 +11,7 @@ using Unity.Networking.Transport.Relay;
 using Unity.Netcode.Transports.UTP;
 using UnityEngine.UI;
 using System.Threading.Tasks;
+using Mono.Cecil.Cil;
 
 public class MenuScript : MonoBehaviour
 {
@@ -47,6 +48,10 @@ public class MenuScript : MonoBehaviour
 
             NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
 
+        }
+        else
+        {
+            ServerPlayerStateManager.Instance.lobbyJoinCode = "local game";
         }
 
         NetworkManager.Singleton.OnClientConnectedCallback += (ulong id) =>
