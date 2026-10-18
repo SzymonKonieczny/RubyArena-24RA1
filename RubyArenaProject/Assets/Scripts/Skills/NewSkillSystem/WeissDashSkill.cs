@@ -37,7 +37,7 @@ public class WeissDashSkill : SkillBase
         }
         if (IsOwner)
         {
-            combatManagerRef.playerMove.startDash();
+            combatManagerRef.PlayerMove.startDash();
             animationScript.Trigger("SpellAcknowledge1");
         }
         else

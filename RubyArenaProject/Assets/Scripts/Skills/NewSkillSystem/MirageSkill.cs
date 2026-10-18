@@ -75,7 +75,7 @@ public class MirageSkill : SkillBase
         // owned by the same client so the explosion is credited to them.
         if (decoyPrefab != null)
         {
-            GameObject decoyGO = Instantiate(decoyPrefab, combatManagerRef.playerMove.Model.position + new Vector3(0,-1,0), combatManagerRef.playerMove.Model.rotation);
+            GameObject decoyGO = Instantiate(decoyPrefab, combatManagerRef.PlayerMove.Model.position + new Vector3(0,-1,0), combatManagerRef.PlayerMove.Model.rotation);
 
             // Inject [Inject] fields on the decoy (e.g. its EventBus) BEFORE spawning:
             // OnNetworkSpawn runs during Spawn, so injection must happen first.
@@ -105,7 +105,7 @@ public class MirageSkill : SkillBase
         if (IsOwner)
         {
             // Dash forward and turn invisible on all clients (they can all see the model).
-            combatManagerRef.playerMove.startDash();
+            combatManagerRef.PlayerMove.startDash();
             animationScript.Trigger("SpellAcknowledge1");
         }
         else

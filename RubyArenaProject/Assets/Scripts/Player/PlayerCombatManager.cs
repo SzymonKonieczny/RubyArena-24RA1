@@ -1,80 +1,82 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
-using UnityEditor;
-using Unity.VisualScripting;
 
 [RequireComponent(typeof(InputCollectorScript))]
-
-
-public class PlayerCombatManager : NetworkBehaviour
+public class PlayerCombatManager : CombatEntity
 {
-    public NetworkVariable<bool> canCombat = new(true);
+    [SerializeField] private PlayerAnimationScript animationScript;
+    [SerializeField] private Movement playerMove;
 
-    InputCollectorScript InputCollector;
-    PlayerScript playerScript;
-    public Transform SkillshotSpawnPoint;
+    private InputCollectorScript inputCollector;
 
-    public PlayerAnimationScript animationScript;
+    public override bool CanCombat { get; protected set; } = true;
+    public override PlayerAnimationScript AnimationScript => animationScript;
+    public override Movement PlayerMove => playerMove;
 
-    public Movement playerMove;
-    [SerializeField] NetworkObject NetworkObject;
-    private bool isInitialized = false;
+    public override void SetStunTimer(float time)
+    {
+        if (inputCollector == null) 
+        {
+            Debug.LogWarning($"No Input Collector Found for {this.name}");
+            return;
+        }
+
+
+        if(IsOwner)
+        {
+            // Logic doubling, its bad i know. Without this appraoch if a client calls ClientRPC it will ignore the call. Nothing will happen and the "windup" animation self-stuns wont apply
+            if (inputCollector.StunTime < 0)
+                inputCollector.StunTime = 0;
+            inputCollector.StunTime += time;
+
+        }
+        else
+        {
+            SetStunTimerClientRpc(time);
+        }
+
+  
+    }
 
     [ClientRpc]
-    public void SetStunTimerClientRPC(float time)
+    void SetStunTimerClientRpc(float time)
     {
-        SetStunTimer(time);
+        if (inputCollector == null) 
+        {
+            Debug.LogWarning($"No Input Collector Found for {this.name}");
+            return;
+        }
+
+        if (inputCollector.StunTime < 0)
+            inputCollector.StunTime = 0;
+
+        inputCollector.StunTime += time;
+        Debug.LogWarning($"Called Stun for duration: {time}!");
     }
 
-    public void SetStunTimer(float time)
-    {
-        if (InputCollector == null) return;
-
-        if (InputCollector.StunTime < 0)
-            InputCollector.StunTime = 0;
-
-        InputCollector.StunTime += time;
-
-    }
     private void OnTransformParentChanged()
     {
         Initialize();
     }
-    // Start is called before the first frame update
+
     public void Initialize()
     {
-        isInitialized = true;
-
-        InputCollector = GetComponent<InputCollectorScript>();
-        playerScript = GetComponent<PlayerScript>();
+        inputCollector = GetComponent<InputCollectorScript>();
         animationScript = GetComponent<PlayerAnimationScript>();
         playerMove = GetComponent<Movement>();
-        NetworkObject = GetComponent<NetworkObject>();
-       
-
-    }
-
-    void FixedUpdate()
-    {
-
     }
 
     private void OnTriggerEnter(Collider other)
     {
         if (!IsServer) return;
-
         if (other.CompareTag("NonFightArea"))
-            canCombat.Value = false;
-
+            CanCombat = false;
     }
+
     private void OnTriggerExit(Collider other)
     {
         if (!IsServer) return;
-
         if (other.CompareTag("NonFightArea"))
-            canCombat.Value = true;
+            CanCombat = true;
     }
-
 }

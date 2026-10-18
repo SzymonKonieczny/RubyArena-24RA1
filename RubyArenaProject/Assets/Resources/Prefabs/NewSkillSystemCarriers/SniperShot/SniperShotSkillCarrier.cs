@@ -21,7 +21,7 @@ public class SniperShotSkillCarrier : SkillBase
 
     public override bool Use()
     {
-        animationScript = combatManagerRef.animationScript;
+        animationScript = combatManagerRef.AnimationScript;
 
         animationScript.Trigger("WindUp");
         combatManagerRef.SetStunTimer(windupTime);
@@ -64,10 +64,9 @@ public class SniperShotSkillCarrier : SkillBase
     {
         if (IsOwner)
         {
-            //combatManagerRef.playerMove.AddNetworkRbForceClientRPC((combatManagerRef.playerMove.Orientation.forward * ForceAdded ) + new Vector3(0, 1f, 0));
             animationScript.Trigger("SpellAcknowledge1");
             shotEffect?.PlayEffect(0);
-            combatManagerRef.playerMove.SnapModelToCameraDir();
+            combatManagerRef.PlayerMove.SnapModelToCameraDir();
         }
         else
         {

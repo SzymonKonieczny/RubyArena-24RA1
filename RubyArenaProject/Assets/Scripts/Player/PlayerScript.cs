@@ -73,7 +73,9 @@ public class PlayerScript : NetworkBehaviour
     {
         base.OnNetworkPostSpawn();
         skillHolder = GetComponent<PlayerSkillHolder>();
-        skillHolder.Stats.basicStats.Value = CharacterList.Instance.Characters[this.characterID.Value].characterModel.BaseStats;
+        
+        if(IsServer)
+            skillHolder.Stats.basicStats.Value = CharacterList.Instance.Characters[this.characterID.Value].characterModel.BaseStats;
     }
     void InitializeCharacter()
     {

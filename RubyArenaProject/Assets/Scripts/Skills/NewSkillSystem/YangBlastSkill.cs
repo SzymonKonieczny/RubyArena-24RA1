@@ -59,12 +59,12 @@ public class YangBlastSkill : SkillBase
 
     public override bool Use()
     {
-        animationScript = combatManagerRef.animationScript;
+        animationScript = combatManagerRef.AnimationScript;
         animationScript.Trigger("WindUp");
         combatManagerRef.SetStunTimer(windupTime);
 
         Vector3 lookDir = getLookDirection();
-        combatManagerRef.playerMove.AddNetworkRbVelocityClientRPC(-lookDir * 5);
+        combatManagerRef.PlayerMove.AddNetworkRbVelocityClientRPC(-lookDir * 5);
         ServerSideUseServerRPC(lookDir);
 
         return true;
@@ -82,16 +82,16 @@ public class YangBlastSkill : SkillBase
         ulong senderId = combatManagerRef.NetworkObjectId;
         Vector3 skillOrigin = combatManagerRef.SkillshotSpawnPoint.position;
 
-        foreach (PlayerCombatManager target in GetPlayersInCone(skillOrigin, lookDir))
+        foreach (CombatEntity target in GetEntitiesInCone(skillOrigin, lookDir))
         {
-            if (target.NetworkObject.NetworkObjectId == senderId) continue;
+            if (target.NetworkObjectId == senderId) continue;
 
             UnitResource resources = target.GetComponent<UnitResource>();
             if (resources == null) continue;
 
             // Knockback away from Yang
             Vector3 knockbackDir = (target.transform.position - skillOrigin).normalized;
-            target.playerMove?.AddNetworkRbVelocityClientRPC(knockbackDir * 10);
+            target.PlayerMove?.AddNetworkRbVelocityClientRPC(knockbackDir * 10);
 
             resources.damage(new SkillInstanceData
             {
@@ -150,7 +150,7 @@ public class YangBlastSkill : SkillBase
     /// <summary>
     /// Returns all players within a 5-unit 40° cone in front of the skill origin.
     /// </summary>
-    PlayerCombatManager[] GetPlayersInCone(Vector3 origin, Vector3 direction)
+    CombatEntity[] GetEntitiesInCone(Vector3 origin, Vector3 direction)
     {
         Collider[] overlaps = Physics.OverlapSphere(origin, 5);
         int coneCount = 0;
@@ -162,13 +162,13 @@ public class YangBlastSkill : SkillBase
                 coneCount++;
         }
 
-        PlayerCombatManager[] result = new PlayerCombatManager[coneCount];
+        CombatEntity[] result = new CombatEntity[coneCount];
         int index = 0;
 
         for (int i = 0; i < overlaps.Length; i++)
         {
             if (IsInCone(overlaps[i], origin, direction))
-                result[index++] = overlaps[i].GetComponent<PlayerCombatManager>();
+                result[index++] = overlaps[i].GetComponent<CombatEntity>();
         }
 
         return result;
@@ -179,11 +179,11 @@ public class YangBlastSkill : SkillBase
         if (!collider.CompareTag("Player"))
             return false;
 
-        PlayerCombatManager combatManager = collider.GetComponent<PlayerCombatManager>();
-        if (combatManager == null || combatManager == combatManagerRef)
+        CombatEntity combatEntity = collider.GetComponent<CombatEntity>();
+        if (combatEntity == null || combatEntity == combatManagerRef)
             return false;
 
-        Vector3 toTarget = (combatManager.transform.position - origin);
+        Vector3 toTarget = (combatEntity.transform.position - origin);
         float angle = Mathf.Acos(Vector3.Dot(direction.normalized, toTarget.normalized));
 
         return Mathf.Abs(angle) < Mathf.Deg2Rad * 40;

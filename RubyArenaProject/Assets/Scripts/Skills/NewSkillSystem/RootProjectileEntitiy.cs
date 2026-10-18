@@ -51,7 +51,7 @@ public class RootProjectileEntitiy : NetworkBehaviour
         {
             this.NetworkObject.Despawn();
         }
-        lifeTime-= Time.deltaTime;
+        lifeTime-= Time.fixedDeltaTime;
         if (!wasHit)
         {
             transform.position = transform.position + transform.forward.normalized * speed * Time.fixedDeltaTime;
@@ -79,11 +79,11 @@ public class RootProjectileEntitiy : NetworkBehaviour
         if(collision.gameObject.CompareTag("Player"))
         {
             var playerNO = collision.transform.GetComponent<NetworkObject>();
-            var playerCombatManager = collision.transform.GetComponent<PlayerCombatManager>();
+            var combatEntity = collision.transform.GetComponent<CombatEntity>();
             rb.velocity = Vector3.zero;
             collider.enabled = false;
             this.transform.rotation = Quaternion.Euler(180, 0, 0);
-            if (playerCombatManager == null || playerNO == null) 
+            if (combatEntity == null || playerNO == null)
             {   // JUST FOR TESTING WITHOUT 2 PLAERS, CONTENT OF THE IF REMOVABLE, JUST KEEP THE "RETURN"
                 lifeTime = stunTime;
                 wasHit = true;
@@ -92,9 +92,10 @@ public class RootProjectileEntitiy : NetworkBehaviour
                 this.transform.position = collision.transform.position + new Vector3(0, 1, 0);
                 return;
             }
-            playerCombatManager.SetStunTimerClientRPC(stunTime);
+            combatEntity.SetStunTimer(stunTime);
+
             SwapParticleSystemsClientRPC();
-            this.transform.position = playerCombatManager.transform.position + new Vector3(0,-1.0f , 0);
+            this.transform.position = combatEntity.transform.position + new Vector3(0,-1.0f , 0);
             lifeTime = stunTime;
             wasHit = true;
             StartCoroutine(DespawnAfterDelay());

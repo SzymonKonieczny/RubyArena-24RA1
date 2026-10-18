@@ -157,7 +157,7 @@ public class RiposteSkill : SkillBase
         if (!NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(e.damagerNetworkObjectId, out var attackerObj))
             return;
 
-        PlayerCombatManager attackerCombat = attackerObj.GetComponent<PlayerCombatManager>();
+        CombatEntity attackerCombat = attackerObj.GetComponent<CombatEntity>();
         if (attackerCombat == null) return;
 
         ExecuteRiposteClientRPC(e.damagerNetworkObjectId);
@@ -166,7 +166,7 @@ public class RiposteSkill : SkillBase
         StartCoroutine(ApplyRiposteEffects(attackerCombat));
     }
 
-    IEnumerator ApplyRiposteEffects(PlayerCombatManager attacker)
+    IEnumerator ApplyRiposteEffects(CombatEntity attacker)
     {
         yield return new WaitForSeconds(invisibilityDuration);
 

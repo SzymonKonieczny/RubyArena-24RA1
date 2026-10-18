@@ -90,9 +90,9 @@ public class DecoyEntity : NetworkBehaviour
         {
             if (!hit.CompareTag("Player")) continue;
 
-            PlayerCombatManager combatManager = hit.GetComponent<PlayerCombatManager>();
-            if (combatManager == null) continue;
-            if (combatManager.NetworkObject.NetworkObjectId == ownerNetworkObjectId) continue;
+            CombatEntity combatEntity = hit.GetComponent<CombatEntity>();
+            if (combatEntity == null) continue;
+            if (combatEntity.NetworkObjectId == ownerNetworkObjectId) continue;
 
             UnitResource resource = hit.GetComponent<UnitResource>();
             if (resource == null) continue;

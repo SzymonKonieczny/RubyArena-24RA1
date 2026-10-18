@@ -58,3 +58,5 @@ public class PlayerObjectSpawner : NetworkBehaviour
     }
 
 }
+//TODO:
+//We only end up resolving DI on the serverside. This will cause exceptions as on the client at least currently we also subscribe to the eventbus. This means, we will be causing NREs

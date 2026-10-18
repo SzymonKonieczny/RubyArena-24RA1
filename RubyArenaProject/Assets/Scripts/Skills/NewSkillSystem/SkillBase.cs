@@ -20,7 +20,7 @@ public abstract class SkillBase : NetworkBehaviour
     public PlayerSkillHolder skillHolderRef;
     
     //TODO: Remove those 3, replace all usages with skillHolderRef.X
-    public PlayerCombatManager combatManagerRef;
+    public CombatEntity combatManagerRef;
     public PlayerAnimationScript animationScript;
     public InputCollectorScript InputCollector;
     

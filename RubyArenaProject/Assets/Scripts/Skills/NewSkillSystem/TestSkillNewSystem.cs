@@ -13,7 +13,7 @@ public class TestSkillNewSystem : SkillBase
 
     public override bool Use()
     {
-        animationScript = combatManagerRef.animationScript;
+        animationScript = combatManagerRef.AnimationScript;
 
         animationScript.Trigger("WindUp");
         combatManagerRef.SetStunTimer(windupTime);

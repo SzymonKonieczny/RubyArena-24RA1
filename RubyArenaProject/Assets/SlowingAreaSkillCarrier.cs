@@ -35,13 +35,13 @@ public class SlowingAreaSkillCarrier : SkillBase
 
     public override bool Use()
     {
-        animationScript = combatManagerRef.animationScript;
+        animationScript = combatManagerRef.AnimationScript;
 
         animationScript.Trigger("WindUp");
         combatManagerRef.SetStunTimer(windupTime);
 
         Vector3 LookDir = getLookDirection();
-        combatManagerRef.playerMove.AddNetworkRbVelocityClientRPC(-LookDir * 5);
+        combatManagerRef.PlayerMove.AddNetworkRbVelocityClientRPC(-LookDir * 5);
         ServerSideUseServerRPC(LookDir);
 
         return true;

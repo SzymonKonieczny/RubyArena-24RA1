@@ -104,7 +104,7 @@ public class AutoAttackSkillCarrier : SkillBase
 
     public override bool Use()
     {
-        animationScript = combatManagerRef.animationScript;
+        animationScript = combatManagerRef.AnimationScript;
         animationScript.Trigger("WindUp");
         combatManagerRef.SetStunTimer(windupTime);
         Vector3 LookDir = getLookDirection();
@@ -129,23 +129,23 @@ public class AutoAttackSkillCarrier : SkillBase
             new Vector3(1, 1, autoAttackParams.Value.Range / 2), Quaternion.LookRotation(lookDir), Color.red); 
          //Gizmos.DrawWireCube(skillshotSpawnPos + (combatManagerRef.transform.forward * autoAttackParams.Value.Range / 2), new Vector3(2, 1, autoAttackParams.Value.Range / 2));
 
-        //check for which of them are players
-        List<PlayerCombatManager> playerCombatManagers = new();
+        //check for which of them are combat entities
+        List<CombatEntity> combatEntities = new();
         foreach (var o in ovelappingColliders)
         {
             if (o.CompareTag("Player"))
             {
-                var combatManager = o.transform.GetComponent<PlayerCombatManager>();
-                if (combatManager && combatManagerRef != combatManager) playerCombatManagers.Add(combatManager);
+                var combatEntity = o.transform.GetComponent<CombatEntity>();
+                if (combatEntity && combatManagerRef != combatEntity) combatEntities.Add(combatEntity);
             }
         }
 
 
-        //damage players with this dataSO;
-        foreach (var player in playerCombatManagers)
+        //damage entities with this dataSO;
+        foreach (var entity in combatEntities)
         {
-            var playerResources = player.GetComponent<UnitResource>();
-            if (!playerResources || player.NetworkObject.NetworkObjectId == combatManagerRef.NetworkObjectId) continue;
+            var playerResources = entity.GetComponent<UnitResource>();
+            if (!playerResources || entity.NetworkObjectId == combatManagerRef.NetworkObjectId) continue;
 
             var data = new SkillInstanceData
             {
@@ -165,9 +165,8 @@ public class AutoAttackSkillCarrier : SkillBase
         //animationScript.Trigger("SpellCastAccepted");
         if (IsOwner)
         {
-            //combatManagerRef.playerMove.AddNetworkRbForceClientRPC((combatManagerRef.playerMove.Orientation.forward * ForceAdded ) + new Vector3(0, 1f, 0));
             animationScript.Trigger("AutoAttackAcknowledge");
-            combatManagerRef.playerMove.SnapModelToCameraDir();
+            combatManagerRef.PlayerMove.SnapModelToCameraDir();
             //combatManagerRef.SetStunTimer(windupTime);
         }
         else
