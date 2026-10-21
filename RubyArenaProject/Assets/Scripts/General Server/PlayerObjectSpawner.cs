@@ -48,7 +48,8 @@ public class PlayerObjectSpawner : NetworkBehaviour
 
         var obj = Instantiate(playerPrefab);
 
-        container.InjectGameObject(obj);// resolve [inject] requests for DI
+        // Below has been moved to the PlayerScript internals. This had to be done so that the clientside can also get DI resolved.
+       // container.InjectGameObject(obj);// resolve [inject] requests for DI
 
         var objNO = obj.GetComponent<NetworkObject>();
         spawnedObjects.Add(objNO);

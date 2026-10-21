@@ -28,11 +28,15 @@ public class PlayerScript : NetworkBehaviour
 
     private void Start()
     {
+
     }
+
+
     public override void OnNetworkSpawn()
     {
         InitializePlayer();
     }
+
     void InitializePlayer()
     {
 
@@ -76,6 +80,12 @@ public class PlayerScript : NetworkBehaviour
         
         if(IsServer)
             skillHolder.Stats.basicStats.Value = CharacterList.Instance.Characters[this.characterID.Value].characterModel.BaseStats;
+
+
+        //TODO:
+        //Order of operations is fked. For some reason this executes before DefaultLifeTimeScope.OnAwake(). No idea how this is possible 
+        DefaultLifeTimeScope.Resolver.InjectGameObject(gameObject);
+
     }
     void InitializeCharacter()
     {
