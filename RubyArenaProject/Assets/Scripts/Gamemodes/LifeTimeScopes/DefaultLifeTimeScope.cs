@@ -14,6 +14,7 @@ public class DefaultLifeTimeScope : LifetimeScope
         base.Configure(builder);
         builder.Register(typeof(EventBus<>), Lifetime.Singleton);
         builder.RegisterComponentInHierarchy<PlayerObjectSpawner>();
+        builder.RegisterComponentInHierarchy<MobSpawner>();
         builder.RegisterComponentInHierarchy<TestGameModeManager>().As<IGameMode>();
 }    }
 

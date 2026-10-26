@@ -133,26 +133,24 @@ public class AutoAttackSkillCarrier : SkillBase
         List<CombatEntity> combatEntities = new();
         foreach (var o in ovelappingColliders)
         {
-            if (o.CompareTag("Player"))
-            {
-                var combatEntity = o.transform.GetComponent<CombatEntity>();
-                if (combatEntity && combatManagerRef != combatEntity) combatEntities.Add(combatEntity);
-            }
+            var combatEntity = o.transform.GetComponent<CombatEntity>();
+            if (combatEntity && combatEntity.GetComponent<UnitResource>() != null && combatManagerRef != combatEntity)
+                combatEntities.Add(combatEntity);
         }
 
 
         //damage entities with this dataSO;
         foreach (var entity in combatEntities)
         {
-            var playerResources = entity.GetComponent<UnitResource>();
-            if (!playerResources || entity.NetworkObjectId == combatManagerRef.NetworkObjectId) continue;
+            var unitResources = entity.GetComponent<UnitResource>();
+            if (!unitResources || entity.NetworkObjectId == combatManagerRef.NetworkObjectId) continue;
 
             var data = new SkillInstanceData
             {
                 damage = this.damage,
                 ownerNetworkObjectId = combatManagerRef.NetworkObjectId
             };
-            playerResources.damage(data);
+            unitResources.damage(data);
         }
 
         ServerAnnounceSpellCastClientRPC();

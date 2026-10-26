@@ -88,8 +88,6 @@ public class DecoyEntity : NetworkBehaviour
         Collider[] hits = Physics.OverlapSphere(transform.position, explosionRadius);
         foreach (Collider hit in hits)
         {
-            if (!hit.CompareTag("Player")) continue;
-
             CombatEntity combatEntity = hit.GetComponent<CombatEntity>();
             if (combatEntity == null) continue;
             if (combatEntity.NetworkObjectId == ownerNetworkObjectId) continue;

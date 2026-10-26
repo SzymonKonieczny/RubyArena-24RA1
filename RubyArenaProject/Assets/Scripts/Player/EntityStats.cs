@@ -13,6 +13,7 @@ public struct Stats : INetworkSerializable, System.IEquatable<Stats>
     public int AttackDamage;
     public float AttackSpeed;
     public float AttackRange;
+    public float MaxHP;
 
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {
@@ -21,6 +22,7 @@ public struct Stats : INetworkSerializable, System.IEquatable<Stats>
         serializer.SerializeValue(ref AttackDamage);
         serializer.SerializeValue(ref AttackSpeed);
         serializer.SerializeValue(ref AttackRange);
+        serializer.SerializeValue(ref MaxHP);
     }
 
     public bool Equals(Stats other)
@@ -29,7 +31,8 @@ public struct Stats : INetworkSerializable, System.IEquatable<Stats>
                canFly == other.canFly &&
                AttackDamage == other.AttackDamage &&
                AttackSpeed == other.AttackSpeed &&
-               AttackRange == other.AttackRange;
+               AttackRange == other.AttackRange &&
+               MaxHP == other.MaxHP;
     }
 }
 

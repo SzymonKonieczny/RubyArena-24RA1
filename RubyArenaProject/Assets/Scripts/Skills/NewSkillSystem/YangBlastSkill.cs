@@ -177,9 +177,6 @@ public class YangBlastSkill : SkillBase
 
     bool IsInCone(Collider collider, Vector3 origin, Vector3 direction)
     {
-        if (!collider.CompareTag("Player"))
-            return false;
-
         CombatEntity combatEntity = collider.GetComponent<CombatEntity>();
         if (combatEntity == null || combatEntity == combatManagerRef)
             return false;

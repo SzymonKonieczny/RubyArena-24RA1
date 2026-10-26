@@ -15,27 +15,44 @@ public class EntityStatisticsModifier //add more as needed
 }
 
 
-/*
-class GameplayEffectExample : IGameplayEffect <--------- Pipeline Takich!
+interface IGameplayEffect
+{
+    double serverTimeEffectEnd { get; set; }
+    public  void OnStart();
+    public void OnFinish();
+    public void OnFixedUpdate();
+}
+class GameplayEffectExample : IGameplayEffect// <--------- Pipeline Takich!
 {
     float speedBuff = 1.4;
-    public Apply(PlayerSkillHolder playerRef)
+
+    public double serverTimeEffectEnd { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+
+    public void Apply(PlayerSkillHolder playerRef)
     { 
         playerRef.StatsAfterEffects.Speed *= speedBuff; 
     }
     public void OnStart()
-    public void OnFinish()
-    public void OnFixedUpdate() //apply overtime dmg np
+    {
 
+    }
+    public void OnFinish()
+    {
+
+    }
+    public void OnFixedUpdate()
+    {
+        //apply overtime dmg np
+    }
 
 
 }
 public class EntityEffectHolder : MonoBehaviour
 {
-    public List<IEffect> modifiers = new();
+    public List<IGameplayEffect> modifiers = new();
     public EntityStatistics statsAfterModifiers = new();
 
-    List<IEffect> toRemove = new();
+    List<IGameplayEffect> toRemove = new();
     private void FixedUpdate()
     {
 
@@ -54,7 +71,7 @@ public class EntityEffectHolder : MonoBehaviour
     }
 }
  
- */
+
 public class StatModifierHolder : MonoBehaviour
 {
     public EntityStats entityStats;

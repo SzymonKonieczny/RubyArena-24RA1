@@ -76,10 +76,10 @@ public class RootProjectileEntitiy : NetworkBehaviour
     }
     private void OnCollisionEnter(Collision collision)
     {
-        if(collision.gameObject.CompareTag("Player"))
+        var combatEntity = collision.transform.GetComponent<CombatEntity>();
+        if (combatEntity != null)
         {
             var playerNO = collision.transform.GetComponent<NetworkObject>();
-            var combatEntity = collision.transform.GetComponent<CombatEntity>();
             rb.velocity = Vector3.zero;
             collider.enabled = false;
             this.transform.rotation = Quaternion.Euler(180, 0, 0);

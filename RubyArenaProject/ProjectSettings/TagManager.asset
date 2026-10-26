@@ -9,6 +9,7 @@ TagManager:
   - GameModeManager
   - GameModeRelatedObject
   - LobbyCanvas
+  - Mob
   layers:
   - Default
   - TransparentFX

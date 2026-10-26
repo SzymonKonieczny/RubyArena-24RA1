@@ -20,13 +20,13 @@ public class TestGameModeManager : NetworkBehaviour, IGameMode
     [SerializeField] GameModeCaptureOwnedObjective capturePoint;
 
     [Inject]
-    EventBus<PlayerDeathEvent> playerDeathEvent;
+    EventBus<EntityDeathEvent> entityDeathEvent;
 
     [Inject]
     EventBus<DamageTakenEvent> damageTakenEvent;
 
 
-    EventBinding<PlayerDeathEvent> deathEventBinding;
+    EventBinding<EntityDeathEvent> deathEventBinding;
     EventBinding<DamageTakenEvent> damageEventBinding;
 
     public void RegisterNetworkedObject(ulong networkId)
@@ -52,30 +52,29 @@ public class TestGameModeManager : NetworkBehaviour, IGameMode
     {
 
     }
-    void OnPlayerDeath(ulong killerNoId, ulong killedNoId)
+    void OnEntityDeath(ulong killerNoId, ulong killedNoId)
     {
-        NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(killerNoId, out NetworkObject killerPlayerNO);
-        NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(killedNoId, out NetworkObject killedPlayerNO);
-        if(killerPlayerNO== null )
+        NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(killerNoId, out NetworkObject killerNO);
+        NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(killedNoId, out NetworkObject killedNO);
+
+        // Handle player death (respawn, scoring)
+        if (killedNO != null)
         {
-            Debug.LogError($" Killed player unobtainable");
-            return;
+            PlayerScript killedPlayerScript = killedNO.GetComponent<PlayerScript>();
+            if (killedPlayerScript != null)
+            {
+                killedPlayerScript.playerMove.RequestTeleportClientRPC(playerRespawn.position);
+                killedPlayerScript.playerResources.Hp.Value = killedPlayerScript.playerResources.getMaxHP();
+            }
         }
 
-        PlayerScript killerPlayerScript = killerPlayerNO.GetComponent<PlayerScript>();
-        PlayerScript killedPlayerScript = killedPlayerNO.GetComponent<PlayerScript>();
-
-        killedPlayerScript.playerMove.RequestTeleportClientRPC(playerRespawn.position);
-        killedPlayerScript.playerResources.Hp.Value = killedPlayerScript.playerResources.getMaxHP();
-
-        if ( killerPlayerNO == null)
+        // Only proceed with capture-point scoring if killer is a player
+        if (killerNO != null && killerNO.GetComponent<PlayerScript>() != null)
         {
-            Debug.LogError($"Killer player unobtainable, probably skill doesnt set its data. Killer {killerPlayerNO}, Killed {killedPlayerNO}");
-            return;
+            capturePoint.playerAssignedToCapturePoint.Value = killerNoId;
+            capturePoint.active.Value = true;
+            MoveCapture();
         }
-        capturePoint.playerAssignedToCapturePoint.Value = killerNoId;
-        capturePoint.active.Value = true;
-        MoveCapture();
     }
 
     void Start()
@@ -96,12 +95,12 @@ public class TestGameModeManager : NetworkBehaviour, IGameMode
                 capturePoint.transform.position = capturePointSpawnPositions[randomIndex].position;
             }    
         }
-        deathEventBinding = new EventBinding<PlayerDeathEvent>((eventData) =>
-            OnPlayerDeath(eventData.playerKillingNetworkId, eventData.playerKilledNetworkId)
+        deathEventBinding = new EventBinding<EntityDeathEvent>((eventData) =>
+            OnEntityDeath(eventData.killerNetworkObjectId, eventData.killedNetworkObjectId)
         );
         damageEventBinding = new EventBinding<DamageTakenEvent>(OnPlayerDamaged);
 
-        playerDeathEvent.Register(deathEventBinding);
+        entityDeathEvent.Register(deathEventBinding);
         damageTakenEvent.Register(damageEventBinding);
 
     }
@@ -132,18 +131,42 @@ public class TestGameModeManager : NetworkBehaviour, IGameMode
     }
     int MoveCapture()
     {
-        int randomIndex = Random.Range(0, capturePointSpawnPositions.Count);
-        while (true)
+        if (capturePointSpawnPositions.Count == 0)
         {
-            if (Vector3.Distance(capturePoint.transform.position, capturePointSpawnPositions[randomIndex].position) < 1)
-            {
-                randomIndex = Random.Range(0, capturePointSpawnPositions.Count);
-                continue;
-            }
-            capturePoint.transform.position = capturePointSpawnPositions[randomIndex].position;
-            break;
+            Debug.LogError($"{name}: MoveCapture failed - no capture point spawn positions assigned on {nameof(TestGameModeManager)}.");
+            return -1;
         }
-        return randomIndex;
+
+        Vector3 currentPos = capturePoint.transform.position;
+        List<int> validIndices = new();
+        for (int i = 0; i < capturePointSpawnPositions.Count; i++)
+        {
+            Transform spawn = capturePointSpawnPositions[i];
+            if (spawn != null && Vector3.Distance(currentPos, spawn.position) >= 1)
+                validIndices.Add(i);
+        }
+
+        // Every configured position is too close to the current one; just move to a different one if possible.
+        if (validIndices.Count == 0)
+        {
+            Debug.LogWarning($"{name}: MoveCapture found no spawn position at least 1 unit away - falling back to any other position. Check capturePointSpawnPositions.");
+            for (int i = 0; i < capturePointSpawnPositions.Count; i++)
+            {
+                if (capturePointSpawnPositions[i] != null &&
+                    Vector3.Distance(currentPos, capturePointSpawnPositions[i].position) > 0)
+                    validIndices.Add(i);
+            }
+        }
+
+        if (validIndices.Count == 0)
+        {
+            Debug.LogError($"{name}: MoveCapture failed - no usable spawn position (only one position, or all are null). Capture point stays at {currentPos}.");
+            return -1;
+        }
+
+        int index = validIndices[Random.Range(0, validIndices.Count)];
+        capturePoint.transform.position = capturePointSpawnPositions[index].position;
+        return index;
     }
     void playerCapturedPoint(ulong playerObjectId, GameModeCaptureOwnedObjective capturedPoint)
     {

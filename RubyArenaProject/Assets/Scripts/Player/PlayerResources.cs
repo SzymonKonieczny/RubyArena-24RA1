@@ -28,7 +28,7 @@ public class PlayerResources : UnitResource
     EventBus<DamageTakenEvent> damageEventBus;
 
     [Inject]
-    EventBus<PlayerDeathEvent> playerDeathEvent;
+    EventBus<EntityDeathEvent> entityDeathEvent;
 
     public void SetMaxHP(float amount)
     {
@@ -67,9 +67,9 @@ public class PlayerResources : UnitResource
 
         if(Hp.Value <=0)
         {
-            playerDeathEvent.Raise(new PlayerDeathEvent { 
-                playerKillingNetworkId = skillData.ownerNetworkObjectId,
-                playerKilledNetworkId =  this.NetworkObject.NetworkObjectId });
+            entityDeathEvent.Raise(new EntityDeathEvent {
+                killerNetworkObjectId = skillData.ownerNetworkObjectId,
+                killedNetworkObjectId =  this.NetworkObject.NetworkObjectId });
         }
     }
 
