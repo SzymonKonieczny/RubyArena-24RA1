@@ -5,101 +5,80 @@ using Unity.Netcode;
 using Assets.Scripts.Events;
 using VContainer;
 
-[System.Serializable]
-public struct AutoAttackParams : INetworkSerializable, System.IEquatable<AutoAttackParams>
-{
-    public float AttackSpeed;
-    public float Range;
-    public int Damage;
-
-    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
-    {
-        if (serializer.IsReader)
-        {
-            var reader = serializer.GetFastBufferReader();
-            reader.ReadValueSafe(out AttackSpeed);
-            reader.ReadValueSafe(out Range);
-            reader.ReadValueSafe(out Damage);
-        }
-        else
-        {
-            var writer = serializer.GetFastBufferWriter();
-            writer.WriteValueSafe(AttackSpeed);
-            writer.WriteValueSafe(Range);
-            writer.WriteValueSafe(Damage);
-        }
-    }
-
-    public bool Equals(AutoAttackParams other)
-    {
-        return  AttackSpeed == other.AttackSpeed && Range == other.Range && Damage == other.Damage;
-    }
-}
+/// <summary>
+/// The auto attack is the one skill that is driven entirely by <see cref="EntityStats"/>:
+/// damage, cadence and reach all come from modifiedStats, not from serialized per-skill
+/// fields. Every other skill keeps its own authored values.
+///
+/// Reads happen at use time rather than being cached into fields, so a stat buff that
+/// lands mid-fight is picked up on the very next swing.
+/// </summary>
 public class AutoAttackSkillCarrier : SkillBase
 {
-    public NetworkVariable< AutoAttackParams> autoAttackParams = new();
-    float Range;
-    
     [Inject]
     EventBus<GlobalStatsChangeEvent> GlobalStatsChangeEvent;
 
-    EventBinding<GlobalStatsChangeEvent> GlobalStatsChangeEventBinding; //Someone changed stats, gotta check if it was us!
-
-    [ServerRpc]
-    private void ParamsSyncRequestServerRpc() //Could be set before networkSpawn, but that would cause dumb if-ology in the spawning logic
-    {
-        autoAttackParams.SetDirty(true);
-    }
+    EventBinding<GlobalStatsChangeEvent> GlobalStatsChangeEventBinding;
 
     private void Start()
     {
-        autoAttackParams.OnValueChanged += (_, _) =>autoAttackDataUpdate();
-        autoAttackDataUpdate();
-        if (IsOwner)
-        {
-          ParamsSyncRequestServerRpc();
-        }
+        // Injection order is not guaranteed relative to Start (see the note in
+        // PlayerScript.OnNetworkPostSpawn), so only bind if the bus actually arrived.
+        if (GlobalStatsChangeEvent == null) return;
+
         GlobalStatsChangeEventBinding = new(OnStatsChanged);
+        GlobalStatsChangeEvent.Register(GlobalStatsChangeEventBinding);
     }
 
+    /// <summary>
+    /// Fires whenever any entity's stats change. Ignores everyone except our own player.
+    /// </summary>
     void OnStatsChanged(GlobalStatsChangeEvent args)
     {
-        Debug.Log("GlobalStatsChangeEvent Recieved");
-
         if (args == null) return;
+        if (skillHolderRef == null || skillHolderRef.playerCombatManager == null) return;
         if (args.recieverNetworkObjectId != skillHolderRef.playerCombatManager.NetworkObjectId) return;
 
-        Debug.Log("GlobalStatsChangeEvent Was us!");
-        autoAttackDataUpdate();
-    }
-    private void autoAttackDataUpdate()
-    {
-        damage = skillHolderRef.Stats.modifiedStats.Value.AttackDamage;
-        cooldown = 1.0f / skillHolderRef.Stats.modifiedStats.Value.AttackSpeed;
-        Range = skillHolderRef.Stats.modifiedStats.Value.AttackRange;
+        // Nothing to refresh: stats are read live from modifiedStats at the point of use.
+        // The bind exists so buffs that change cadence are observable, and is kept minimal
+        // deliberately rather than caching values that could go stale.
     }
     private void OnTransformParentChanged()
     {
         Init();
     }
+    /// <summary>
+    /// Live stats for the owning player. Every auto-attack value comes from here, so a
+    /// buff applied by any effect is reflected without any local copy to keep in sync.
+    /// </summary>
+    Stats OwnerStats => skillHolderRef != null && skillHolderRef.Stats != null
+        ? skillHolderRef.Stats.modifiedStats.Value
+        : default;
+
+    /// <summary>
+    /// The owning player's character asset name, purely so misconfigured stats can be
+    /// traced back to the CharacterModelSO that needs fixing.
+    /// </summary>
+    string OwnerCharacterName
+    {
+        get
+        {
+            PlayerScript player = skillHolderRef != null ? skillHolderRef.GetComponent<PlayerScript>() : null;
+            if (player == null || CharacterList.Instance == null) return "unknown";
+
+            int id = player.characterID.Value;
+            if (id < 0 || id >= CharacterList.Instance.Characters.Count) return "unknown";
+
+            CharacterCardSO card = CharacterList.Instance.Characters[id];
+            if (card == null) return "unknown";
+            if (!string.IsNullOrEmpty(card.name)) return card.name;
+            return card.characterModel != null ? card.characterModel.name : "unknown";
+        }
+    }
+
     public override void Init()
     {
         base.Init();
-       /* if (IsServer)
-        {
-            autoAttackParams.Value = new AutoAttackParams
-            {
-                AttackSpeed = skillHolderRef.Stats.modifiedStats.AttackSpeed,
-                Damage = skillHolderRef.Stats.modifiedStats.AttackDamage,
-                Range = skillHolderRef.Stats.modifiedStats.AttackRange,
-            };
-        }*/
-
-        autoAttackDataUpdate();
-        if (IsOwner)
-        {
-            Debug.Log($"Logging : {damage} dmg {cooldown} as");
-        }
     }
 
     public override bool Use()
@@ -118,16 +97,37 @@ public class AutoAttackSkillCarrier : SkillBase
         if (!IsServer) return;
         if (isOnCooldown()) return;
 
-        setCooldown(cooldown);
+        // Read once per swing so the whole attack uses one consistent snapshot.
+        Stats stats = OwnerStats;
+
+        // AttackSpeed is a frequency (attacks per second); cooldown is its reciprocal.
+        // A zero/negative AttackSpeed would make the quotient infinite, so guard it.
+        if (stats.AttackSpeed <= 0f)
+        {
+            Debug.LogError($"AutoAttack on '{name}': AttackSpeed is {stats.AttackSpeed}, so the " +
+                           "attack cannot be paced. Check AttackSpeed in the character's " +
+                           "BaseStats on its CharacterModelSO.");
+            return;
+        }
+        setCooldown(1f / stats.AttackSpeed);
+
+        if (stats.AttackRange <= 0f)
+        {
+            Debug.LogError($"AutoAttack on '{name}': AttackRange is {stats.AttackRange} for " +
+                           $"character '{OwnerCharacterName}'. The hitbox will be zero-sized and " +
+                           "connect with nothing. Fill in AttackRange in BaseStats on the " +
+                           "character's CharacterModelSO.");
+        }
 
         Vector3 skillshotSpawnPos = skillHolderRef.playerCombatManager.SkillshotSpawnPoint.transform.position;
 
-        var ovelappingColliders = Physics.OverlapBox(skillshotSpawnPos + (lookDir * autoAttackParams.Value.Range / 2),
-            new Vector3(2, 1, autoAttackParams.Value.Range / 2), Quaternion.LookRotation(lookDir),rayCastMask);
+        // The OverlapBox is centred half a range in front of the player, and sized half a
+        // range deep, so it spans from the player out to AttackRange.
+        var ovelappingColliders = Physics.OverlapBox(skillshotSpawnPos + (lookDir * stats.AttackRange / 2),
+            new Vector3(2, 1, stats.AttackRange / 2), Quaternion.LookRotation(lookDir), rayCastMask);
 
-        Assets.Scripts.Utility.DebugUtils.DrawBox(skillshotSpawnPos + (lookDir* autoAttackParams.Value.Range / 2),
-            new Vector3(1, 1, autoAttackParams.Value.Range / 2), Quaternion.LookRotation(lookDir), Color.red); 
-         //Gizmos.DrawWireCube(skillshotSpawnPos + (combatManagerRef.transform.forward * autoAttackParams.Value.Range / 2), new Vector3(2, 1, autoAttackParams.Value.Range / 2));
+        Assets.Scripts.Utility.DebugUtils.DrawBox(skillshotSpawnPos + (lookDir * stats.AttackRange / 2),
+            new Vector3(1, 1, stats.AttackRange / 2), Quaternion.LookRotation(lookDir), Color.red);
 
         //check for which of them are combat entities
         List<CombatEntity> combatEntities = new();
@@ -139,7 +139,7 @@ public class AutoAttackSkillCarrier : SkillBase
         }
 
 
-        //damage entities with this dataSO;
+        //damage entities hit by the swing
         foreach (var entity in combatEntities)
         {
             var unitResources = entity.GetComponent<UnitResource>();
@@ -147,7 +147,7 @@ public class AutoAttackSkillCarrier : SkillBase
 
             var data = new SkillInstanceData
             {
-                damage = this.damage,
+                damage = stats.AttackDamage,
                 ownerNetworkObjectId = combatManagerRef.NetworkObjectId
             };
             unitResources.damage(data);
@@ -176,7 +176,8 @@ public class AutoAttackSkillCarrier : SkillBase
 
     private void OnDestroy()
     {
-        GlobalStatsChangeEvent.Unregister(GlobalStatsChangeEventBinding);
+        if (GlobalStatsChangeEventBinding == null) return;
+        GlobalStatsChangeEvent?.Unregister(GlobalStatsChangeEventBinding);
     }
 
     // Update is called once per frame

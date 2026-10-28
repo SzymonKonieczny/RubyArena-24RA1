@@ -8,7 +8,6 @@ public class RubyFormSkill : SkillBase
   //  [SerializeField] MeshRenderer characterModelMesh;
     [SerializeField] ParticleSystem roseParticles;
     [SerializeField] Renderer ballRenderer;
-    [SerializeField] float duration;
     [Tooltip("Speed buff granted while in Ruby form. Assign in the inspector.")]
     [SerializeField] StatBuffDefinitionSO rubyFormSpeedBuff;
     PropertyBlockMaterial propertyBlockMaterial;
@@ -37,7 +36,7 @@ public class RubyFormSkill : SkillBase
         skinnedRenderers = combatManagerRef.GetComponentsInChildren<SkinnedMeshRenderer>(true);
         propertyBlockMaterial = new PropertyBlockMaterial(skinnedRenderers);
         ParticleSystem.MainModule main = roseParticles.main;
-        main.duration = duration;
+        main.duration = rubyFormSpeedBuff.duration;
     }
 
  
@@ -73,7 +72,7 @@ public class RubyFormSkill : SkillBase
             skillHolderRef.statModifierHolder.Apply(buff);
         }
 
-        StartCoroutine(this.FormSwap(duration));
+        StartCoroutine(this.FormSwap(rubyFormSpeedBuff.duration));
     }
     IEnumerator UseWithCastTime()
     {

@@ -114,11 +114,13 @@ public class PlayerScript : NetworkBehaviour
             {
                 addSkillPrefab(CharacterList.Instance.Characters[CharacterID ].characterModel.SkillPrefab1, NetworkObject.OwnerClientId);
                 addSkillPrefab(CharacterList.Instance.Characters[CharacterID ].characterModel.SkillPrefab2, NetworkObject.OwnerClientId);
+                // The auto attack takes its damage, cadence and range from EntityStats, so
+                // there is nothing to seed here — the character's BaseStats, written in
+                // OnNetworkPostSpawn, is already the source of truth.
                 var autoAttackCarrierGO = addSkillPrefab(CharacterList.Instance.Characters[CharacterID ].characterModel.AutoAttack, NetworkObject.OwnerClientId);
                 if (autoAttackCarrierGO != null)
                 {
                     AutoAttackSkillCarrier autoAttackScript = autoAttackCarrierGO.GetComponent<AutoAttackSkillCarrier>();
-                    autoAttackScript.autoAttackParams.Value = CharacterList.Instance.Characters[CharacterID].characterModel.AutoAttackParams;
                     autoAttackScript.Init();
                 }
             }
