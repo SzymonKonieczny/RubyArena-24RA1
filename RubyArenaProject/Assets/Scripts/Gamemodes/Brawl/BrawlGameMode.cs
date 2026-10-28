@@ -144,6 +144,9 @@ public class BrawlGameMode : NetworkBehaviour, IGameMode
     {
         base.OnNetworkSpawn();
 
+        // So effects (DoTs on mobs/players) can run the gamemode's damage restriction.
+        GameModeProvider.Register(this);
+
        GameObject[] gamemodeRelatedGOs= GameObject.FindGameObjectsWithTag("GameModeRelatedObject");
         foreach(GameObject go in gamemodeRelatedGOs)
         {

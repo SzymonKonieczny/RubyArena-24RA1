@@ -84,7 +84,7 @@ public class PlayerScript : NetworkBehaviour
 
         //TODO:
         //Order of operations is fked. For some reason this executes before DefaultLifeTimeScope.OnAwake(). No idea how this is possible 
-        DefaultLifeTimeScope.Resolver.InjectGameObject(gameObject);
+        //DefaultLifeTimeScope.Resolver.InjectGameObject(gameObject);
 
     }
     void InitializeCharacter()

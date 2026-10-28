@@ -207,7 +207,7 @@ public class MobAI : NetworkBehaviour
             if (unitResource == null || combatEntity == null || combatEntity == mobCombatEntity) continue;
 
             int damage = config.attackDamage;
-            if (entityStats != null)
+            if (entityStats?.modifiedStats != null)
                 damage = entityStats.modifiedStats.Value.AttackDamage;
 
             unitResource.damage(new SkillInstanceData

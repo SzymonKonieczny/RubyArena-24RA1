@@ -79,6 +79,9 @@ public class TestGameModeManager : NetworkBehaviour, IGameMode
 
     void Start()
     {
+        // So effects (DoTs on mobs/players) can run the gamemode's damage restriction.
+        GameModeProvider.Register(this);
+
         winningPlayerNetworkObjectId.OnValueChanged += AnnounceWinner;
 
         if (!NetworkManager.Singleton.IsServer) return;

@@ -38,8 +38,11 @@ public struct Stats : INetworkSerializable, System.IEquatable<Stats>
 
 public class EntityStats : NetworkBehaviour
 {
-    [SerializeField] public NetworkVariable<Stats> basicStats;
-    [SerializeField] public NetworkVariable<Stats> modifiedStats { get; private set; } = new();
+    // Plain fields, not properties: NGO's inspector drawer only enumerates fields, so a
+    // property is invisible in the Editor no matter what. Writes to modifiedStats should
+    // still go through WriteModifiedStats so the GlobalStatsChangeEvent fires.
+    [SerializeField] public NetworkVariable<Stats> basicStats = new();
+    [SerializeField] public NetworkVariable<Stats> modifiedStats = new();
 
 
     [Inject]

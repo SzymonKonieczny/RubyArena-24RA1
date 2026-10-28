@@ -9,6 +9,8 @@ public class RubyFormSkill : SkillBase
     [SerializeField] ParticleSystem roseParticles;
     [SerializeField] Renderer ballRenderer;
     [SerializeField] float duration;
+    [Tooltip("Speed buff granted while in Ruby form. Assign in the inspector.")]
+    [SerializeField] StatBuffDefinitionSO rubyFormSpeedBuff;
     PropertyBlockMaterial propertyBlockMaterial;
     [SerializeField] SkinnedMeshRenderer[] skinnedRenderers;
     
@@ -59,11 +61,17 @@ public class RubyFormSkill : SkillBase
             Init();
         }
 
-        skillHolderRef.statModifierHolder.AddModifier(new EntityStatisticsModifier()
+        // Speed buff is now a gameplay effect (see GameplayEffectSystem.md). Applied on
+        // both peers: the server changes stats, the client shows the effect.
+        if (rubyFormSpeedBuff != null)
         {
-            speedMultiplier = 3,
-            serverTimeEffectEnd = NetworkManager.Singleton.ServerTime.Time + 3f
-        });
+            GameplayEffect buff = rubyFormSpeedBuff.CreateEffect();
+            buff.Definition = rubyFormSpeedBuff;
+            buff.SourceNetworkObjectId = combatManagerRef.NetworkObjectId;
+            buff.CarrierNetworkObjectId = NetworkObjectId;
+
+            skillHolderRef.statModifierHolder.Apply(buff);
+        }
 
         StartCoroutine(this.FormSwap(duration));
     }

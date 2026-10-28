@@ -83,6 +83,9 @@ public class WavesGameModeManager : NetworkBehaviour, IGameMode
 
     void Start()
     {
+        // So effects (DoTs on mobs/players) can run the gamemode's damage restriction.
+        GameModeProvider.Register(this);
+
         MobSpawner.FindSpawner((spawner) => mobSpawner = spawner);
         currentWave.OnValueChanged += (_, __) => RefreshScoreDisplay();
 
