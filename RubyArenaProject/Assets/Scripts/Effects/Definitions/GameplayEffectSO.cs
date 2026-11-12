@@ -35,6 +35,9 @@ public abstract class GameplayEffectSO : ScriptableObject
     [Tooltip("Where the cosmetic prefab is parented. Defaults to the target's transform.")]
     public string cosmeticBoneName = "";
 
+    [Tooltip("Sprite icon for the UI of the effect")]
+    public Sprite Icon;
+
     /// <summary>Build the runtime effect with this definition's config applied.
     /// Called on BOTH server (to apply) and client (to mirror a snapshot).</summary>
     public abstract GameplayEffect CreateEffect();

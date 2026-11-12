@@ -18,7 +18,7 @@ public class WavesGameModeManager : NetworkBehaviour, IGameMode
     [SerializeField] List<MobConfigSO> mobConfigs = new();
     [SerializeField] int baseMobsPerWave = 3;
     [SerializeField] int mobsAddedPerWave = 2;
-    [SerializeField] float timeBeforeFirstWave = 3f;
+    [SerializeField] float timeBeforeFirstWave = 10f;
     [SerializeField] float timeBetweenWaves = 5f;
     [SerializeField] List<Transform> mobSpawnPoints = new();
     [Tooltip("Radius used to spread mobs around a spawn point so they don't all stack on one spot.")]

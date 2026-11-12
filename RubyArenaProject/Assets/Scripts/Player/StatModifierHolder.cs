@@ -2,6 +2,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using Unity.Networking.Transport;
+using Assets.Scripts.Events;
+using VContainer;
+using UnityEngine.tvOS;
 
 /// <summary>
 /// Accumulator for stat contributions. Effects fold into this via
@@ -61,6 +64,9 @@ public class StatModifierHolder : NetworkBehaviour
     public double Now => NetworkManager.Singleton != null
         ? NetworkManager.Singleton.NetworkTimeSystem.ServerTime
         : 0;
+
+    [Inject]
+    EventBus<EntityGameplayEffectListChange> gameplayEffectListChangedEvent;   
 
     void Awake()
     {
@@ -127,6 +133,13 @@ public class StatModifierHolder : NetworkBehaviour
             if (IsServerSide)
                 PushSnapshot(existing);
             RecalculateStats();
+
+            gameplayEffectListChangedEvent?.Raise(new EntityGameplayEffectListChange
+            {
+                effectSO = effect.Definition,
+                recieverNetworkObjectId = ownerBehaviour.NetworkObjectId,
+                Type = EntityGamePlayEffectChangeType.Refreshed,
+            });
             return;
         }
 
@@ -139,6 +152,12 @@ public class StatModifierHolder : NetworkBehaviour
             SpawnCosmetic(effect);
 
         RecalculateStats();
+        gameplayEffectListChangedEvent?.Raise(new EntityGameplayEffectListChange
+        {
+            effectSO = effect.Definition,
+            recieverNetworkObjectId = ownerBehaviour.NetworkObjectId,
+            Type = EntityGamePlayEffectChangeType.Added,
+        });
     }
 
     /// <summary>Client-side only: parent the definition's cosmetic prefab to the target.
@@ -183,6 +202,8 @@ public class StatModifierHolder : NetworkBehaviour
 
         if (!toRemove.Contains(effect))
             toRemove.Add(effect);
+
+
     }
 
     /// <summary>True if an effect with this id is on the entity. The primitive marks are
@@ -220,6 +241,13 @@ public class StatModifierHolder : NetworkBehaviour
                 GameplayEffect removed = toRemove[i];
                 removed.OnFinish(ctx);
                 active.Remove(removed);
+
+                gameplayEffectListChangedEvent?.Raise(new EntityGameplayEffectListChange
+                {
+                    effectSO = removed.Definition,
+                    recieverNetworkObjectId = ownerBehaviour.NetworkObjectId,
+                    Type = EntityGamePlayEffectChangeType.Removed,
+                });
             }
             toRemove.Clear();
             listChanged = true;
@@ -236,6 +264,12 @@ public class StatModifierHolder : NetworkBehaviour
                 effect.OnFinish(ctx);
                 active.RemoveAt(i);
                 listChanged = true;
+                gameplayEffectListChangedEvent?.Raise(new EntityGameplayEffectListChange
+                {
+                    effectSO = effect.Definition,
+                    recieverNetworkObjectId = ownerBehaviour.NetworkObjectId,
+                    Type = EntityGamePlayEffectChangeType.Removed,
+                });
                 continue;
             }
 

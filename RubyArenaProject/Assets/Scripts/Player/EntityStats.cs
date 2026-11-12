@@ -68,8 +68,6 @@ public class EntityStats : NetworkBehaviour
         modifiedStats.Value = _modifiedStats;
         GlobalStatsChangeEvent.Raise(new GlobalStatsChangeEvent { recieverNetworkObjectId = NetworkObjectId });
 
-        //TODO:
-        // Sync after every write
     }
 
 }

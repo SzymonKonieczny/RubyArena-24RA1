@@ -1,3 +1,4 @@
+using Assets.Scripts.Utility;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -16,17 +17,9 @@ public class SkillsUIManager : MonoBehaviour
         Recalculate();
     }
 
-    [SerializeField]
     public void Recalculate()
     {
-        int cellSize = (int)(Screen.height * cellSizeScreenSizeRatio);
-        int padding = (int)(Screen.height * extraPadding);
-        layoutGroup.cellSize = new Vector2(cellSize, cellSize);
-        layoutGroup.padding.bottom = (padding / 2);
-        layoutGroup.padding.top = (padding / 2);
-        layoutGroup.padding.left = (padding / 2);
-        layoutGroup.padding.right = (padding / 2);
-        rectTransform.sizeDelta = new Vector2((cellSize) * 3 + padding, cellSize + padding);
+        UiUtils.ScaleGridLayout(extraPadding, cellSizeScreenSizeRatio, layoutGroup, rectTransform);
     }
 
     // Update is called once per frame

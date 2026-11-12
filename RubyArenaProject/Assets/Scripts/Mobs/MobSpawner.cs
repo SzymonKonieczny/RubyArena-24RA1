@@ -72,12 +72,17 @@ public class MobSpawner : NetworkBehaviour
 
         GameObject mobGO = Instantiate(mobCorePrefab, position, rotation ?? Quaternion.identity);
 
+        //Also same issue as below, this happens only serverside. It in general isnt very bad, clients dont have to listen to events as much, but still it stinks
         // Inject dependencies before spawn (so OnNetworkSpawn has access to EventBus etc.)
         container?.InjectGameObject(mobGO);
 
         MobCore mobCore = mobGO.GetComponent<MobCore>();
         if (mobCore != null)
         {
+            //TODO: BUG
+            //currently only doing this on the serverside, which is bad coz it means that on client it calls its Start and NetworkSpawn methods on a null config.
+            //This is not a super fast fix coz you would need to add a network wire to tell the client which config to spawn.
+            //Its not super urgent as the gamemode is supposed to initially only be singleplayer, but it is something worth investing some thought into later. (if "later" ever comes xdd)
             mobCore.InitializeMob(config);
         }
 
