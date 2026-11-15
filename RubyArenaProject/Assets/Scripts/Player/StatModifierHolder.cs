@@ -1,10 +1,10 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using Unity.Networking.Transport;
 using Assets.Scripts.Events;
 using VContainer;
-using UnityEngine.tvOS;
 
 /// <summary>
 /// Accumulator for stat contributions. Effects fold into this via
@@ -90,6 +90,22 @@ public class StatModifierHolder : NetworkBehaviour
     }
 
     void Start()
+    {
+        if (DIHelper.TryInject(this))
+            InitializeEffectSnapshots();
+        else
+            StartCoroutine(WaitForInjection());
+    }
+
+    IEnumerator WaitForInjection()
+    {
+        while (!DIHelper.TryInject(this))
+            yield return null;
+        Debug.LogWarning("[StatModifierHolder] Late injection succeeded");
+        InitializeEffectSnapshots();
+    }
+
+    void InitializeEffectSnapshots()
     {
         if (effectSnapshots == null)
             effectSnapshots = new NetworkList<EffectSnapshot>();

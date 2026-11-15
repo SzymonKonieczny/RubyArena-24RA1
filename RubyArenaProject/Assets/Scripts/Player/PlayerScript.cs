@@ -28,12 +28,26 @@ public class PlayerScript : NetworkBehaviour
 
     private void Start()
     {
+        if (DIHelper.TryInject(this))
+            return;
 
+        StartCoroutine(WaitForInjection());
     }
 
+    IEnumerator WaitForInjection()
+    {
+        while (!DIHelper.TryInject(this))
+            yield return null;
+        Debug.LogWarning("[PlayerScript] Late injection succeeded");
+    }
+
+    void Update()
+    {
+    }
 
     public override void OnNetworkSpawn()
     {
+        base.OnNetworkSpawn();
         InitializePlayer();
     }
 
@@ -163,8 +177,5 @@ public class PlayerScript : NetworkBehaviour
         }
     }
 
-    void Update()
-    {
-    }
-   
+
 }

@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
@@ -34,6 +35,21 @@ public class MobCore : NetworkBehaviour
     public void InitializeMob(MobConfigSO cfg)
     {
         config = cfg;
+    }
+
+    void Start()
+    {
+        if (DIHelper.TryInject(this))
+            return;
+
+        StartCoroutine(WaitForInjection());
+    }
+
+    IEnumerator WaitForInjection()
+    {
+        while (!DIHelper.TryInject(this))
+            yield return null;
+        Debug.LogWarning("[MobCore] Late injection succeeded");
     }
 
     public override void OnNetworkSpawn()

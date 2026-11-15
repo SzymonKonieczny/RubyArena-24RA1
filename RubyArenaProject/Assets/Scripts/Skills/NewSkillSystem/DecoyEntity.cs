@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using Unity.Netcode;
 using Assets.Scripts.Events;
@@ -29,6 +30,25 @@ public class DecoyEntity : NetworkBehaviour
     bool exploded = false;
 
     // --- Lifetime ---
+
+    void Start()
+    {
+        if (DIHelper.TryInject(this))
+            return;
+
+        StartCoroutine(WaitForInjection());
+    }
+
+    System.Collections.IEnumerator WaitForInjection()
+    {
+        while (!DIHelper.TryInject(this))
+            yield return null;
+        Debug.LogWarning("[DecoyEntity] Late injection succeeded");
+    }
+
+    void Update()
+    {
+    }
 
     public override void OnNetworkSpawn()
     {

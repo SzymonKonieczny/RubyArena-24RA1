@@ -13,6 +13,20 @@ public class DecoyUnitResource : UnitResource
     [Inject]
     EventBus<DamageTakenEvent> damageEventBus;
 
+    void Start()
+    {
+        if (DIHelper.TryInject(this))
+            return;
+
+        StartCoroutine(WaitForInjection());
+    }
+
+    System.Collections.IEnumerator WaitForInjection()
+    {
+        while (!DIHelper.TryInject(this))
+            yield return null;
+        Debug.LogWarning("[DecoyUnitResource] Late injection succeeded");
+    }
     public override void damage(SkillInstanceData skillData)
     {
         if (!IsServer) return;

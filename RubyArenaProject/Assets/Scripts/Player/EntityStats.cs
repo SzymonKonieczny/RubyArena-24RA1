@@ -53,6 +53,8 @@ public class EntityStats : NetworkBehaviour
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
+        Debug.LogWarning("OnNetworkSpawnCalled");
+
         basicStats.OnValueChanged += (Stats old, Stats newStats) =>
         {
             if(IsServer)
@@ -60,6 +62,21 @@ public class EntityStats : NetworkBehaviour
         };
         GlobalStatsChangeEvent.Raise(new GlobalStatsChangeEvent { recieverNetworkObjectId = NetworkObjectId });
 
+    }
+    private void Start()
+    {
+        Debug.LogWarning("StartCalled");
+        if (DIHelper.TryInject(this))
+            return;
+
+        StartCoroutine(WaitForInjection());
+    }
+
+    System.Collections.IEnumerator WaitForInjection()
+    {
+        while (!DIHelper.TryInject(this))
+            yield return null;
+        Debug.LogWarning("[EntityStats] Late injection succeeded");
     }
 
     public void WriteModifiedStats(Stats _modifiedStats) 

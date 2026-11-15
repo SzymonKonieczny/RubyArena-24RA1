@@ -48,9 +48,8 @@ public class PlayerObjectSpawner : NetworkBehaviour
 
         var obj = Instantiate(playerPrefab);
 
-        //TODO:
-        // Below has been moved to the PlayerScript internals. This had to be done so that the clientside can also get DI resolved.
-        container.InjectGameObject(obj);// resolve [inject] requests for DI
+        // Pre-spawn DI on server. Client-side peers self-inject in OnNetworkSpawn.
+        container.InjectGameObject(obj);
 
         var objNO = obj.GetComponent<NetworkObject>();
         spawnedObjects.Add(objNO);
@@ -60,5 +59,3 @@ public class PlayerObjectSpawner : NetworkBehaviour
     }
 
 }
-//TODO:
-//We only end up resolving DI on the serverside. This will cause exceptions as on the client at least currently we also subscribe to the eventbus. This means, we will be causing NREs

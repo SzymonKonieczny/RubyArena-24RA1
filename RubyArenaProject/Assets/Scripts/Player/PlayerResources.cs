@@ -90,6 +90,20 @@ public class PlayerResources : UnitResource
         Mana.Value -= amount;
 
     }
+    void Start()
+    {
+        if (DIHelper.TryInject(this))
+            return;
+
+        StartCoroutine(WaitForInjection());
+    }
+
+    IEnumerator WaitForInjection()
+    {
+        while (!DIHelper.TryInject(this))
+            yield return null;
+        Debug.LogWarning("[PlayerResources] Late injection succeeded");
+    }
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();

@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using Unity.Netcode;
 using Assets.Scripts.Events;
@@ -51,6 +52,21 @@ public class MobUnitResource : UnitResource
     public override float getHP() => Hp.Value;
     public override float getMana() => 0f;
     public override void takeMana(float amount) { /* mobs have no mana */ }
+
+    void Start()
+    {
+        if (DIHelper.TryInject(this))
+            return;
+
+        StartCoroutine(WaitForInjection());
+    }
+
+    IEnumerator WaitForInjection()
+    {
+        while (!DIHelper.TryInject(this))
+            yield return null;
+        Debug.LogWarning("[MobUnitResource] Late injection succeeded");
+    }
 
     public override void OnNetworkSpawn()
     {
