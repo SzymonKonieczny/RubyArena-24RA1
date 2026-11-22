@@ -27,6 +27,10 @@ public class WavesGameModeManager : NetworkBehaviour, IGameMode
     [Header("Players")]
     [SerializeField] Transform playerSpawn;
 
+    [Header("Rewards")]
+    [Tooltip("Handles effect rewards offered every N waves. Optional — if left empty, no rewards are offered.")]
+    [SerializeField] WaveRewardApplier rewardApplier;
+
     [Header("UI")]
     [Tooltip("Shows the wave number. Falls back to scoreDisplay if left empty.")]
     [SerializeField] TMP_Text waveDisplay;
@@ -53,6 +57,9 @@ public class WavesGameModeManager : NetworkBehaviour, IGameMode
 
     [Inject]
     EventBus<EntityDeathEvent> entityDeathEvent;
+
+    [Inject]
+    EventBus<WaveRewardOfferedEvent> rewardOfferedEvent;
 
     EventBinding<EntityDeathEvent> deathEventBinding;
 
@@ -109,6 +116,11 @@ public class WavesGameModeManager : NetworkBehaviour, IGameMode
         {
             Debug.LogError($"{name}: no {nameof(mobSpawnPoints)} assigned - mobs have nowhere to spawn.");
             return;
+        }
+
+        if (rewardApplier != null)
+        {
+            rewardApplier.Initialize(rewardOfferedEvent);
         }
 
         waveRoutine = StartCoroutine(WaveLoop());
@@ -199,6 +211,7 @@ public class WavesGameModeManager : NetworkBehaviour, IGameMode
         {
             Debug.Log($"{name}: wave {currentWave.Value} cleared.");
             RefreshScoreDisplay();
+            rewardApplier?.OnWaveCleared(currentWave.Value);
         }
     }
 
@@ -292,4 +305,5 @@ public class WavesGameModeManager : NetworkBehaviour, IGameMode
 
         target.text = text;
     }
+
 }
