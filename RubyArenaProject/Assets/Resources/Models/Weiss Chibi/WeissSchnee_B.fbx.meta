@@ -3,7 +3,12 @@ guid: 3f7a6a11f5f0f9e4bb256ec7af84e69e
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Weiss_B_SD
+    second: {fileID: 2100000, guid: de67d212672be534da6d56e24bcb46ce, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

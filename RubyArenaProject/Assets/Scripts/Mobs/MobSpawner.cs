@@ -3,6 +3,7 @@ using UnityEngine;
 using Unity.Netcode;
 using VContainer;
 using VContainer.Unity;
+using System.Collections;
 
 /// <summary>
 /// Server-authoritative mob spawner. Creates mobs with DI injection and tracks them for cleanup.
@@ -99,7 +100,7 @@ public class MobSpawner : NetworkBehaviour
     /// <summary>
     /// Despawns a specific mob.
     /// </summary>
-    public void DespawnMob(MobCore mob)
+    public void DespawnMob(MobCore mob, float delay = 0)
     {
         if (!IsServer || mob == null) return;
 
@@ -107,10 +108,19 @@ public class MobSpawner : NetworkBehaviour
         if (mobNO != null && mobNO.IsSpawned)
         {
             spawnedMobs.Remove(mobNO.NetworkObjectId);
-            mobNO.Despawn();
+            if (delay > 0)
+            {
+                StartCoroutine(DespawnWithDelay(mobNO, delay));
+            }
+            else mobNO.Despawn();
         }
     }
 
+    IEnumerator DespawnWithDelay(NetworkObject mobNO, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        mobNO.Despawn();
+    }
     /// <summary>
     /// Despawns all tracked mobs.
     /// </summary>

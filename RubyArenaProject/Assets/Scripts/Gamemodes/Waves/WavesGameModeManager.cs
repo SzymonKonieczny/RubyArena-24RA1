@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using Unity.Netcode;
 using VContainer;
+using System.Globalization;
 
 /// <summary>
 /// Vampire-Survivors style wave survival game mode.
@@ -205,6 +206,11 @@ public class WavesGameModeManager : NetworkBehaviour, IGameMode
                 OnPlayerDied(killedId, killedNO);
                 return;
             }
+            if(killedNO.GetComponent<MobCore>() != null)
+            {
+                mobSpawner.DespawnMob(killedNO.GetComponent<MobCore>(),3);
+            }
+
         }
 
         if (aliveMobIds.Remove(killedId) && aliveMobIds.Count == 0)

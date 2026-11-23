@@ -161,6 +161,9 @@ public class StatModifierHolder : NetworkBehaviour
 
         effect.OnStart(ctx);
         active.Add(effect);
+        Debug.Log($"Adding Mirror Active Effect from Apply() | Registry ID :{effect.RegistryId}");
+
+
 
         if (IsServerSide)
             PushSnapshot(effect);
@@ -279,6 +282,8 @@ public class StatModifierHolder : NetworkBehaviour
             {
                 effect.OnFinish(ctx);
                 active.RemoveAt(i);
+                Debug.Log($"Removing Active Effect (expired) | Registry ID :{effect.RegistryId}");
+
                 listChanged = true;
                 gameplayEffectListChangedEvent?.Raise(new EntityGameplayEffectListChange
                 {
@@ -391,6 +396,8 @@ public class StatModifierHolder : NetworkBehaviour
 
             pair.Value.OnFinish(ctx);
             active.Remove(pair.Value);
+            Debug.Log($"Removing Mirror Active Effect from snapshot | Registry ID :{pair.Value.RegistryId}");
+
             (stale ??= new List<(ushort, ulong)>()).Add(pair.Key);
         }
         if (stale != null)
@@ -423,6 +430,7 @@ public class StatModifierHolder : NetworkBehaviour
             mirror.OnStart(ctx);
             clientMirrors[key] = mirror;
             active.Add(mirror);
+            Debug.Log($"Adding Mirror Active Effect from snapshot | Registry ID :{snapshot.registryId}");
             SpawnCosmetic(mirror);   // client-only VFX for this effect
         }
     }

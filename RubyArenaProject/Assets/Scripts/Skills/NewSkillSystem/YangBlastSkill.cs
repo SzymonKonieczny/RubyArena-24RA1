@@ -63,7 +63,7 @@ public class YangBlastSkill : SkillBase
         animationScript.Trigger("WindUp");
         combatManagerRef.SetStunTimer(windupTime);
 
-        Vector3 lookDir = getLookDirection();
+        Vector3 lookDir = getLookDirectionPerpendicularToCharacter();
         combatManagerRef.PlayerMove.AddNetworkRbVelocityClientRPC(-lookDir * 5);
         ServerSideUseServerRPC(lookDir);
 

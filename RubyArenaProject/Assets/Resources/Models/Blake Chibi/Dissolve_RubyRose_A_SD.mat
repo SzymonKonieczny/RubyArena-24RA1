@@ -124,7 +124,7 @@ Material:
     - _NoiseScale: 60
     - _OcclusionStrength: 1
     - _Parallax: 0.02
-    - _Progress: 0
+    - _Progress: -0.05
     - _QueueControl: 0
     - _QueueOffset: 0
     - _ReceiveShadows: 1

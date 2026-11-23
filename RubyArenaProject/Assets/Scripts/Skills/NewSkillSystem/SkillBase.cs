@@ -87,6 +87,12 @@ public abstract class SkillBase : NetworkBehaviour
     {
         nextAvaliable.Value = NetworkManager.NetworkTimeSystem.ServerTime + cooldown;
     }
+
+    /// <summary>
+    /// Gets the direction in the following order: ray shot from the camera until it hits something. Then the direction from the character to that point.
+    /// If it doesnt hit anything returns just the camera direction
+    /// </summary>
+    /// <returns></returns>
     protected Vector3 getLookDirection()
     {
         var ray = Camera.main.ScreenPointToRay(new Vector3((float)Screen.width / 2f, (float)Screen.height / 2f));
@@ -94,6 +100,30 @@ public abstract class SkillBase : NetworkBehaviour
         if (Physics.Raycast(ray, out RaycastHit raycastHit, rayCastMask))
         {
             SkillDir = (raycastHit.point - this.combatManagerRef.SkillshotSpawnPoint.position).normalized;
+            Debug.DrawLine(ray.origin,
+            raycastHit.point, Color.red, 3f);
+        }
+        else
+        {
+            SkillDir = ray.direction;
+        }
+
+        return SkillDir;
+    }
+
+    /// <summary>
+    /// Gets the direction in the following order: ray shot from the camera until it hits something. 
+    /// Then the direction from the character to that point, but with 0 on the Y axis.
+    /// If it doesnt hit anything returns just the camera direction
+    /// </summary>
+    /// <returns></returns>
+    protected Vector3 getLookDirectionPerpendicularToCharacter()
+    {
+        var ray = Camera.main.ScreenPointToRay(new Vector3((float)Screen.width / 2f, (float)Screen.height / 2f));
+        Vector3 SkillDir = new();
+        if (Physics.Raycast(ray, out RaycastHit raycastHit, rayCastMask))
+        {
+            SkillDir = (raycastHit.point - this.combatManagerRef.SkillshotSpawnPoint.position).ScaleVec( new Vector3(1,0,1)).normalized;
             Debug.DrawLine(ray.origin,
             raycastHit.point, Color.red, 3f);
         }
