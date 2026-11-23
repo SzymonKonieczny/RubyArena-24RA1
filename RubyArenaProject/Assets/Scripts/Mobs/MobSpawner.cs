@@ -119,7 +119,8 @@ public class MobSpawner : NetworkBehaviour
     IEnumerator DespawnWithDelay(NetworkObject mobNO, float delay)
     {
         yield return new WaitForSeconds(delay);
-        mobNO.Despawn();
+        if (NetworkObject != null && NetworkObject.IsSpawned)
+            mobNO.Despawn();
     }
     /// <summary>
     /// Despawns all tracked mobs.
